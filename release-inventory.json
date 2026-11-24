@@ -51,8 +51,8 @@
       "sha256": "a99c4c5e7bf0d3307362a8c7d83d733d1af54cf5177347d33b41be84d9832576"
     },
     "README.md": {
-      "bytes": 6182,
-      "sha256": "4e38b0da87809d75605fa81a9cfe307d605dc2d8af96fb1c703538e8e9b7c345"
+      "bytes": 15212,
+      "sha256": "b9bc93eef1cddeb9ce7d6e9ecbd1f27716d601b7378fa70b370852c7793cb8bf"
     },
     "SECURITY.md": {
       "bytes": 1199,
@@ -2473,6 +2473,10 @@
     "pyproject.toml": {
       "bytes": 528,
       "sha256": "b27ea14fdd6ba54e144a9d7054b74d70a50ad475dd33ea9342935c3fdf0a95f3"
+    },
+    "readme.pt-br.md": {
+      "bytes": 17060,
+      "sha256": "31ac2afc068dee80e6760a3c3948246c373bde50bc3a19731778b3df3473ed74"
     },
     "scripts/adversarial_benchmark.py": {
       "bytes": 634,

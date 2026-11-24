@@ -2,80 +2,204 @@
 
 **Evidence-bound, policy-governed and revocable agentic software delivery.**
 
-Agents generate code. Evidence earns trust. Policy grants authority. Autonomy must remain revocable.
+[![Release v1.0.0](https://img.shields.io/badge/release-v1.0.0-2563EB?style=flat-square&logo=github)](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0)
+[![CI](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml)
+[![Security](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/security.yml)
+[![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-64748B?style=flat-square)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Research / experimental](https://img.shields.io/badge/status-experimental-D97706?style=flat-square)](#trust-boundaries-and-limitations)
+[![No merge authority](https://img.shields.io/badge/merge__authority-false-64748B?style=flat-square)](#trust-boundaries-and-limitations)
 
-ITM is a vendor-neutral **research and reference implementation**, not a production merge service. Version 1.0.0 is a source release candidate for public qualification. The RC.6 experimental baseline passed on the maintainer's Mac; final packaging, dependency qualification, license confirmation and release signing are separate gates. `production_ready: false` and `merge_authority: false` remain unchanged in the new lab profile. The older GitHub integration is opt-in and must not be used to manufacture approvals.
+**English** · [Português (Brasil)](readme.pt-br.md) · [Release v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) · [Security](SECURITY.md)
 
-## Why ITM?
+An AI coding agent can deliver a change that passes CI while violating a business invariant, exceeding its authorized scope or lacking an independent approval. A passing build is evidence of a test result, not a grant of merge authority.
 
-A successful build is not an authorization decision. An agent can produce a candidate that passes CI while violating an intent boundary, a business invariant, or an approval policy. ITM demonstrates separate controls for specification, provenance, behavioral verification, convergence, authorization and operational autonomy, with digest-bound evidence, fail-closed policy evaluation and revocation.
+ITM is a vendor-neutral **research and reference implementation** that explores how to govern the path from an explicit intent to a candidate merge decision. It separates generation, verification, policy and lifecycle state, so that a candidate can be technically correct and still be blocked.
+
+> Agents generate code. Evidence supports trust. Policy grants authority. Autonomy must remain revocable.
+
+**Status:** v1.0.0 was published on November 24, 2026. The project is experimental, not a production merge authorization service. `production_ready: false`; `merge_authority: false`.
+
+**On this page**
+
+[What ITM explores](#what-itm-explores) · [Who should read this?](#who-should-read-this) · [How ITM relates to existing tools](#how-itm-relates-to-existing-tools) · [Architecture](#architecture) · [Experimental results](#experimental-results) · [Quickstart — no agent credentials or paid calls](#quickstart--no-agent-credentials-or-paid-calls) · [Reproduce the studies](#reproduce-the-studies) · [Trust boundaries and limitations](#trust-boundaries-and-limitations) · [Documentation](#documentation) · [License and citation](#license-and-citation)
+
+## What ITM explores
+
+| Control | Question it addresses |
+| --- | --- |
+| Intent and scope | Does the change implement the requested behavior within authorized boundaries? |
+| Provenance | Is the evidence bound to the exact Git base, head and tree? |
+| Behavioral verification | Does the candidate satisfy acceptance criteria, generated properties and differential checks? |
+| Convergence | Should the agent retry, stop on repeated failures or stop when its observed budget is exhausted? |
+| Authorization | Are the required policy and approval conditions satisfied independently of code generation? |
+| Operational autonomy | Is a decision still current, or has a lifecycle event revoked it? |
+
+## Who should read this?
+
+- **AI engineers and architects:** explore separation of generation, deterministic verification, and authority in coding-agent workflows.
+- **Platform engineering, DevSecOps, and security teams:** experiment with candidate-bound evidence, fail-closed policy, and revocable decisions.
+- **Researchers and quality engineers:** reproduce ablations, verify signed receipts, and examine control limitations.
+
+## How ITM relates to existing tools
+
+| Layer | Primary question |
+| --- | --- |
+| CI / tests | Did the change pass its configured checks? |
+| Human or AI-assisted code review | Is the change understandable, appropriate, and free of issues that need review? |
+| [Entire CLI](https://entire.io/about/cli) | What agent-session context is associated with the change in Git? |
+| **ITM (experimental)** | Does candidate-bound evidence satisfy the declared policy, and is the decision still current? |
+
+These layers are complementary. The comparison describes their focus, not an exhaustive feature matrix. ITM does not replace CI, human review, or native branch protections. No integration with Entire or comparative tool benchmark has been qualified.
+
+## Architecture
+
+```mermaid
+flowchart TB
+    classDef intent fill:#E0F2FE,stroke:#0284C7,color:#0C4A6E,stroke-width:1.5px;
+    classDef agent fill:#F1F5F9,stroke:#64748B,color:#0F172A,stroke-width:1.5px;
+    classDef verify fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:1.5px;
+    classDef evidence fill:#EDE9FE,stroke:#7C3AED,color:#3B0764,stroke-width:1.5px;
+    classDef ok fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.5px;
+    classDef block fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.5px;
+    subgraph L["01 · Integrated candidate lab — AUTH-201"]
+        direction TB
+        A(["Intent + policy"]):::intent --> B["Agent / fixture"]:::agent
+        B --> C["Exact Git candidate<br/>+ behavioral verification"]:::verify
+        C --> D{"Bounded convergence"}:::verify
+        D -->|Retry within budget| B
+        D -->|Record outcome| E["Signed lab receipt"]:::evidence
+        E --> F["Local lifecycle journal"]:::evidence
+        G["Authenticated synthetic events"]:::agent --> F
+        F --> H["Checkpoint comparison"]:::verify
+    end
+    subgraph S["02 · Separate distributed simulation"]
+        direction TB
+        J["6 synthetic HTTP controls"]:::agent --> K["Signed decisions + aggregator"]:::evidence
+    end
+    subgraph R["03 · GitHub trust domain"]
+        I["External evidence gate"]:::agent
+        X(["Lab profile rejected"]):::block
+        I --> X
+    end
+    E -.->|Does not grant authority| I
+```
+
+The integrated runtime, distributed simulation and GitHub evidence gate are separate experimental profiles, **not a qualified end-to-end production control plane**. A lab receipt cannot authorize the external gate. See [architecture and trust boundaries](docs/architecture.md).
+
+The repository also includes Claude Code and Codex adapters, historical signed evidence replay, multi-repository compatibility and compensation fixtures, and operational GitHub experiments.
+
+### Decision path — AUTH-201 fixture
 
 ```mermaid
 flowchart TD
-    A[Intent and policy] --> B[Agent / candidate]
-    B --> C[Exact Git candidate verification]
-    C --> D[Bounded convergence]
-    D -->|retry within budget| B
-    D --> E[Signed lab receipt]
-    E --> F[Local lifecycle journal]
-    G[Authenticated local events] --> F
-    F --> H[Checkpoint comparison]
-    E -. rejected lab profile .-> I[External GitHub evidence gate]
-    J[Six synthetic HTTP controls] --> K[Separate synthetic aggregator]
+    classDef intent fill:#E0F2FE,stroke:#0284C7,color:#0C4A6E,stroke-width:1.5px;
+    classDef agent fill:#F1F5F9,stroke:#64748B,color:#0F172A,stroke-width:1.5px;
+    classDef verify fill:#FEF3C7,stroke:#D97706,color:#78350F,stroke-width:1.5px;
+    classDef evidence fill:#EDE9FE,stroke:#7C3AED,color:#3B0764,stroke-width:1.5px;
+    classDef ok fill:#DCFCE7,stroke:#16A34A,color:#14532D,stroke-width:1.5px;
+    classDef block fill:#FEE2E2,stroke:#DC2626,color:#7F1D1D,stroke-width:1.5px;
+    A(["Explicit intent"]):::intent --> B["Fixture candidate"]:::agent
+    B --> C{"Behavioral verification"}:::verify
+    C -->|Recoverable failure within budget| B
+    C -->|Terminal failure| X(["BLOCK / no authorization"]):::block
+    C -->|Repair passes| D["Convergence PASSED"]:::ok
+    D --> E{"Independent approval and external evidence?"}:::verify
+    E -->|Missing in the lab| X
+    E -.->|Outside qualified scope| Y["Separate external evaluation"]:::agent
 ```
 
-The diagram depicts the integrated AUTH-201 runtime, the separate synthetic distributed plane and the separate GitHub trust domain. The three have not been qualified as a single production control plane.
+The second diagram depicts the fixture repair path: verification success does not authorize a merge. External evaluation is a conceptual boundary, not a positive path validated by the lab.
 
-## Start here — no agent credentials or paid calls
+## Experimental results
 
-This final source candidate includes the maintainer-audited `uv.lock`. First verify the source inventory and follow [release qualification](docs/public-release.md); do not resolve a new lock implicitly. Python 3.11+ and Git are required; Docker is required for opt-in live agents.
+The published [v1.0.0 release notes](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) record the final local qualification and subsequent successful GitHub Actions runs on the signed release commit.
+
+| Qualification | Observed result | Scope |
+| --- | --- | --- |
+| Regression suite | **224/224 passed** | Maintainer's Mac, final local candidate |
+| GitHub Actions | **2/2 workflows passed** | Signed v1.0.0 commit, tests and security checks |
+| Distributed control plane | **15/15 expected outcomes** | Six synthetic Compose services; 14 negative cases blocked |
+| Offline decision receipt replay | **15/15 verified** | Wrong trust pin rejected; no current ALLOW at replay |
+| Python dependency audit | **0 known vulnerabilities reported** | Seven audited runtime dependencies, point-in-time snapshot |
+| Static analysis | 57 findings reviewed; 0 HIGH; 39 lab residuals remain | Scoped Bandit review, not absence of risk |
+| Secret scan | Four public-key fixture findings reviewed; none unresolved | Gitleaks qualification, not an empty raw scan |
+
+### Why passing CI is not enough
+
+In the RC.3 adversarial ablation, 25 curated candidates (20 unsafe and five safe) were evaluated against progressively stronger controls:
+
+| Cumulative strategy | Unsafe candidates accepted | Safe candidates accepted |
+| --- | ---: | ---: |
+| S0 — Deliberately weak CI | 20/20 | 5/5 |
+| S1 — Scope and intent | 15/20 | 5/5 |
+| S2 — Behavioral oracle | 10/20 | 5/5 |
+| S3 — Signed synthetic controls | 0/20 | 5/5 |
+
+A separate historical AMGB study replayed 19 signed fixed traces: unsafe accepts fell from 10/15 to 8/15, 6/15, 5/15 and finally 0/15, with all four safe traces accepted at each stage. These are distinct curated studies; do not pool their denominators or interpret them as real-world incident rates.
+
+Live Claude Code and Codex pilots also produced passing first-attempt candidates. The RC.3 untrusted-context challenge observed no retained unauthorized marker. These small pilots do not establish model superiority, hostile-code isolation or successful live iterative repair. See [methodology](docs/benchmark-methodology.md) and [experimental results](docs/experimental-results.md).
+
+## Quickstart — no agent credentials or paid calls
+
+Requirements: Python 3.11+, Git and `uv` (0.12.10 was used for qualification). Use a reviewed compatible version of uv; do not resolve a new lock implicitly. Docker is needed for the optional Docker and live-agent studies, not the local fixture below.
 
 ```sh
+git clone --branch v1.0.0 https://github.com/brunovicco/intent-to-merge-governance.git
+cd intent-to-merge-governance
 python3 scripts/release_inventory.py verify --require-lock
 uv sync --locked --extra telemetry
-uv run --locked python -m unittest discover -s tests -v
 uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/repair
 ```
 
-Expected fixture result: two attempts, `PASSED` convergence, governance `BLOCK`, no merge authority. Use a fresh output directory each run.
+Expected: two attempts, convergence `PASSED`, governance `BLOCK`, `merge_authority: false`. The fixture demonstrates a successful repair without granting merge authority. Use a fresh output directory for every run.
+
+To run the full regression suite:
+
+```sh
+uv run --locked python -m unittest discover -s tests -v
+```
+
+For the signed distribution ZIP, manifest and commit identifier, see the [release assets](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0). Verify the manifest signature against an independently trusted signer fingerprint before relying on its checksums. The release inventory checks file consistency; it is not a signature or a security attestation.
 
 ## Reproduce the studies
 
-| Study | Command after locked sync | Scope |
-|---|---|---|
-| Historical AMGB | `uv run --locked intent-merge benchmark-replay --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 curated signed fixtures |
+Run from a locked checkout after the quickstart setup. Each command uses a fresh output directory.
+
+| Study | Command | Scope |
+| --- | --- | --- |
+| Historical AMGB | `uv run --locked intent-merge benchmark-replay --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 signed curated traces |
 | Adversarial ablation | `uv run --locked python scripts/adversarial_benchmark.py --out results/adversarial` | 25 curated candidates |
 | Distributed control plane | `uv run --locked python scripts/control_plane.py demo --out results/control-plane` | Six synthetic controls; 15 cases |
-| Integrated runtime | `uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/runtime` | AUTH-201 repair, signed local evidence |
-| Journal checkpoint | `uv run --locked python scripts/journal_checkpoint.py --db results/runtime/lifecycle.sqlite` | Compare against a trusted external pin separately |
+| Integrated runtime | `uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/runtime` | AUTH-201 fixture repair |
+| Journal checkpoint | `uv run --locked python scripts/journal_checkpoint.py --db results/runtime/lifecycle.sqlite` | Run after the integrated fixture; compare against a separately trusted current pin |
 
-For live agents and Docker Compose, see the [historical runbooks](HISTORY.md). Run only under a disposable separate OS account or VM with no access to privileged credentials. The lab Docker adapter is not a proven hostile-code sandbox.
+For Docker Compose and opt-in live agents, follow the [versioned runbooks](HISTORY.md). Do not provide production credentials or sensitive repositories to the demos.
 
-## Experimental evidence
+## Trust boundaries and limitations
 
-| Study | Reported outcome |
-|---|---|
-| RC.6 regression (maintainer Mac) | 205/205 |
-| Security-remediation candidate (maintainer Mac, pre-final edits) | 217/217; zero reported dependency advisories; 15/15 Compose |
-| RC.3 synthetic adversarial ablation | unsafe accepts 20 → 15 → 10 → 0 of 20; 5/5 safe accepted |
-| RC.2 live agent pilot | 10/10 first-attempt tasks |
-| RC.3 live untrusted-context pilot | 10/10; no retained unauthorized marker observed |
-| RC.4 Docker Compose | 15/15 expected synthetic decisions |
-| RC.5 and RC.6 integrated live pilots | two first-pass candidates per release; no merge authority |
-| Real GitHub lab | negative checks published; non-authorizing check updated success → failure; no merge attempted |
-
-Results are scoped and not pooled statistical estimates. The live and Mac outcomes were reported by the maintainer, not independently re-run by the public-package builder. See [methodology](docs/benchmark-methodology.md), [experimental results](docs/experimental-results.md), and [qualification](examples/public-release/qualification.json).
-
-## Trust and limitations
-
-- No independent organizational verifier identities, hostile-code isolation, real approval withdrawal or merge queue enforcement has been qualified.
-- The candidate and observation worker share an interpreter in the lab; process separation is not privilege separation. External checkpoint pins must be kept outside the agent trust zone.
-- Token limits use observed self-reported usage; no provider hard cap or billing guarantee. Real multi-attempt repair remains unobserved.
-- GitHub preflight and evidence-gate experiments are not atomic remote merge authorization. No actual merge was attempted.
-- Do not run privileged GitHub probes in the agent's environment. The legacy lab scripts deliberately target the original test repository and are not a turnkey public deployment.
+- No hostile-code isolation, independently administered verifier identities, real human approval withdrawal or merge-queue enforcement has been qualified.
+- The lab candidate and observation worker share an interpreter. Process separation and resource-limited Docker do not establish privilege separation. Run live agents only under a disposable separate OS identity or VM without privileged credentials.
+- Local journal rollback detection requires a separately trusted current checkpoint. Synthetic lifecycle events are not evidence of organizational approval revocation.
+- GitHub preflight and evidence-gate checks are not atomic remote authorization; TOCTOU remains. The real lab published negative checks and updated a non-authorizing check from success to failure. No actual merge was attempted.
+- Usage budgets depend on observed self-reported telemetry, not a provider hard cap or billing guarantee. Live multi-attempt repair was not demonstrated.
+- The Python audit does not cover the OS, container base image or complete scanner/build toolchain. The reviewed process/PATH risks remain within the experimental scope.
 
 ## Documentation
 
-[Architecture and trust boundaries](docs/architecture.md) · [Threat model](docs/rc6-security-review.md) · [Production limitations](docs/production-limitations.md) · [Public release runbook](docs/public-release.md) · [History and feature reference](HISTORY.md) · [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md)
+| Topic | Reference |
+| --- | --- |
+| Architecture and evidence profiles | [Architecture](docs/architecture.md) |
+| Benchmark design and outcomes | [Methodology](docs/benchmark-methodology.md) · [Results](docs/experimental-results.md) |
+| Threat model and remaining risks | [Security review](docs/rc6-security-review.md) · [Production limitations](docs/production-limitations.md) |
+| Release qualification and reproducibility | [Runbook](docs/public-release.md) · [Published release](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) |
+| Version history and advanced demos | [History](HISTORY.md) · [Changelog](CHANGELOG.md) |
+| Responsible disclosure and contributions | [Security](SECURITY.md) · [Contributing](CONTRIBUTING.md) |
 
-Independent educational project, not affiliated with Anthropic, OpenAI, Entire or GitHub. See LICENSE and NOTICE for the proposed Apache-2.0 licensing; rights-holder confirmation is required before publication.
+Historical runbooks and evidence retain their original candidate status and qualification scope. The maintainer's publication approval is recorded in the v1.0.0 release notes; it does not retroactively change historical reports or confer production readiness.
+
+## License and citation
+
+Apache License 2.0 — see [LICENSE](LICENSE), [NOTICE](NOTICE) and the maintainer approval in the [v1.0.0 release notes](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0). If citing this work, use the software version, commit and relevant experiment; see [CITATION.cff](CITATION.cff).
+
+Independent research project, not affiliated with Anthropic, OpenAI, Entire or GitHub.
