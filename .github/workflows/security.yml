@@ -18,6 +18,6 @@ jobs:
           version: '0.12.10'
           enable-cache: false
       - run: |
-          GOBIN="$RUNNER_TEMP/itm-tools" go install github.com/gitleaks/gitleaks/v8@v8.24.3
+          GOBIN="$RUNNER_TEMP/itm-tools" go install github.com/zricethezav/gitleaks/v8@v8.24.3
           echo "$RUNNER_TEMP/itm-tools" >> "$GITHUB_PATH"
       - run: bash scripts/public_security.sh
