@@ -1,0 +1,20 @@
+{
+  "acceptance.py": "bc07e54043abd883e5b57f4bf8ca953cf5b609f4b2f12316be33d05628d7fb90",
+  "baseline-observations.json": "05aeb074108cdb8c43a1655c7d46ce7d1095aad6b362e9a2357ad8745e949ffe",
+  "baseline.py": "6300b42a2bee8d2fc8a0c35907661a770a7d522cd70be164b1ba3eb8642f9f63",
+  "candidate-1.py": "b810f972e3e06efdd5b00e6cb3489c7239998fe594333795093002c8fba2e0c0",
+  "checkpoints.json": "7531edd508859b9a3c1f392eaad22750203729669e36448aa53da21ee418e758",
+  "convergence.json": "5dc8e39ada8450b0a3b125a2a06480448f3bcadecb8a10f0631259509bfa6059",
+  "intent-drift.json": "1a46160fae7e024c21c1a611fa948a0675d144cc25a192392dab9f4dc978a6ff",
+  "intent-graph.json": "4c40c03ec3fcf4680c4dc4c116d0c39de96e261c810691f0d80e7a53172f3d53",
+  "intent-graph.mmd": "8d753e5a98205bae56c737e6dddf1926f013b122d2e56e6055e8ec1661f06d07",
+  "iteration-1.diff": "801bc12612953a635b7ffb11d5c91cb5cf549272684e033fe01661df3600aec9",
+  "ledger.jsonl": "954a90d0b4ca8b3258f1a51495993071f3d413efdc976d8190aaf2650d628704",
+  "mutation-report.json": "a4738e77c3c73577bd641a4f02b985fb54ff1c24b402efade8c96b7dc395d594",
+  "policy.toml": "922b02900d2627d4a2b99b7d7ac603ba4eb7056efbc4bfa672998f2f0e95b2f6",
+  "report.json": "b0fb71e7103c6dcc3a201adbf751f73f5e5db67e62097c44c10bdd6f20951a58",
+  "requirement-coverage.json": "887ea440df1ec1afd77649c0d14d15c20f467f678780a98d613c6a7bf77765d3",
+  "spec.toml": "03a5af9651ace74505ef3009fc2385abf0ee799afd8aa68ccfb1081a93419834",
+  "verification-plan.json": "0db2f7d7f3b2e8e9233864b39ace00f581c162f1e325485fa77310963bc3c2c0",
+  "verification.json": "ab0f79afec3f1e5ecffe880e42c40dd378bd546828126e664abdd4198540d178"
+}

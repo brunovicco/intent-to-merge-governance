@@ -1,0 +1,1 @@
+{"schema_version":"1.0","provider":"anthropic","runtime":"claude-code","session_id":"synthetic-claude-001","agent_id":"demo-agent","tool_types":["read","write","test"],"claimed_requirements":["R01"]}

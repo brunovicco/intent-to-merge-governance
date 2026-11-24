@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "status": "SOURCE_CANDIDATE_HOLD",
+  "release_type": "research-reference-implementation",
+  "experimental_qualification": "PASS_RC6_MAINTAINER_REPORTED",
+  "production_ready": false,
+  "merge_authority": false,
+  "publication_ready": false,
+  "rc6_maintainer_reported": {
+    "tests": 205,
+    "seconds": 78.567,
+    "original_files_verified": 645,
+    "fixture_repair_attempts": 2,
+    "checkpoint_matches_previous_digest": true,
+    "live_agents_first_pass": 2,
+    "live_decision": "BLOCK"
+  },
+  "builder": {
+    "input_rc6_inventory": "PASS_645",
+    "runtime_and_amgb_corpus_byte_identical": true,
+    "new_inventory_tests": {
+      "passed": 7,
+      "total": 7,
+      "uv_check_mocked": true
+    },
+    "rc6_targeted_tests": {
+      "passed": 18,
+      "total": 18
+    },
+    "full_final_regression": "NOT_RUN",
+    "expected_tests": 212,
+    "lock_resolution": "FAILED_PYPI_DNS",
+    "actual_lockfile_present": false,
+    "dependency_audit": "NOT_RUN",
+    "sast": "NOT_RUN",
+    "gitleaks": "NOT_RUN",
+    "runtime_sbom": "NOT_GENERATED",
+    "ci_yaml_parse": "PASS",
+    "ci_execution": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "remote_writes": false,
+    "release_signing": "NOT_PERFORMED"
+  },
+  "pending": [
+    "review and confirm proposed Apache-2.0 license/rights and lab identifiers",
+    "resolve lock and seal inventory",
+    "run full locked regression and scanners, review findings",
+    "check CI remotely and establish reporting route",
+    "independent review and sign release/checksum"
+  ]
+}

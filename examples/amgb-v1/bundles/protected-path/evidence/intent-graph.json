@@ -1,0 +1,156 @@
+{
+  "edges": [
+    {
+      "from": "intent:PAY-104",
+      "kind": "requires",
+      "to": "req:R01"
+    },
+    {
+      "from": "req:R01",
+      "kind": "acceptance",
+      "to": "criterion:positive_amount"
+    },
+    {
+      "from": "req:R01",
+      "kind": "maps_to",
+      "to": "path:app/payments.py"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "requires",
+      "to": "req:R02"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:same_key_same_payment"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:distinct_keys"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:conflicting_payload"
+    },
+    {
+      "from": "req:R02",
+      "kind": "maps_to",
+      "to": "path:app/payments.py"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG01"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG02"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG03"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "subject_to",
+      "to": "decision:ec70c1fda038a37f847e8004864db519a16d36a8"
+    },
+    {
+      "from": "decision:ec70c1fda038a37f847e8004864db519a16d36a8",
+      "kind": "determines",
+      "to": "merge:ec70c1fda038a37f847e8004864db519a16d36a8"
+    }
+  ],
+  "intent_id": "PAY-104",
+  "nodes": [
+    {
+      "description": "Make payment registration idempotent and reject invalid amounts.",
+      "digest": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885",
+      "id": "intent:PAY-104",
+      "kind": "intent"
+    },
+    {
+      "description": "Reject invalid amounts",
+      "id": "req:R01",
+      "kind": "requirement"
+    },
+    {
+      "id": "criterion:positive_amount",
+      "kind": "criterion"
+    },
+    {
+      "id": "path:app/payments.py",
+      "kind": "path"
+    },
+    {
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "req:R02",
+      "kind": "requirement"
+    },
+    {
+      "id": "criterion:same_key_same_payment",
+      "kind": "criterion"
+    },
+    {
+      "id": "criterion:distinct_keys",
+      "kind": "criterion"
+    },
+    {
+      "id": "criterion:conflicting_payload",
+      "kind": "criterion"
+    },
+    {
+      "description": "Do not change authorization logic",
+      "id": "non-goal:NG01",
+      "kind": "non_goal"
+    },
+    {
+      "description": "Do not change the register API signature",
+      "id": "non-goal:NG02",
+      "kind": "non_goal"
+    },
+    {
+      "description": "Do not introduce new imports",
+      "id": "non-goal:NG03",
+      "kind": "non_goal"
+    },
+    {
+      "authorized": false,
+      "id": "decision:ec70c1fda038a37f847e8004864db519a16d36a8",
+      "kind": "decision",
+      "reasons": [
+        "not_converged",
+        "outside_spec",
+        "protected_path",
+        "stale_evaluation",
+        "check_failed:checkpoint_binding",
+        "check_failed:conflicting_payload",
+        "check_failed:contract_flow",
+        "check_failed:differential_compatibility",
+        "check_failed:distinct_keys",
+        "check_failed:intent_drift",
+        "check_failed:mutation_adequacy",
+        "check_failed:positive_amount",
+        "check_failed:property_invariants",
+        "check_failed:requirement_coverage",
+        "check_failed:same_key_same_payment",
+        "check_failed:scope",
+        "unclassified_path:tests/acceptance.py",
+        "missing_approval:engineering",
+        "missing_approval:security"
+      ]
+    },
+    {
+      "id": "merge:ec70c1fda038a37f847e8004864db519a16d36a8",
+      "kind": "merge_result",
+      "main": "ec70c1fda038a37f847e8004864db519a16d36a8",
+      "merged": false
+    }
+  ],
+  "schema_version": "1.0"
+}

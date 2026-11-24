@@ -1,0 +1,110 @@
+[
+  {
+    "binding": {
+      "base": "185e7088ecaeec049badbb50eca8c3a488e9aa28",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "b97083405a1e3fc886ba0e084c7ec61a9b33ba64",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "453ed32f9187558a066c14896ce59d5a7e766950438e6099db9f4f552aecdc7d",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "243c16ccaa21d80e84276cc9a5169c0694ed813206c5507fe5c38b6225c585b9",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "stale-approval-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "3d377d50a081e3468be4df5ed1c7de9631facce33177a71553e9b0e03a4048b4",
+    "source": "agent_proposal",
+    "tree": "ac0c0eb10bbc5d05f6054da415af7d688b219578",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "185e7088ecaeec049badbb50eca8c3a488e9aa28",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "4027ea3ff3eec02fd76d07e4894e05c8512b40b8",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "0d1446dda2cf96a5eee81cac50f6f3bc869030b14f2f6c87001d5aff1dc3c48c",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "6a760dd4ee57e5c2ef030498c6d55cd238ccdf23c1a5e1f78509930016d4ae1b",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "stale-approval-2",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "c6e0aa714dd9dc69f101946ba96818bb1aeb29e271d688d578e06d19985914f7",
+    "source": "agent_proposal",
+    "tree": "875c8974f5be5a72a6910b5736c3a9485e532060",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "185e7088ecaeec049badbb50eca8c3a488e9aa28",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "e7af14ce0851a3b15b38a8d92c3046846e21f03b",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "0d1446dda2cf96a5eee81cac50f6f3bc869030b14f2f6c87001d5aff1dc3c48c",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "6a760dd4ee57e5c2ef030498c6d55cd238ccdf23c1a5e1f78509930016d4ae1b",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "stale-approval-2",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "c6e0aa714dd9dc69f101946ba96818bb1aeb29e271d688d578e06d19985914f7",
+    "source": "harness_refresh",
+    "tree": "875c8974f5be5a72a6910b5736c3a9485e532060",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

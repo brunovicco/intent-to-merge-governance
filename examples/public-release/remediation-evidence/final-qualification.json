@@ -1,0 +1,32 @@
+{
+  "profile": "itm-final-source-candidate-v1",
+  "version": "1.0.0",
+  "prior_maintainer_evidence": {
+    "tests_passed": 217,
+    "audit_dependencies": 7,
+    "reported_vulnerabilities": 0,
+    "compose_expected_matches": 15,
+    "compose_total": 15,
+    "gitleaks_unresolved": 0,
+    "bandit_report_findings": 62
+  },
+  "current_builder": {
+    "tests_implemented": 224,
+    "tests_passed": 45,
+    "suite_breakdown": {
+      "final_release": 7,
+      "rc6": 18,
+      "autonomy": 20
+    },
+    "python": "3.13.5",
+    "cryptography": "46.0.4",
+    "filtered_prior_report_matches": 57,
+    "fresh_scanners_executed": false,
+    "docker_build_executed": false,
+    "full_regression_executed": false,
+    "lockfile_sha256": "891e8c8dd597002fd42e9da05725ba2a50502308b0f851ae875ed8a0ff1b2061"
+  },
+  "publication_ready": false,
+  "production_ready": false,
+  "merge_authority": false
+}

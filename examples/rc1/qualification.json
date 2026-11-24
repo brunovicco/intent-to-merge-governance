@@ -1,0 +1,76 @@
+{
+  "release": "1.0.0-rc.1",
+  "promotion": "HOLD",
+  "production_ready": false,
+  "local": {
+    "regression": {
+      "status": "PASS",
+      "tests": 139
+    },
+    "e2e": {
+      "status": "PASS",
+      "scenarios": 4
+    },
+    "api_contract": {
+      "status": "PASS",
+      "cases": 8,
+      "simulated": true
+    },
+    "offline_bundles": {
+      "status": "PASS",
+      "count": 4
+    },
+    "amgb_replay": {
+      "status": "PASS",
+      "count": 19
+    },
+    "changeset_receipts": {
+      "status": "PASS",
+      "count": 3
+    }
+  },
+  "external": {
+    "docker": {
+      "status": "NOT_RUN",
+      "reason": "Docker executable unavailable"
+    },
+    "claude": {
+      "status": "NOT_RUN",
+      "reason": "Claude CLI unavailable"
+    },
+    "codex": {
+      "status": "NOT_RUN",
+      "reason": "Codex CLI unavailable"
+    },
+    "github_app": {
+      "status": "NOT_RUN",
+      "reason": "no authenticated external execution"
+    },
+    "merge_queue": {
+      "status": "BLOCKED",
+      "reason": "merge_group handling not implemented"
+    },
+    "live_controls": {
+      "status": "BLOCKED",
+      "reason": "live independent verifier services not integrated"
+    },
+    "sandbox_security": {
+      "status": "BLOCKED",
+      "reason": "independent hostile-code containment validation outstanding"
+    },
+    "distributed_recovery": {
+      "status": "BLOCKED",
+      "reason": "external current-state anchors and distributed fencing outstanding"
+    },
+    "live_benchmark": {
+      "status": "NOT_RUN",
+      "reason": "real agents not executed"
+    }
+  },
+  "artifact_sha256": {
+    "report.json": "b4a37e51b1f45a95e5845dcbb29f9501a03ddc281711453453d0c3a4baf07283",
+    "report.html": "ed3aa4f842283743663a71656c4bc99c5fd67c4b6170b0506fb8eee58c29cdae",
+    "regression.log": "f1dda634d18946f80ab5215bc5fe113477d45f526fe556660e4be63a522e78d0",
+    "external-probes.json": "92440d57100a880c06a6758b66af9ce07799523ba1c6cd7bfda57ca25f62293b"
+  }
+}

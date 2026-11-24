@@ -1,0 +1,87 @@
+x-common: &common
+  image: itm-control-plane:1.0.0-locked
+  build:
+    context: .
+    dockerfile: Dockerfile.control-plane
+  user: "${ITM_UID:-1000}:${ITM_GID:-1000}"
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs:
+    - /tmp:rw,nosuid,nodev,noexec,size=32m
+  mem_limit: 128m
+  pids_limit: 32
+  networks: [lab]
+services:
+  authorization:
+    <<: *common
+    command: [serve, --control, authorization, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/authorization:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  convergence:
+    <<: *common
+    command: [serve, --control, convergence, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/convergence:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  intent:
+    <<: *common
+    command: [serve, --control, intent, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/intent:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  operational-autonomy:
+    <<: *common
+    command: [serve, --control, operational_autonomy, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/operational_autonomy:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  provenance:
+    <<: *common
+    command: [serve, --control, provenance, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/provenance:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  verification:
+    <<: *common
+    command: [serve, --control, verification, --key, /keys/key.pem, --host, 0.0.0.0]
+    volumes: ["${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/verification:/keys:ro"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=1)"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+  coordinator:
+    <<: *common
+    profiles: [run]
+    command: [run, --keys, /keys, --out, /results/compose-study]
+    volumes:
+      - "${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/aggregate:/keys/aggregate:ro"
+      - "${ITM_LAB_KEYS:?set ITM_LAB_KEYS}/trust.json:/keys/trust.json:ro"
+      - "${ITM_LAB_RESULTS:?set ITM_LAB_RESULTS}:/results:rw"
+    depends_on:
+      authorization: {condition: service_healthy}
+      convergence: {condition: service_healthy}
+      intent: {condition: service_healthy}
+      operational-autonomy: {condition: service_healthy}
+      provenance: {condition: service_healthy}
+      verification: {condition: service_healthy}
+networks:
+  lab:
+    internal: true

@@ -1,0 +1,16 @@
+{
+  "historical_verification": "PASS",
+  "current_gate": {
+    "profile": "integrated-candidate-lab-v1",
+    "candidate_verified": true,
+    "decision": "BLOCK",
+    "reasons": [
+      "independent_human_approval_missing",
+      "external_control_inventory_missing"
+    ],
+    "merge_authority": false,
+    "production_ready": false
+  },
+  "merge_authority": false,
+  "note": "Historical replay is not current authorization; lifecycle journal not replayed."
+}

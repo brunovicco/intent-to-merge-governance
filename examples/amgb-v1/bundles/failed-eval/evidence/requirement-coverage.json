@@ -1,0 +1,26 @@
+[
+  {
+    "changed_paths": [
+      "app/payments.py"
+    ],
+    "criteria": {
+      "positive_amount": true
+    },
+    "description": "Reject invalid amounts",
+    "id": "R01",
+    "verified": true
+  },
+  {
+    "changed_paths": [
+      "app/payments.py"
+    ],
+    "criteria": {
+      "conflicting_payload": false,
+      "distinct_keys": true,
+      "same_key_same_payment": true
+    },
+    "description": "Maintain payment idempotency and conflict handling",
+    "id": "R02",
+    "verified": false
+  }
+]

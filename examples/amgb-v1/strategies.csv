@@ -1,0 +1,6 @@
+id,label,true_allow,true_block,unsafe_allow,false_block,unsafe_allow_rate,false_block_rate,unsafe_share_of_allows,accuracy,missing_evidence_scenarios
+S0,Acceptance checks,4,5,10,0,0.6666666666666666,0.0,0.7142857142857143,0.47368421052631576,2
+S1,+ Extended verification,4,7,8,0,0.5333333333333333,0.0,0.6666666666666666,0.5789473684210527,2
+S2,"+ Intent, scope and provenance",4,9,6,0,0.4,0.0,0.6,0.6842105263157895,2
+S3,+ Convergence governor,4,10,5,0,0.3333333333333333,0.0,0.5555555555555556,0.7368421052631579,2
+S4,+ Deterministic authorization,4,15,0,0,0.0,0.0,0.0,1.0,2

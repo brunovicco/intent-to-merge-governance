@@ -1,0 +1,76 @@
+[
+  {
+    "binding": {
+      "base": "9b48007d139df9107f12540ca0f5956996db6b6c",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "d88e9370d4ae85477797c2698021993cba24533a",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "iteration": 1,
+    "result": {
+      "findings": [
+        {
+          "detail": "invariant preserved",
+          "id": "NG01",
+          "kind": "preserve_symbol",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "invariant preserved",
+          "id": "NG02",
+          "kind": "preserve_signature",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "invariant preserved",
+          "id": "NG03",
+          "kind": "no_new_imports",
+          "passed": true,
+          "path": "app/payments.py"
+        }
+      ],
+      "method": "python_ast_structural_v1",
+      "passed": true
+    }
+  },
+  {
+    "binding": {
+      "base": "9b48007d139df9107f12540ca0f5956996db6b6c",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "10e78f7a47be5e6903a63c9b859fec89e678ceba",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "iteration": 2,
+    "result": {
+      "findings": [
+        {
+          "detail": "invariant preserved",
+          "id": "NG01",
+          "kind": "preserve_symbol",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "invariant preserved",
+          "id": "NG02",
+          "kind": "preserve_signature",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "invariant preserved",
+          "id": "NG03",
+          "kind": "no_new_imports",
+          "passed": true,
+          "path": "app/payments.py"
+        }
+      ],
+      "method": "python_ast_structural_v1",
+      "passed": true
+    }
+  }
+]

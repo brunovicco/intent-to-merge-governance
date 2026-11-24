@@ -1,0 +1,17 @@
+{
+  "candidate": "dd100fc90e6ed60fdd305d44d8eb9dbb499cc8fd",
+  "checkpoint_contract": "verified",
+  "convergence_replay": "verified",
+  "integrity": "verified",
+  "intent_graph": "verified",
+  "key_id": "851aa0866629a8bbda5ad786bc2b5ca8376ca667054590eb3484cd9eedf18582",
+  "ledger_root": "6145f41b0429dff6ff2e3749769b1ae75fa47f907c78e5ccec09b7c29f1fdd65",
+  "limitations": "Does not re-execute tests or attest an external Git server.",
+  "merged": true,
+  "policy_replay": "verified",
+  "profile": "synthetic-demo",
+  "signature": "verified",
+  "structural_drift_replay": "verified",
+  "subjects": 23,
+  "verification_replay": "verified"
+}

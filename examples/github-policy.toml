@@ -1,0 +1,12 @@
+# Example only: replace repository, IDs and check name using trusted configuration.
+version = 1
+repository = "OWNER/REPO"
+base_ref = "main"
+allowed_paths = ["app/**"]
+protected_paths = [".github/**", "tests/**", "**/policy.toml"]
+[[required_checks]]
+name = "trusted-ci"
+app_id = 12345
+[required_roles]
+engineering = [10001]
+security = [10002]

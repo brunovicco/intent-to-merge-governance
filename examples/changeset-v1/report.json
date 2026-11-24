@@ -1,0 +1,89 @@
+{
+  "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+  "merge_authority": false,
+  "profile": "local-synthetic",
+  "scenarios": [
+    {
+      "final_compatible": true,
+      "issues": [],
+      "prefix_compatible": true,
+      "receipt_verified": true,
+      "scenario": "compatible",
+      "status": "COMPLETED",
+      "writes_by_coordinator": 3
+    },
+    {
+      "final_compatible": false,
+      "issues": [
+        "prefix:portal:portal:requires:checkout:v3"
+      ],
+      "prefix_compatible": false,
+      "receipt_verified": false,
+      "scenario": "incompatible-final",
+      "status": "BLOCKED",
+      "writes_by_coordinator": 0
+    },
+    {
+      "final_compatible": true,
+      "issues": [
+        "prefix:payments:checkout:requires:payments:v1"
+      ],
+      "prefix_compatible": false,
+      "receipt_verified": false,
+      "scenario": "incompatible-prefix",
+      "status": "BLOCKED",
+      "writes_by_coordinator": 0
+    },
+    {
+      "final_compatible": true,
+      "issues": [],
+      "prefix_compatible": true,
+      "receipt_verified": true,
+      "scenario": "partial-failure",
+      "status": "COMPENSATED",
+      "writes_by_coordinator": 2
+    },
+    {
+      "final_compatible": true,
+      "issues": [],
+      "prefix_compatible": true,
+      "receipt_verified": true,
+      "scenario": "compensation-conflict",
+      "status": "MANUAL_INTERVENTION",
+      "writes_by_coordinator": 1
+    },
+    {
+      "final_compatible": true,
+      "issues": [
+        "invalid commit binding"
+      ],
+      "prefix_compatible": true,
+      "receipt_verified": false,
+      "scenario": "stale-plan",
+      "status": "BLOCKED",
+      "writes_by_coordinator": 0
+    },
+    {
+      "final_compatible": true,
+      "issues": [
+        "missing component approval"
+      ],
+      "prefix_compatible": true,
+      "receipt_verified": false,
+      "scenario": "missing-approval",
+      "status": "BLOCKED",
+      "writes_by_coordinator": 0
+    },
+    {
+      "final_compatible": true,
+      "issues": [
+        "portal:out_of_scope:policy.toml"
+      ],
+      "prefix_compatible": true,
+      "receipt_verified": false,
+      "scenario": "scope-violation",
+      "status": "BLOCKED",
+      "writes_by_coordinator": 0
+    }
+  ]
+}

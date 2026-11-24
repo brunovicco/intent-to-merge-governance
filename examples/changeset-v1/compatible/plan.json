@@ -1,0 +1,107 @@
+{
+  "components": {
+    "checkout": {
+      "base": "2ce2e85e42fc3f8bd1f319e73a4fa981a597fa8a",
+      "base_contract": {
+        "provides": [
+          "v1"
+        ],
+        "requires": {
+          "payments": "v1"
+        }
+      },
+      "fast_forward": true,
+      "head": "9cd8210154922a0dca2b4ebe7f22502de883b4d9",
+      "head_contract": {
+        "provides": [
+          "v1",
+          "v2"
+        ],
+        "requires": {
+          "payments": "v2"
+        }
+      },
+      "paths": [
+        "app.txt",
+        "contract.json"
+      ]
+    },
+    "payments": {
+      "base": "768c20d647c3280ffdc7ae5b93ccad9d9d4e965b",
+      "base_contract": {
+        "provides": [
+          "v1"
+        ],
+        "requires": {}
+      },
+      "fast_forward": true,
+      "head": "f148e1a68110c6132e58434a3667c6974e64d07a",
+      "head_contract": {
+        "provides": [
+          "v1",
+          "v2"
+        ],
+        "requires": {}
+      },
+      "paths": [
+        "app.txt",
+        "contract.json"
+      ]
+    },
+    "portal": {
+      "base": "2626a6d82945262d99240f7cdade6abd68b38fe5",
+      "base_contract": {
+        "provides": [
+          "v1"
+        ],
+        "requires": {
+          "checkout": "v1"
+        }
+      },
+      "fast_forward": true,
+      "head": "77d5e1970f0560698623a52584a573ee9b3ff69f",
+      "head_contract": {
+        "provides": [
+          "v1",
+          "v2"
+        ],
+        "requires": {
+          "checkout": "v2"
+        }
+      },
+      "paths": [
+        "app.txt",
+        "contract.json"
+      ]
+    }
+  },
+  "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+  "eligible": true,
+  "intent_id": "payment-contract-v2",
+  "issues": [],
+  "merge_authority": false,
+  "order": [
+    "payments",
+    "checkout",
+    "portal"
+  ],
+  "stages": [
+    {
+      "after": null,
+      "violations": []
+    },
+    {
+      "after": "payments",
+      "violations": []
+    },
+    {
+      "after": "checkout",
+      "violations": []
+    },
+    {
+      "after": "portal",
+      "violations": []
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "binding": {
+      "base": "9b48007d139df9107f12540ca0f5956996db6b6c",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "c74f5841f92db1e55348a10fc402fc149d7fa80f",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "11e4e8c183c28756a6fcbd7f0a518a7afe0ac9e8146973b6b969423d6722ade2",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "f4fc1deb676da042455d2721616cad2c383bf04da69e6cd0faac822c3df0ee7e",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "property-regression-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "909feb211636c5e80b03ddaee74adad553e14c5b1573f537840235892ca603a9",
+    "source": "agent_proposal",
+    "tree": "23a18bd1f855162cf05205e91dbd83b63ba1b2d8",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "9b48007d139df9107f12540ca0f5956996db6b6c",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "5032a5b79fa9185425e1d2317abe82487a462895",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "11e4e8c183c28756a6fcbd7f0a518a7afe0ac9e8146973b6b969423d6722ade2",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "d1060c16d9e3fa3b60bc0ee4db5a63349c2066ba8ff46828dd8b5bb0b777bef1",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "property-regression-2",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "c451d9560ea099d0c92367f12e889159101623fdf3c8108065644bf6c5b6326a",
+    "source": "agent_proposal",
+    "tree": "23a18bd1f855162cf05205e91dbd83b63ba1b2d8",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

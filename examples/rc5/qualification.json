@@ -1,0 +1,16 @@
+{
+  "profile": "rc5-integrated-candidate-lab-qualification",
+  "production_ready": false,
+  "merge_authority": false,
+  "promotion": "HOLD",
+  "targeted_tests_passed": 13,
+  "targeted_tests_total": 13,
+  "synthetic_repair": "PASS",
+  "historical_signature_replay": "PASS",
+  "live_agent_convergence": "PENDING",
+  "external_authorities": "PENDING",
+  "remote_revocation": "PENDING",
+  "full_regression": "PARTIAL",
+  "full_regression_completed_ok": 65,
+  "full_regression_expected_total": 187
+}

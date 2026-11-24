@@ -1,0 +1,26 @@
+{
+  "adverse_limit": 2,
+  "clean_required": 2,
+  "initial_level": 2,
+  "keys": {
+    "governance": "375f3f13ef565778e06530109d28d552a29bf0cf2146133cd971d7f17620b548",
+    "observer": "0c7526164c4ca122d5a1c01eefaf88d327631ccf3470e0d9d5b6931adb686d56",
+    "proposer": "caec434f5bbc214999cab199d0f655c823a17607b026ff52e561906dab4c666f",
+    "reviewer": "3d4b7485602f2cd8fba08603f6e588fec4c2b0d93eef1df69c0af0c9791b45d4",
+    "verifier": "442ed211bfce1da7eb158f113d823af1d4a5251c2920650818cc1178893679e5"
+  },
+  "max_level": 2,
+  "risk_ceiling": "high",
+  "scope": {
+    "agent": "coding-agent",
+    "bundle_signer": "5cbeb51a3fca45335919db4365b5656452803d30ae1ef26340975804ce31159d",
+    "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+    "model": "fixture-v1",
+    "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+    "profile": "synthetic-demo",
+    "repository": "demo/payments",
+    "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+  },
+  "version": 1,
+  "window": 2
+}

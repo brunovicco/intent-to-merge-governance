@@ -1,0 +1,36 @@
+{
+  "components": {
+    "checkout": {
+      "allowed_paths": [
+        "contract.json",
+        "app.txt"
+      ],
+      "depends_on": [
+        "payments"
+      ],
+      "reviewer_key": "e284e1307bd981e63890753c885f9ba6c15029c99948aec8910a97cc92e6fbf6"
+    },
+    "payments": {
+      "allowed_paths": [
+        "contract.json",
+        "app.txt"
+      ],
+      "depends_on": [],
+      "reviewer_key": "553636b4556dc86ca5f8af0a18a5dddcfeeff897099e155a90e8f9cc35a4d270"
+    },
+    "portal": {
+      "allowed_paths": [
+        "contract.json",
+        "app.txt"
+      ],
+      "depends_on": [
+        "checkout"
+      ],
+      "reviewer_key": "9e0a90dd59d10a1ef14b4979469734cc55eaa172a75773cd9772b53b78d30d22"
+    }
+  },
+  "executor_key": "45c61b216f720a3031b969ae0de4cf92dc8200ad3ffd711de0dfce399c025007",
+  "intent_id": "payment-contract-v2",
+  "profile": "local-synthetic",
+  "version": 1
+}

@@ -1,0 +1,11 @@
+{
+  "release": "0.10.0",
+  "regression_tests_passed": 122,
+  "hardening_tests_passed": 17,
+  "total_passed": 139,
+  "profile": "local-synthetic-and-mocked-api",
+  "docker_runtime": "not available",
+  "live_github": "not executed",
+  "live_agent_clis": "not executed",
+  "atomic_remote_merge": "not implemented"
+}

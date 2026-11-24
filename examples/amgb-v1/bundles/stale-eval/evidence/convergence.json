@@ -1,0 +1,40 @@
+[
+  {
+    "action": "continue",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 451,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "property_invariants",
+      "requirement_coverage"
+    ],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "ac0c0eb10bbc5d05f6054da415af7d688b219578"
+  },
+  {
+    "action": "passed",
+    "cumulative_cases": 74,
+    "cycle_length": null,
+    "diff_bytes": 548,
+    "failed": [],
+    "iteration": 2,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [
+      "conflicting_payload",
+      "contract_flow",
+      "property_invariants",
+      "requirement_coverage"
+    ],
+    "tree": "875c8974f5be5a72a6910b5736c3a9485e532060"
+  }
+]

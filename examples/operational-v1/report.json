@@ -1,0 +1,61 @@
+{
+  "profile": "synthetic-transport-fixture",
+  "merge_authority": false,
+  "scenarios": [
+    {
+      "scenario": "trusted-snapshot",
+      "decision": "PASS",
+      "initial_state": "DONE",
+      "recovered_state": "DONE",
+      "remote_writes": 1,
+      "reasons": []
+    },
+    {
+      "scenario": "missing-assertion",
+      "decision": "BLOCK",
+      "initial_state": "DONE",
+      "recovered_state": "DONE",
+      "remote_writes": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid"
+      ]
+    },
+    {
+      "scenario": "expired-assertion",
+      "decision": "BLOCK",
+      "initial_state": "DONE",
+      "recovered_state": "DONE",
+      "remote_writes": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid"
+      ]
+    },
+    {
+      "scenario": "synthetic-profile",
+      "decision": "BLOCK",
+      "initial_state": "DONE",
+      "recovered_state": "DONE",
+      "remote_writes": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid"
+      ]
+    },
+    {
+      "scenario": "lost-response",
+      "decision": "PASS",
+      "initial_state": "UNCERTAIN",
+      "recovered_state": "DONE",
+      "remote_writes": 1,
+      "reasons": []
+    },
+    {
+      "scenario": "unresolved-publication",
+      "decision": "PASS",
+      "initial_state": "UNCERTAIN",
+      "recovered_state": "UNCERTAIN",
+      "remote_writes": 1,
+      "reasons": []
+    }
+  ],
+  "note": "No authenticated GitHub or agent calls; the external-verifier profile is signed using an ephemeral fixture key, never a live trust root."
+}

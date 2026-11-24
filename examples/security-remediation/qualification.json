@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "candidate": "security-remediation-1",
+  "status": "HOLD",
+  "publication_ready": false,
+  "production_ready": false,
+  "merge_authority": false,
+  "previous_candidate_maintainer_reported": {
+    "tests_passed": 212,
+    "tests_total": 212,
+    "inventory_passed": 662,
+    "bandit_errors": 0,
+    "bandit_low": 59,
+    "bandit_medium": 5,
+    "bandit_high": 0,
+    "dependency_advisories": 4,
+    "gitleaks_findings": 4
+  },
+  "builder": {
+    "installed_cryptography": "46.0.4",
+    "required_cryptography": ">=50.0.0,<51",
+    "targeted_tests_passed": 28,
+    "expected_total_tests": 217,
+    "distributed_local_study": "PASS_15_OF_15",
+    "full_regression": "NOT_RUN",
+    "new_dependency_resolution": "NOT_RUN_NO_PYPI_DNS",
+    "new_scans": "NOT_RUN",
+    "docker": "NOT_RUN",
+    "historical_amgb_and_changeset_corpus_unchanged": true,
+    "gitHub_writes": false
+  },
+  "pending": [
+    "resolve lock with cryptography 50.x",
+    "run full locked regression and security scans",
+    "review LOW and remaining MEDIUM findings",
+    "verify Docker Compose and historical replay",
+    "license and publication review/signing"
+  ]
+}

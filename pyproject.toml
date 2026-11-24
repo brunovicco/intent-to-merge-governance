@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intent-to-merge-governance"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = ["cryptography>=50.0.0,<51"]
+description = "Vendor-neutral reference harness for evidence-bound software delivery"
+
+[project.optional-dependencies]
+telemetry = ["opentelemetry-sdk>=1.25,<2"]
+
+[project.scripts]
+intent-merge = "intent_merge.cli:main"
+itm-ops = "intent_merge.ops_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

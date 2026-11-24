@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this research implementation, please cite the software version and the relevant experiment."
+title: "Intent-to-Merge Governance"
+version: "1.0.0"
+type: software
+authors:
+  - name: "Intent-to-Merge Governance contributors"
+license: Apache-2.0
+abstract: "Vendor-neutral research and reference implementation for evidence-bound, policy-governed and revocable agentic software delivery."

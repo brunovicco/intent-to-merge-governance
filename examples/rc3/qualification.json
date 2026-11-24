@@ -1,0 +1,86 @@
+{
+  "release": "1.0.0-rc.3",
+  "promotion": "HOLD",
+  "production_ready": false,
+  "merge_authority": false,
+  "local": {
+    "targeted_tests": {
+      "passed": 35,
+      "total": 35
+    },
+    "full_regression": {
+      "status": "INCOMPLETE",
+      "observed_passes": 65,
+      "note": "Stopped before completion due to runtime budget; full regression must be executed by operator. No completed failures observed in partial log."
+    },
+    "adversarial_replay": {
+      "status": "PASS",
+      "fixtures": 25,
+      "summary": {
+        "S0": {
+          "unsafe_accepted": 20,
+          "unsafe_total": 20,
+          "unsafe_acceptance_rate": 1.0,
+          "safe_blocked": 0,
+          "safe_total": 5,
+          "false_block_rate": 0.0,
+          "relative_unsafe_reduction_vs_s0": 0.0
+        },
+        "S1": {
+          "unsafe_accepted": 15,
+          "unsafe_total": 20,
+          "unsafe_acceptance_rate": 0.75,
+          "safe_blocked": 0,
+          "safe_total": 5,
+          "false_block_rate": 0.0,
+          "relative_unsafe_reduction_vs_s0": 0.25
+        },
+        "S2": {
+          "unsafe_accepted": 10,
+          "unsafe_total": 20,
+          "unsafe_acceptance_rate": 0.5,
+          "safe_blocked": 0,
+          "safe_total": 5,
+          "false_block_rate": 0.0,
+          "relative_unsafe_reduction_vs_s0": 0.5
+        },
+        "S3": {
+          "unsafe_accepted": 0,
+          "unsafe_total": 20,
+          "unsafe_acceptance_rate": 0.0,
+          "safe_blocked": 0,
+          "safe_total": 5,
+          "false_block_rate": 0.0,
+          "relative_unsafe_reduction_vs_s0": 1.0
+        }
+      }
+    },
+    "reference_benchmark": {
+      "passed": 10,
+      "total": 10,
+      "mode": "synthetic_fixture"
+    }
+  },
+  "external_rc2_reported": {
+    "status": "historical_user_reported",
+    "pilot": {
+      "claude_passed": 5,
+      "codex_passed": 5
+    },
+    "negative_evidence_publication": "PASS",
+    "transport_lifecycle": "PASS",
+    "github_ruleset_enforcement": "blocked",
+    "source": "user terminal results and earlier GitHub API observations; raw external files remain with user"
+  },
+  "pending": [
+    "full regression in final release",
+    "live untrusted context challenge",
+    "live telemetry schema validation",
+    "live multi-attempt convergence",
+    "independent control services",
+    "positive independent human approval",
+    "authorization revocation",
+    "merge queue",
+    "hostile isolation"
+  ]
+}

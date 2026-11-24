@@ -1,0 +1,21 @@
+{
+  "scope": "maintainer evidence for sealed security-remediation candidate before final edits",
+  "input_sha256": {
+    "bandit.json": "162fe306a70555dfb32c7a954b3243930ceeedc798ae28cb5b1802ee8230b7bf",
+    "gitleaks-review.json": "bb9b1f5ab85d603c880beaa3176cd6a1324441ed758d147fd223a6e7667db306",
+    "pip-audit.json": "bd9b1d56516a7101d813d52f83e37890c835f877e10a32885c221caae096ef7d",
+    "release-inventory.json": "0107a0bf15857708c53bff05aca96b7e97cfff0fa53965c5aaeffb3e8fc49ba0",
+    "report.json": "66068d227a7ca1b9ac583ced07bfa93295ac0dbe789166684970ae1dc154a078",
+    "runtime.cdx.json": "746087d2c7c00a10a6a8b3f0d2e535a0d92bd1ab25051bc6538cff3b96a162fd",
+    "status.json": "8d4dfd2f56983453c3b618de6f0a570a3641484f6c37141143ae91e33a0e4b34",
+    "uv.lock": "891e8c8dd597002fd42e9da05725ba2a50502308b0f851ae875ed8a0ff1b2061"
+  },
+  "tests_reported": 217,
+  "audit_dependencies": 7,
+  "reported_vulnerabilities": 0,
+  "bandit_findings": 62,
+  "gitleaks_unresolved": 0,
+  "publication_ready": false,
+  "production_ready": false,
+  "merge_authority": false
+}

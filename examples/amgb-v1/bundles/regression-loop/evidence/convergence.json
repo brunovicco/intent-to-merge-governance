@@ -1,0 +1,45 @@
+[
+  {
+    "action": "continue",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 451,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "property_invariants",
+      "requirement_coverage"
+    ],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "ac0c0eb10bbc5d05f6054da415af7d688b219578"
+  },
+  {
+    "action": "regression_budget",
+    "cumulative_cases": 74,
+    "cycle_length": null,
+    "diff_bytes": 0,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "positive_amount",
+      "property_invariants",
+      "requirement_coverage",
+      "same_key_same_payment"
+    ],
+    "iteration": 2,
+    "no_progress": 1,
+    "regressions": 2,
+    "reopened": [
+      "positive_amount",
+      "same_key_same_payment"
+    ],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "37e43ac01615ea0889ebc2cb98e05d7d5c3df13d"
+  }
+]

@@ -1,0 +1,22 @@
+test_exact_commit_verification (test_hardening.CandidateTests.test_exact_commit_verification) ... ok
+test_after_cas_recovery (test_hardening.DurableTests.test_after_cas_recovery) ... ok
+test_before_cas_recovery (test_hardening.DurableTests.test_before_cas_recovery) ... ok
+test_compensation_recovery (test_hardening.DurableTests.test_compensation_recovery) ... ok
+test_conflict_recovery (test_hardening.DurableTests.test_conflict_recovery) ... ok
+test_tampered_journal (test_hardening.DurableTests.test_tampered_journal) ... ok
+test_bad_aggregate (test_hardening.HardeningTests.test_bad_aggregate) ... ok
+test_base_revocation (test_hardening.HardeningTests.test_base_revocation) ... ok
+test_complete_signed_receipts (test_hardening.HardeningTests.test_complete_signed_receipts) ... ok
+test_duplicate_receipt (test_hardening.HardeningTests.test_duplicate_receipt) ... ok
+test_expiry_sweep (test_hardening.HardeningTests.test_expiry_sweep) ... ok
+test_legacy_boolean_not_accepted (test_hardening.HardeningTests.test_legacy_boolean_not_accepted) ... ok
+test_missing_receipt (test_hardening.HardeningTests.test_missing_receipt) ... ok
+test_remote_mismatch (test_hardening.HardeningTests.test_remote_mismatch) ... ok
+test_review_revocation (test_hardening.HardeningTests.test_review_revocation) ... ok
+test_shared_key (test_hardening.HardeningTests.test_shared_key) ... ok
+test_tampered_artifact (test_hardening.HardeningTests.test_tampered_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 7.881s
+
+OK

@@ -1,0 +1,18 @@
+test_budget (test_rc5.IntegratedTests.test_budget) ... ok
+test_expired_and_wrong_key (test_rc5.IntegratedTests.test_expired_and_wrong_key) ... ok
+test_external_validator_rejects (test_rc5.IntegratedTests.test_external_validator_rejects) ... ok
+test_first (test_rc5.IntegratedTests.test_first) ... ok
+test_lifecycle_dedup_conflict_restart (test_rc5.IntegratedTests.test_lifecycle_dedup_conflict_restart) ... ok
+test_reconciliation_binding (test_rc5.IntegratedTests.test_reconciliation_binding) ... ok
+test_reconciliation_expiry (test_rc5.IntegratedTests.test_reconciliation_expiry) ... ok
+test_repair (test_rc5.IntegratedTests.test_repair) ... ok
+test_repeat (test_rc5.IntegratedTests.test_repeat) ... ok
+test_scope (test_rc5.IntegratedTests.test_scope) ... ok
+test_tamper (test_rc5.IntegratedTests.test_tamper) ... ok
+test_valid_receipt_not_authorization (test_rc5.IntegratedTests.test_valid_receipt_not_authorization) ... ok
+test_wrong_candidate (test_rc5.IntegratedTests.test_wrong_candidate) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 18.418s
+
+OK

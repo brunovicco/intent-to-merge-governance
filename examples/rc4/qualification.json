@@ -1,0 +1,18 @@
+{
+  "profile": "rc4-distributed-lab-qualification",
+  "production_ready": false,
+  "merge_authority": false,
+  "promotion": "HOLD",
+  "new_tests_passed": 16,
+  "new_tests_total": 16,
+  "http_expected_matches": 15,
+  "http_cases": 15,
+  "local_revocation_lifecycle": "PASS",
+  "full_regression": "PENDING",
+  "compose_runtime": "PENDING_NO_DOCKER_DAEMON",
+  "trust_digest": "1d75c466bb30be3ef69e942cd2f064fa41cffbcc090363e27058fb6d22308fe1",
+  "live_human_authorization": "PENDING",
+  "live_authorization_revocation": "PENDING",
+  "merge_group_integration": "PARSER_ONLY",
+  "live_multi_attempt_convergence": "PENDING"
+}

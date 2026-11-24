@@ -1,0 +1,261 @@
+{
+  "amgb_replay": "verified",
+  "api_contract_cases": [
+    {
+      "controls": {
+        "authorization": true,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": true,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "PASS",
+      "expired_check": "REVOKED",
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "normal",
+      "observed": "PASS",
+      "publication_count": 1,
+      "reasons": [],
+      "scenario": "happy"
+    },
+    {
+      "controls": {
+        "authorization": true,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": true,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "tamper",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "independent_control_evidence_missing_or_invalid"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "controls": {
+        "authorization": true,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": true,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "stale-review",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "approval:security"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "controls": {
+        "authorization": true,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": true,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "PASS",
+      "expired_check": "REVOKED",
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "lost-response",
+      "observed": "PASS",
+      "publication_count": 1,
+      "reasons": [],
+      "scenario": "happy"
+    },
+    {
+      "controls": {
+        "authorization": true,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": false,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "incident",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid",
+        "independent_control_evidence_missing_or_invalid"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "controls": {
+        "authorization": false,
+        "convergence": false,
+        "intent": false,
+        "operational_autonomy": false,
+        "provenance": true,
+        "verification": false
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "normal",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid",
+        "independent_control_evidence_missing_or_invalid"
+      ],
+      "scenario": "intent-drift"
+    },
+    {
+      "controls": {
+        "authorization": false,
+        "convergence": false,
+        "intent": true,
+        "operational_autonomy": false,
+        "provenance": true,
+        "verification": false
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "normal",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid",
+        "independent_control_evidence_missing_or_invalid"
+      ],
+      "scenario": "property-regression"
+    },
+    {
+      "controls": {
+        "authorization": false,
+        "convergence": true,
+        "intent": true,
+        "operational_autonomy": false,
+        "provenance": true,
+        "verification": true
+      },
+      "expected": "BLOCK",
+      "expired_check": null,
+      "journal_state": "DONE",
+      "merge_authority": false,
+      "mode": "normal",
+      "observed": "BLOCK",
+      "publication_count": 1,
+      "reasons": [
+        "trusted_live_assertion_missing_or_invalid",
+        "independent_control_evidence_missing_or_invalid"
+      ],
+      "scenario": "missing-approval"
+    }
+  ],
+  "changeset_receipts": [
+    {
+      "execution_replay": "verified",
+      "integrity": "verified",
+      "ledger_root": "91a1fe099cd891cd665157c060659565ed6c4ec7107b129d07ee0b06a88327b8",
+      "merge_authority": false,
+      "profile": "local-synthetic",
+      "scenario": "compatible",
+      "status": "COMPLETED"
+    },
+    {
+      "execution_replay": "verified",
+      "integrity": "verified",
+      "ledger_root": "a10e779b5601753e5e66d06d94ae7718c93f7fe0b4b61a1a2b869c7ba025ad3c",
+      "merge_authority": false,
+      "profile": "local-synthetic",
+      "scenario": "partial-failure",
+      "status": "COMPENSATED"
+    },
+    {
+      "execution_replay": "verified",
+      "integrity": "verified",
+      "ledger_root": "0a19986f423942f35c9c74722f389ad66b2cd792cf6f7124f52f495ade65f605",
+      "merge_authority": false,
+      "profile": "local-synthetic",
+      "scenario": "compensation-conflict",
+      "status": "MANUAL_INTERVENTION"
+    }
+  ],
+  "limitations": [
+    "GitHub API simulated, signing identities ephemeral, no live agents or production events.",
+    "Worker snapshot is not atomic merge authorization; merge_group enforcement is not implemented.",
+    "Local executor is trusted fixture only."
+  ],
+  "production_ready": false,
+  "profile": "local-synthetic-e2e",
+  "release": "1.0.0-rc.1",
+  "remote_writes": 0,
+  "scenarios": [
+    {
+      "autonomy": "ELIGIBLE",
+      "base": "0d2d5adab82f7995821a088698632279f36da465",
+      "cases": 37,
+      "exact_verification": true,
+      "expected_merge": true,
+      "head": "1453f2f252dab70798dc0a1d9bc78920c318565d",
+      "local_merge": true,
+      "offline_after_git_removed": true,
+      "scenario": "happy",
+      "signed_bundle": "verified"
+    },
+    {
+      "autonomy": "BLOCKED",
+      "base": "6bf24f59e08d6c649727da8ab2060d18f11cbfc5",
+      "cases": 37,
+      "exact_verification": false,
+      "expected_merge": false,
+      "head": "937d6d2963e847478f13fe3c24499217cbfde1d8",
+      "local_merge": false,
+      "offline_after_git_removed": true,
+      "scenario": "intent-drift",
+      "signed_bundle": "verified"
+    },
+    {
+      "autonomy": "BLOCKED",
+      "base": "55f496e272714db1ccf4565fdc75eb0536b51daa",
+      "cases": 37,
+      "exact_verification": false,
+      "expected_merge": false,
+      "head": "8de202b067b7faf2d3157eb3c00e7370a959421c",
+      "local_merge": false,
+      "offline_after_git_removed": true,
+      "scenario": "property-regression",
+      "signed_bundle": "verified"
+    },
+    {
+      "autonomy": "BLOCKED",
+      "base": "1777180f89a07575ea40449726dde3381430e3ea",
+      "cases": 37,
+      "exact_verification": true,
+      "expected_merge": false,
+      "head": "3005bce9db195a10127034adc84207a85e5d4095",
+      "local_merge": false,
+      "offline_after_git_removed": true,
+      "scenario": "missing-approval",
+      "signed_bundle": "verified"
+    }
+  ]
+}

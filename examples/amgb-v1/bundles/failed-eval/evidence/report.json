@@ -1,0 +1,82 @@
+{
+  "base": "ec70c1fda038a37f847e8004864db519a16d36a8",
+  "candidate": "5fd237ab1b8c32af3c37a0ef26a349955fc250a6",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "check_failed:conflicting_payload",
+      "check_failed:contract_flow",
+      "check_failed:property_invariants",
+      "check_failed:requirement_coverage",
+      "missing_approval:engineering",
+      "missing_approval:security"
+    ],
+    "required_roles": [
+      "engineering",
+      "security"
+    ],
+    "risk": "high",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 54,
+    "nodes": 35
+  },
+  "history": [
+    {
+      "head": "e12a9f2776ad217aece98364f33c9490aad6c575",
+      "iteration": 1,
+      "passed": 9,
+      "total": 13
+    },
+    {
+      "head": "5fd237ab1b8c32af3c37a0ef26a349955fc250a6",
+      "iteration": 2,
+      "passed": 9,
+      "total": 13
+    }
+  ],
+  "ledger_root": "ae4bdc39cc19e816c9fdaf69c0097195ed623b68b655e02b55a6b936d263c499",
+  "main": "ec70c1fda038a37f847e8004864db519a16d36a8",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "positive_amount": true
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": true
+    },
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "conflicting_payload": false,
+        "distinct_keys": true,
+        "same_key_same_payment": true
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": false
+    }
+  ],
+  "scenario": "failed-eval",
+  "termination": "repeated_tree",
+  "verification_cases_per_candidate": 37
+}

@@ -1,0 +1,107 @@
+{
+  "profile": "integrated-candidate-lab-v1",
+  "mode": "synthetic_fixture",
+  "fixture": "repair",
+  "provider": "claude",
+  "base": "acb97226f0a1ac4457bbd6e1d6b727cab0f875be",
+  "head": "35badac562b66d4a1d999d54364617409a1f9c78",
+  "status": "PASSED",
+  "attempts": [
+    {
+      "attempt": 1,
+      "tree": "67dec3e33b10670a8474c5cebca15b7cc58893bf",
+      "usage": {
+        "input_total": 100,
+        "uncached": 100,
+        "cache_write": 0,
+        "cache_read": 0,
+        "output": 20,
+        "trust": "self_reported"
+      },
+      "cumulative_observed_tokens": 120,
+      "cumulative_elapsed_ms": 887,
+      "state": "READY",
+      "merge_authority": false,
+      "head": "c00274911d82aff0e737ebd885ff76550122381d",
+      "base": "acb97226f0a1ac4457bbd6e1d6b727cab0f875be",
+      "scope_valid": true,
+      "verification": {
+        "base": "acb97226f0a1ac4457bbd6e1d6b727cab0f875be",
+        "head": "c00274911d82aff0e737ebd885ff76550122381d",
+        "tree": "67dec3e33b10670a8474c5cebca15b7cc58893bf",
+        "source_digest": "5fd8186612552d51bc256b80ca9655939ecf6f594927fa2d367ec2e356d54ac4",
+        "scenario_digest": "cb3eff1272c5c94fa545d0ca72593aca0803a9a9ee9b37132c1e5783903c38a6",
+        "verification": {
+          "cases": 20,
+          "passed_cases": 15,
+          "weak_ci_passed": true,
+          "structural_passed": true,
+          "passed": false,
+          "executor": {
+            "backend": "local",
+            "image_id": null,
+            "timeout_seconds": 15,
+            "isolation": "none_fixture_only"
+          }
+        }
+      },
+      "observation_digest": "ea70ee292b517c6f0135d2d5fa7028af07e8870ba326613bcbca3a84f2d41002",
+      "telemetry_trust": "synthetic"
+    },
+    {
+      "attempt": 2,
+      "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+      "usage": {
+        "input_total": 100,
+        "uncached": 100,
+        "cache_write": 0,
+        "cache_read": 0,
+        "output": 20,
+        "trust": "self_reported"
+      },
+      "cumulative_observed_tokens": 240,
+      "cumulative_elapsed_ms": 1724,
+      "state": "PASSED",
+      "merge_authority": false,
+      "head": "35badac562b66d4a1d999d54364617409a1f9c78",
+      "base": "acb97226f0a1ac4457bbd6e1d6b727cab0f875be",
+      "scope_valid": true,
+      "verification": {
+        "base": "acb97226f0a1ac4457bbd6e1d6b727cab0f875be",
+        "head": "35badac562b66d4a1d999d54364617409a1f9c78",
+        "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+        "source_digest": "f38eb2bd58ddf6965420886dccc042adfe7fda5f67469a38e54140da524b5f9a",
+        "scenario_digest": "cb3eff1272c5c94fa545d0ca72593aca0803a9a9ee9b37132c1e5783903c38a6",
+        "verification": {
+          "cases": 20,
+          "passed_cases": 20,
+          "weak_ci_passed": true,
+          "structural_passed": true,
+          "passed": true,
+          "executor": {
+            "backend": "local",
+            "image_id": null,
+            "timeout_seconds": 15,
+            "isolation": "none_fixture_only"
+          }
+        }
+      },
+      "observation_digest": "1034f0b8956f565078ae7142ac6c5d8aad3a0798d1ad4d35f1eae513ad50b170",
+      "telemetry_trust": "synthetic"
+    }
+  ],
+  "limits": {
+    "attempts": 3,
+    "observed_tokens": 400000,
+    "elapsed_ms": 180000
+  },
+  "error_type": null,
+  "merge_authority": false,
+  "production_ready": false,
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "timeout_seconds": 15,
+    "isolation": "none_fixture_only"
+  }
+}

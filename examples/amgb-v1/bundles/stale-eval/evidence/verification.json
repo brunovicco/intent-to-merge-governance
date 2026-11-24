@@ -1,0 +1,7338 @@
+[
+  {
+    "binding": {
+      "base": "8305bdfa6bd88b37554c96d63fa5f193f7178493",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "9886b0635ed5f3c92cf7d4693a654e03b6fa8872",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "execution": {
+      "observations": [
+        [
+          {
+            "error": "ValueError",
+            "store": {}
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              },
+              "b": {
+                "amount": 10,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 2
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              },
+              "key-0-other": {
+                "amount": 347,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 347,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              },
+              "key-0-other": {
+                "amount": 347,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              },
+              "key-1-other": {
+                "amount": 3781,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 3781,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              },
+              "key-1-other": {
+                "amount": 3781,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              },
+              "key-2-other": {
+                "amount": 203,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 203,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              },
+              "key-2-other": {
+                "amount": 203,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              },
+              "key-3-other": {
+                "amount": 296,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 296,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              },
+              "key-3-other": {
+                "amount": 296,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              },
+              "key-4-other": {
+                "amount": 2426,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2426,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              },
+              "key-4-other": {
+                "amount": 2426,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              },
+              "key-5-other": {
+                "amount": 5450,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 5450,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              },
+              "key-5-other": {
+                "amount": 5450,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              },
+              "key-6-other": {
+                "amount": 1024,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 1024,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              },
+              "key-6-other": {
+                "amount": 1024,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              },
+              "key-7-other": {
+                "amount": 4261,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4261,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              },
+              "key-7-other": {
+                "amount": 4261,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              },
+              "key-8-other": {
+                "amount": 2892,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2892,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              },
+              "key-8-other": {
+                "amount": 2892,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              },
+              "key-9-other": {
+                "amount": 6717,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 6717,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              },
+              "key-9-other": {
+                "amount": 6717,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              },
+              "key-10-other": {
+                "amount": 7367,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7367,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              },
+              "key-10-other": {
+                "amount": 7367,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              },
+              "key-11-other": {
+                "amount": 4257,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4257,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              },
+              "key-11-other": {
+                "amount": 4257,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              },
+              "key-12-other": {
+                "amount": 654,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              },
+              "key-12-other": {
+                "amount": 654,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              },
+              "key-13-other": {
+                "amount": 9810,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 9810,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              },
+              "key-13-other": {
+                "amount": 9810,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              },
+              "key-14-other": {
+                "amount": 4206,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4206,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              },
+              "key-14-other": {
+                "amount": 4206,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              },
+              "key-15-other": {
+                "amount": 5612,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 5612,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              },
+              "key-15-other": {
+                "amount": 5612,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              },
+              "key-16-other": {
+                "amount": 8899,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 8899,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              },
+              "key-16-other": {
+                "amount": 8899,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              },
+              "key-17-other": {
+                "amount": 765,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 765,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              },
+              "key-17-other": {
+                "amount": 765,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              },
+              "key-18-other": {
+                "amount": 7624,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7624,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              },
+              "key-18-other": {
+                "amount": 7624,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              },
+              "key-19-other": {
+                "amount": 2194,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2194,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              },
+              "key-19-other": {
+                "amount": 2194,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              },
+              "key-20-other": {
+                "amount": 3006,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 3006,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              },
+              "key-20-other": {
+                "amount": 3006,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              },
+              "key-21-other": {
+                "amount": 723,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 723,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              },
+              "key-21-other": {
+                "amount": 723,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              },
+              "key-22-other": {
+                "amount": 537,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 537,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              },
+              "key-22-other": {
+                "amount": 537,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              },
+              "key-23-other": {
+                "amount": 2654,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2654,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              },
+              "key-23-other": {
+                "amount": 2654,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 453,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 453,
+              "id": 1
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 87,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 87,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 87,
+                "id": 1
+              },
+              "k1": {
+                "amount": 64,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 64,
+              "id": 2
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 158,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              },
+              "k1": {
+                "amount": 74,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 74,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              },
+              "k1": {
+                "amount": 74,
+                "id": 2
+              },
+              "k2": {
+                "amount": 11,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 11,
+              "id": 3
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 133,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 834,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              },
+              "k2": {
+                "amount": 716,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 716,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              },
+              "k2": {
+                "amount": 716,
+                "id": 3
+              },
+              "k3": {
+                "amount": 250,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 250,
+              "id": 4
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 127,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 75,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 484,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              },
+              "k3": {
+                "amount": 636,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 636,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              },
+              "k3": {
+                "amount": 636,
+                "id": 4
+              },
+              "k4": {
+                "amount": 575,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 575,
+              "id": 5
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 735,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 428,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 646,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 851,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              },
+              "k4": {
+                "amount": 561,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 561,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              },
+              "k4": {
+                "amount": 561,
+                "id": 5
+              },
+              "k5": {
+                "amount": 490,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 490,
+              "id": 6
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 548,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 193,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 737,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 442,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 318,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              },
+              "k5": {
+                "amount": 27,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 27,
+              "id": 6
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              },
+              "k5": {
+                "amount": 27,
+                "id": 6
+              },
+              "k6": {
+                "amount": 863,
+                "id": 7
+              }
+            },
+            "value": {
+              "amount": 863,
+              "id": 7
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 782,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 711,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 26,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 879,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 903,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 912,
+              "id": 6
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              },
+              "k6": {
+                "amount": 741,
+                "id": 7
+              }
+            },
+            "value": {
+              "amount": 741,
+              "id": 7
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              },
+              "k6": {
+                "amount": 741,
+                "id": 7
+              },
+              "k7": {
+                "amount": 860,
+                "id": 8
+              }
+            },
+            "value": {
+              "amount": 860,
+              "id": 8
+            }
+          }
+        ],
+        [
+          {
+            "store": {},
+            "value": true
+          },
+          {
+            "store": {},
+            "value": false
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              },
+              "b": {
+                "amount": 7,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              },
+              "b": {
+                "amount": 7,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 5,
+              "id": 1
+            }
+          }
+        ]
+      ],
+      "status": "ok"
+    },
+    "iteration": 1,
+    "result": {
+      "checks": {
+        "conflicting_payload": false,
+        "contract_flow": false,
+        "differential_compatibility": true,
+        "distinct_keys": true,
+        "positive_amount": true,
+        "property_invariants": false,
+        "same_key_same_payment": true
+      },
+      "outcomes": [
+        {
+          "group": "positive_amount",
+          "id": "positive_amount:0",
+          "passed": true
+        },
+        {
+          "group": "same_key_same_payment",
+          "id": "same_key_same_payment:1",
+          "passed": true
+        },
+        {
+          "group": "distinct_keys",
+          "id": "distinct_keys:2",
+          "passed": true
+        },
+        {
+          "group": "conflicting_payload",
+          "id": "conflicting_payload:3",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:4",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:5",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:6",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:7",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:8",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:9",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:10",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:11",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:12",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:13",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:14",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:15",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:16",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:17",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:18",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:19",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:20",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:21",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:22",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:23",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:24",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:25",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:26",
+          "passed": false
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:27",
+          "passed": false
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:28",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:29",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:30",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:31",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:32",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:33",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:34",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:35",
+          "passed": true
+        },
+        {
+          "group": "contract_flow",
+          "id": "contract_flow:36",
+          "passed": false
+        }
+      ]
+    }
+  },
+  {
+    "binding": {
+      "base": "8305bdfa6bd88b37554c96d63fa5f193f7178493",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "779e9e5b8a6b2d3f100c26f6bf9e8f9a81d5c364",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "execution": {
+      "observations": [
+        [
+          {
+            "error": "ValueError",
+            "store": {}
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              },
+              "b": {
+                "amount": 10,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 2
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 10,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "a": {
+                "amount": 10,
+                "id": 1
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 321,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              },
+              "key-0-other": {
+                "amount": 347,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 347,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-0": {
+                "amount": 321,
+                "id": 1
+              },
+              "key-0-other": {
+                "amount": 347,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 3730,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              },
+              "key-1-other": {
+                "amount": 3781,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 3781,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-1": {
+                "amount": 3730,
+                "id": 1
+              },
+              "key-1-other": {
+                "amount": 3781,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 111,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              },
+              "key-2-other": {
+                "amount": 203,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 203,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-2": {
+                "amount": 111,
+                "id": 1
+              },
+              "key-2-other": {
+                "amount": 203,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 274,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              },
+              "key-3-other": {
+                "amount": 296,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 296,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-3": {
+                "amount": 274,
+                "id": 1
+              },
+              "key-3-other": {
+                "amount": 296,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2410,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              },
+              "key-4-other": {
+                "amount": 2426,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2426,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-4": {
+                "amount": 2410,
+                "id": 1
+              },
+              "key-4-other": {
+                "amount": 2426,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5402,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              },
+              "key-5-other": {
+                "amount": 5450,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 5450,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-5": {
+                "amount": 5402,
+                "id": 1
+              },
+              "key-5-other": {
+                "amount": 5450,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 998,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              },
+              "key-6-other": {
+                "amount": 1024,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 1024,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-6": {
+                "amount": 998,
+                "id": 1
+              },
+              "key-6-other": {
+                "amount": 1024,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4210,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              },
+              "key-7-other": {
+                "amount": 4261,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4261,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-7": {
+                "amount": 4210,
+                "id": 1
+              },
+              "key-7-other": {
+                "amount": 4261,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2811,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              },
+              "key-8-other": {
+                "amount": 2892,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2892,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-8": {
+                "amount": 2811,
+                "id": 1
+              },
+              "key-8-other": {
+                "amount": 2892,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 6711,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              },
+              "key-9-other": {
+                "amount": 6717,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 6717,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-9": {
+                "amount": 6711,
+                "id": 1
+              },
+              "key-9-other": {
+                "amount": 6717,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7298,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              },
+              "key-10-other": {
+                "amount": 7367,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7367,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-10": {
+                "amount": 7298,
+                "id": 1
+              },
+              "key-10-other": {
+                "amount": 7367,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4233,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              },
+              "key-11-other": {
+                "amount": 4257,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4257,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-11": {
+                "amount": 4233,
+                "id": 1
+              },
+              "key-11-other": {
+                "amount": 4257,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 641,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              },
+              "key-12-other": {
+                "amount": 654,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-12": {
+                "amount": 641,
+                "id": 1
+              },
+              "key-12-other": {
+                "amount": 654,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 9794,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              },
+              "key-13-other": {
+                "amount": 9810,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 9810,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-13": {
+                "amount": 9794,
+                "id": 1
+              },
+              "key-13-other": {
+                "amount": 9810,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 4134,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              },
+              "key-14-other": {
+                "amount": 4206,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 4206,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-14": {
+                "amount": 4134,
+                "id": 1
+              },
+              "key-14-other": {
+                "amount": 4206,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5602,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              },
+              "key-15-other": {
+                "amount": 5612,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 5612,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-15": {
+                "amount": 5602,
+                "id": 1
+              },
+              "key-15-other": {
+                "amount": 5612,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 8873,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              },
+              "key-16-other": {
+                "amount": 8899,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 8899,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-16": {
+                "amount": 8873,
+                "id": 1
+              },
+              "key-16-other": {
+                "amount": 8899,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 672,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              },
+              "key-17-other": {
+                "amount": 765,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 765,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-17": {
+                "amount": 672,
+                "id": 1
+              },
+              "key-17-other": {
+                "amount": 765,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 7553,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              },
+              "key-18-other": {
+                "amount": 7624,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7624,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-18": {
+                "amount": 7553,
+                "id": 1
+              },
+              "key-18-other": {
+                "amount": 7624,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2165,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              },
+              "key-19-other": {
+                "amount": 2194,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2194,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-19": {
+                "amount": 2165,
+                "id": 1
+              },
+              "key-19-other": {
+                "amount": 2194,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2939,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              },
+              "key-20-other": {
+                "amount": 3006,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 3006,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-20": {
+                "amount": 2939,
+                "id": 1
+              },
+              "key-20-other": {
+                "amount": 3006,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 654,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              },
+              "key-21-other": {
+                "amount": 723,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 723,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-21": {
+                "amount": 654,
+                "id": 1
+              },
+              "key-21-other": {
+                "amount": 723,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 518,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              },
+              "key-22-other": {
+                "amount": 537,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 537,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-22": {
+                "amount": 518,
+                "id": 1
+              },
+              "key-22-other": {
+                "amount": 537,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 2626,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              },
+              "key-23-other": {
+                "amount": 2654,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 2654,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "key-23": {
+                "amount": 2626,
+                "id": 1
+              },
+              "key-23-other": {
+                "amount": 2654,
+                "id": 2
+              }
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 453,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 453,
+              "id": 1
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 87,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 87,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 87,
+                "id": 1
+              },
+              "k1": {
+                "amount": 64,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 64,
+              "id": 2
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 158,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              },
+              "k1": {
+                "amount": 74,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 74,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 158,
+                "id": 1
+              },
+              "k1": {
+                "amount": 74,
+                "id": 2
+              },
+              "k2": {
+                "amount": 11,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 11,
+              "id": 3
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 133,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 834,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              },
+              "k2": {
+                "amount": 716,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 716,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 133,
+                "id": 1
+              },
+              "k1": {
+                "amount": 834,
+                "id": 2
+              },
+              "k2": {
+                "amount": 716,
+                "id": 3
+              },
+              "k3": {
+                "amount": 250,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 250,
+              "id": 4
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 127,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 75,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 484,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              },
+              "k3": {
+                "amount": 636,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 636,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 127,
+                "id": 1
+              },
+              "k1": {
+                "amount": 75,
+                "id": 2
+              },
+              "k2": {
+                "amount": 484,
+                "id": 3
+              },
+              "k3": {
+                "amount": 636,
+                "id": 4
+              },
+              "k4": {
+                "amount": 575,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 575,
+              "id": 5
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 735,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 428,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 646,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 851,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              },
+              "k4": {
+                "amount": 561,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 561,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 735,
+                "id": 1
+              },
+              "k1": {
+                "amount": 428,
+                "id": 2
+              },
+              "k2": {
+                "amount": 646,
+                "id": 3
+              },
+              "k3": {
+                "amount": 851,
+                "id": 4
+              },
+              "k4": {
+                "amount": 561,
+                "id": 5
+              },
+              "k5": {
+                "amount": 490,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 490,
+              "id": 6
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 548,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 193,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 737,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 442,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 318,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              },
+              "k5": {
+                "amount": 27,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 27,
+              "id": 6
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 548,
+                "id": 1
+              },
+              "k1": {
+                "amount": 193,
+                "id": 2
+              },
+              "k2": {
+                "amount": 737,
+                "id": 3
+              },
+              "k3": {
+                "amount": 442,
+                "id": 4
+              },
+              "k4": {
+                "amount": 318,
+                "id": 5
+              },
+              "k5": {
+                "amount": 27,
+                "id": 6
+              },
+              "k6": {
+                "amount": 863,
+                "id": 7
+              }
+            },
+            "value": {
+              "amount": 863,
+              "id": 7
+            }
+          }
+        ],
+        [
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 782,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 711,
+              "id": 2
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              }
+            },
+            "value": {
+              "amount": 26,
+              "id": 3
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              }
+            },
+            "value": {
+              "amount": 879,
+              "id": 4
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              }
+            },
+            "value": {
+              "amount": 903,
+              "id": 5
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              }
+            },
+            "value": {
+              "amount": 912,
+              "id": 6
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              },
+              "k6": {
+                "amount": 741,
+                "id": 7
+              }
+            },
+            "value": {
+              "amount": 741,
+              "id": 7
+            }
+          },
+          {
+            "store": {
+              "k0": {
+                "amount": 782,
+                "id": 1
+              },
+              "k1": {
+                "amount": 711,
+                "id": 2
+              },
+              "k2": {
+                "amount": 26,
+                "id": 3
+              },
+              "k3": {
+                "amount": 879,
+                "id": 4
+              },
+              "k4": {
+                "amount": 903,
+                "id": 5
+              },
+              "k5": {
+                "amount": 912,
+                "id": 6
+              },
+              "k6": {
+                "amount": 741,
+                "id": 7
+              },
+              "k7": {
+                "amount": 860,
+                "id": 8
+              }
+            },
+            "value": {
+              "amount": 860,
+              "id": 8
+            }
+          }
+        ],
+        [
+          {
+            "store": {},
+            "value": true
+          },
+          {
+            "store": {},
+            "value": false
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              }
+            },
+            "value": {
+              "amount": 5,
+              "id": 1
+            }
+          },
+          {
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              },
+              "b": {
+                "amount": 7,
+                "id": 2
+              }
+            },
+            "value": {
+              "amount": 7,
+              "id": 2
+            }
+          },
+          {
+            "error": "ValueError",
+            "store": {
+              "a": {
+                "amount": 5,
+                "id": 1
+              },
+              "b": {
+                "amount": 7,
+                "id": 2
+              }
+            }
+          }
+        ]
+      ],
+      "status": "ok"
+    },
+    "iteration": 2,
+    "result": {
+      "checks": {
+        "conflicting_payload": true,
+        "contract_flow": true,
+        "differential_compatibility": true,
+        "distinct_keys": true,
+        "positive_amount": true,
+        "property_invariants": true,
+        "same_key_same_payment": true
+      },
+      "outcomes": [
+        {
+          "group": "positive_amount",
+          "id": "positive_amount:0",
+          "passed": true
+        },
+        {
+          "group": "same_key_same_payment",
+          "id": "same_key_same_payment:1",
+          "passed": true
+        },
+        {
+          "group": "distinct_keys",
+          "id": "distinct_keys:2",
+          "passed": true
+        },
+        {
+          "group": "conflicting_payload",
+          "id": "conflicting_payload:3",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:4",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:5",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:6",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:7",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:8",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:9",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:10",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:11",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:12",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:13",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:14",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:15",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:16",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:17",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:18",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:19",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:20",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:21",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:22",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:23",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:24",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:25",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:26",
+          "passed": true
+        },
+        {
+          "group": "property_invariants",
+          "id": "property_invariants:27",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:28",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:29",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:30",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:31",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:32",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:33",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:34",
+          "passed": true
+        },
+        {
+          "group": "differential_compatibility",
+          "id": "differential_compatibility:35",
+          "passed": true
+        },
+        {
+          "group": "contract_flow",
+          "id": "contract_flow:36",
+          "passed": true
+        }
+      ]
+    }
+  }
+]

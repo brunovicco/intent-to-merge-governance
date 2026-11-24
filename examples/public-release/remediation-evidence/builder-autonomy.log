@@ -1,0 +1,25 @@
+test_adverse_threshold (test_autonomy.AutonomyTests.test_adverse_threshold) ... ok
+test_bundle_scope_pin (test_autonomy.AutonomyTests.test_bundle_scope_pin) ... ok
+test_critical (test_autonomy.AutonomyTests.test_critical) ... ok
+test_demo_stages (test_autonomy.AutonomyTests.test_demo_stages) ... ok
+test_early_promotion (test_autonomy.AutonomyTests.test_early_promotion) ... ok
+test_failed_eval_cannot_resolve (test_autonomy.AutonomyTests.test_failed_eval_cannot_resolve) ... ok
+test_gate_never_bypasses_base (test_autonomy.AutonomyTests.test_gate_never_bypasses_base) ... ok
+test_incident_regression (test_autonomy.AutonomyTests.test_incident_regression) ... ok
+test_major (test_autonomy.AutonomyTests.test_major) ... ok
+test_no_arbitrary_executable_eval (test_autonomy.AutonomyTests.test_no_arbitrary_executable_eval) ... ok
+test_no_premature_resolution (test_autonomy.AutonomyTests.test_no_premature_resolution) ... ok
+test_repeated_outcome (test_autonomy.AutonomyTests.test_repeated_outcome) ... ok
+test_replay_exact (test_autonomy.AutonomyTests.test_replay_exact) ... ok
+test_result_bound_to_candidate (test_autonomy.AutonomyTests.test_result_bound_to_candidate) ... ok
+test_scope_change (test_autonomy.AutonomyTests.test_scope_change) ... ok
+test_shared_key (test_autonomy.AutonomyTests.test_shared_key) ... ok
+test_tamper_even_rehashed (test_autonomy.AutonomyTests.test_tamper_even_rehashed) ... ok
+test_truncation (test_autonomy.AutonomyTests.test_truncation) ... ok
+test_unapproved_eval (test_autonomy.AutonomyTests.test_unapproved_eval) ... ok
+test_wrong_role (test_autonomy.AutonomyTests.test_wrong_role) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 5.022s
+
+OK

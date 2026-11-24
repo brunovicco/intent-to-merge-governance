@@ -1,0 +1,74 @@
+[
+  {
+    "binding": {
+      "base": "130911f1ecd9be49728a30e9fcbd62c399d90c32",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "ce85b00a76750661a48b806123ef2693310c10aa",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "453ed32f9187558a066c14896ce59d5a7e766950438e6099db9f4f552aecdc7d",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "166ecf701d174db5009a4f6e0ab6fad3d00e9c3438e0bbd29d865ad2295b88f0",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "stale-base-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "049920c473c581986e3292a1ec9f52fd207338248ad4eab1b28b03f2ed2db40a",
+    "source": "agent_proposal",
+    "tree": "ac0c0eb10bbc5d05f6054da415af7d688b219578",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "130911f1ecd9be49728a30e9fcbd62c399d90c32",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "c65949147b23a5156839a58b33bdd295f7345749",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "0d1446dda2cf96a5eee81cac50f6f3bc869030b14f2f6c87001d5aff1dc3c48c",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "eee767739d986748a1a92805ce7ff5396680ed53117d52ba2fb3cba03d0f8648",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "stale-base-2",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "9350a58c3bd7566b0c2b1c9b1635898090ac7035efbda6221a314f6f6ab2483d",
+    "source": "agent_proposal",
+    "tree": "875c8974f5be5a72a6910b5736c3a9485e532060",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

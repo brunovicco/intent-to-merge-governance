@@ -1,0 +1,39 @@
+[
+  {
+    "binding": {
+      "base": "063b77a42e86ff46b1f71e22adaf20f003a61448",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "117413f7466a3126ea2fa09dd8d72846fd107cbb",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "iteration": 1,
+    "result": {
+      "findings": [
+        {
+          "detail": "invariant preserved",
+          "id": "NG01",
+          "kind": "preserve_symbol",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "invariant preserved",
+          "id": "NG02",
+          "kind": "preserve_signature",
+          "passed": true,
+          "path": "app/payments.py"
+        },
+        {
+          "detail": "structural invariant violated",
+          "id": "NG03",
+          "kind": "no_new_imports",
+          "passed": false,
+          "path": "app/payments.py"
+        }
+      ],
+      "method": "python_ast_structural_v1",
+      "passed": false
+    }
+  }
+]

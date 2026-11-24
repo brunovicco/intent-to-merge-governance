@@ -1,0 +1,10 @@
+test_empty_report_not_a_review (test_security_remediation.SecurityRemediationTests.test_empty_report_not_a_review) ... ok
+test_no_redirect (test_security_remediation.SecurityRemediationTests.test_no_redirect) ... ok
+test_non_lab_urls (test_security_remediation.SecurityRemediationTests.test_non_lab_urls) ... ok
+test_scoped_public_key_review (test_security_remediation.SecurityRemediationTests.test_scoped_public_key_review) ... ok
+test_valid_health_and_response_cap (test_security_remediation.SecurityRemediationTests.test_valid_health_and_response_cap) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.048s
+
+OK

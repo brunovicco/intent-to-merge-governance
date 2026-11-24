@@ -1,0 +1,5 @@
+{
+  "coding-agent": "ed25519-public:27c63f9070df50be58d0b4173039fec5e2ccd31acfb7f64368077e538715d034",
+  "reviewer": "ed25519-public:f7a79eaf6b21363b67a3b4cfc9dedebd861b653b33ede6039fadac9b489d3f35",
+  "security": "ed25519-public:3095d8651eaff3cfc73a41ee229e8fefbf5e6402cae782dcf9f795292d1632b1"
+}

@@ -1,0 +1,21 @@
+test_fail_closed (test_rc4.BudgetTests.test_fail_closed) ... ok
+test_normalization (test_rc4.BudgetTests.test_normalization) ... ok
+test_repeat_and_budget (test_rc4.BudgetTests.test_repeat_and_budget) ... ok
+test_success (test_rc4.BudgetTests.test_success) ... ok
+test_denials (test_rc4.ControlPlaneTests.test_denials) ... ok
+test_happy (test_rc4.ControlPlaneTests.test_happy) ... ok
+test_key_files_separate (test_rc4.ControlPlaneTests.test_key_files_separate) ... ok
+test_live_gate_rejects_lab_profile (test_rc4.ControlPlaneTests.test_live_gate_rejects_lab_profile) ... ok
+test_missing (test_rc4.ControlPlaneTests.test_missing) ... ok
+test_shared_key (test_rc4.ControlPlaneTests.test_shared_key) ... ok
+test_tampered (test_rc4.ControlPlaneTests.test_tampered) ... ok
+test_wrong_binding_and_expiry (test_rc4.ControlPlaneTests.test_wrong_binding_and_expiry) ... ok
+test_wrong_signer (test_rc4.ControlPlaneTests.test_wrong_signer) ... ok
+test_bad_hmac_and_repo (test_rc4.MergeGroupTests.test_bad_hmac_and_repo) ... ok
+test_valid (test_rc4.MergeGroupTests.test_valid) ... ok
+test_wrong_ref (test_rc4.MergeGroupTests.test_wrong_ref) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 9.505s
+
+OK

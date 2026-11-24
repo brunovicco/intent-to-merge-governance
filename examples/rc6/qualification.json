@@ -1,0 +1,45 @@
+{
+  "release": "1.0.0-rc.6",
+  "qualification": "RESEARCH_REFERENCE_ONLY",
+  "production_ready": false,
+  "merge_authority": false,
+  "promotion": "HOLD",
+  "builder": {
+    "python": "3.13.5",
+    "platform": "Linux",
+    "full_regression": {
+      "status": "PASS",
+      "tests": 203,
+      "seconds": 197.281,
+      "note": "Discovery started before two new RC6 tests were added. ResourceWarning for unclosed SQLite connection observed; not a test failure."
+    },
+    "final_targeted": {
+      "status": "PASS",
+      "tests": 18,
+      "seconds": 25.831
+    },
+    "expected_final_discovery": 205,
+    "historical_amgb_report_equal": true,
+    "historical_verification_py_sha256": "74c96cca7a8ee1a209451ce0ee5a25d2226233a099d36cd66d582030170da4e1",
+    "fixture_repair": {
+      "status": "PASS",
+      "attempts": 2,
+      "decision": "BLOCK"
+    },
+    "checkpoint_correct_pin": "PASS",
+    "checkpoint_wrong_pin": "REJECTED",
+    "docker_available": false,
+    "live_agents_executed": false,
+    "remote_writes": false,
+    "vulnerability_scan_performed": false,
+    "complete_transitive_sbom": false
+  },
+  "pending": [
+    "fresh full regression of final package (205 tests)",
+    "Docker live execution with new bounded adapter",
+    "hostile code isolation and independently administered signer",
+    "real independent approvals and remote revocation",
+    "mTLS/workload identities and external journal anchors",
+    "full dependency lock, SBOM, security scan, release signing and license"
+  ]
+}

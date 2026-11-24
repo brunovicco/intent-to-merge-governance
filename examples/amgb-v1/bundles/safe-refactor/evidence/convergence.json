@@ -1,0 +1,16 @@
+[
+  {
+    "action": "passed",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 647,
+    "failed": [],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "cff1f4de15618008584f6b9ea0c8bfcf100451d2"
+  }
+]

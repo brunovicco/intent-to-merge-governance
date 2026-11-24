@@ -1,0 +1,205 @@
+{
+  "approvals": [
+    {
+      "component": "payments",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "23eb8583db9d7ff3096f9fa8861a50e794518e804665651c599665c0a2675b30",
+      "signature": "d68ae6a10fa89afbbf0eedd149c5980c8f68abe6eba0d152e605232b5c1cdee0a7d6f53c37b652c52c2a928505f2824668593ad545b5c795cc6d40b46d77650e"
+    },
+    {
+      "component": "checkout",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "23eb8583db9d7ff3096f9fa8861a50e794518e804665651c599665c0a2675b30",
+      "signature": "3531b6215b832b0b725352e2fd6e12f9be8df87f311497c7405277217fa72d5c6223f40ced7459cce24a241e3611f9b8843f88394a08900ae2d0844ae7d55b0c"
+    },
+    {
+      "component": "portal",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "23eb8583db9d7ff3096f9fa8861a50e794518e804665651c599665c0a2675b30",
+      "signature": "bee2e6a335a11d7c95d3b0babc2c72afe2c75f029874860b1c54470cf6222cfdac67e3c9c18cbd3d53be4457aedf78ae7d2a5251077a9ea35dba0ed45b714d07"
+    }
+  ],
+  "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+  "events": [
+    {
+      "hash": "1211888b6bb679794d2931bb5964ee370510c8d6c30ac78ba1924b2f50d371cc",
+      "kind": "start",
+      "payload": {
+        "refs": {
+          "checkout": "2ce2e85e42fc3f8bd1f319e73a4fa981a597fa8a",
+          "payments": "768c20d647c3280ffdc7ae5b93ccad9d9d4e965b",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "seq": 0
+    },
+    {
+      "hash": "e85307063b988c61b565f1f088217f70324f9322058d7c498da066afc7988700",
+      "kind": "merged",
+      "payload": {
+        "component": "payments",
+        "refs": {
+          "checkout": "2ce2e85e42fc3f8bd1f319e73a4fa981a597fa8a",
+          "payments": "f148e1a68110c6132e58434a3667c6974e64d07a",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "1211888b6bb679794d2931bb5964ee370510c8d6c30ac78ba1924b2f50d371cc",
+      "seq": 1
+    },
+    {
+      "hash": "bc2c3841186d1e8e06ee7e9f286e68f0cde156e1196347010a041940fb0caaed",
+      "kind": "merged",
+      "payload": {
+        "component": "checkout",
+        "refs": {
+          "checkout": "9cd8210154922a0dca2b4ebe7f22502de883b4d9",
+          "payments": "f148e1a68110c6132e58434a3667c6974e64d07a",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "e85307063b988c61b565f1f088217f70324f9322058d7c498da066afc7988700",
+      "seq": 2
+    },
+    {
+      "hash": "776a855ffac1d7d03da76e26ccb4d969170f913b72a69444c7dcc4694c885ebb",
+      "kind": "merged",
+      "payload": {
+        "component": "portal",
+        "refs": {
+          "checkout": "9cd8210154922a0dca2b4ebe7f22502de883b4d9",
+          "payments": "f148e1a68110c6132e58434a3667c6974e64d07a",
+          "portal": "77d5e1970f0560698623a52584a573ee9b3ff69f"
+        }
+      },
+      "prev": "bc2c3841186d1e8e06ee7e9f286e68f0cde156e1196347010a041940fb0caaed",
+      "seq": 3
+    },
+    {
+      "hash": "91a1fe099cd891cd665157c060659565ed6c4ec7107b129d07ee0b06a88327b8",
+      "kind": "finish",
+      "payload": {
+        "refs": {
+          "checkout": "9cd8210154922a0dca2b4ebe7f22502de883b4d9",
+          "payments": "f148e1a68110c6132e58434a3667c6974e64d07a",
+          "portal": "77d5e1970f0560698623a52584a573ee9b3ff69f"
+        },
+        "status": "COMPLETED"
+      },
+      "prev": "776a855ffac1d7d03da76e26ccb4d969170f913b72a69444c7dcc4694c885ebb",
+      "seq": 4
+    }
+  ],
+  "merge_authority": false,
+  "plan": {
+    "components": {
+      "checkout": {
+        "base": "2ce2e85e42fc3f8bd1f319e73a4fa981a597fa8a",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {
+            "payments": "v1"
+          }
+        },
+        "fast_forward": true,
+        "head": "9cd8210154922a0dca2b4ebe7f22502de883b4d9",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {
+            "payments": "v2"
+          }
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      },
+      "payments": {
+        "base": "768c20d647c3280ffdc7ae5b93ccad9d9d4e965b",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {}
+        },
+        "fast_forward": true,
+        "head": "f148e1a68110c6132e58434a3667c6974e64d07a",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {}
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      },
+      "portal": {
+        "base": "2626a6d82945262d99240f7cdade6abd68b38fe5",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {
+            "checkout": "v1"
+          }
+        },
+        "fast_forward": true,
+        "head": "77d5e1970f0560698623a52584a573ee9b3ff69f",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {
+            "checkout": "v2"
+          }
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      }
+    },
+    "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+    "eligible": true,
+    "intent_id": "payment-contract-v2",
+    "issues": [],
+    "merge_authority": false,
+    "order": [
+      "payments",
+      "checkout",
+      "portal"
+    ],
+    "stages": [
+      {
+        "after": null,
+        "violations": []
+      },
+      {
+        "after": "payments",
+        "violations": []
+      },
+      {
+        "after": "checkout",
+        "violations": []
+      },
+      {
+        "after": "portal",
+        "violations": []
+      }
+    ],
+    "version": 1
+  },
+  "signature": "cb9e24f24fd1af3e456ce6a449076cb30327091f1f3d6a0c76b7fd0ac94a7c0d56f375355bfd3e1787f96873fe8f028e52d24931db71d88ea4f8676711ebf908",
+  "status": "COMPLETED",
+  "version": 1
+}

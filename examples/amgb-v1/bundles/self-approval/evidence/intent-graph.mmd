@@ -1,0 +1,92 @@
+flowchart TD
+    N0["intent: PAY-104"]
+    N1["requirement: R01"]
+    N2["criterion: positive_amount"]
+    N3["path: app/payments.py"]
+    N4["requirement: R02"]
+    N5["criterion: same_key_same_payment"]
+    N6["criterion: distinct_keys"]
+    N7["criterion: conflicting_payload"]
+    N8["non_goal: NG01"]
+    N9["non_goal: NG02"]
+    N10["non_goal: NG03"]
+    N11["commit: 8bf50cabc8b5985f1275f8a88d269322d2c71db6"]
+    N12["checkpoint: 8bf50cabc8b5985f1275f8a88d269322d2c71db6"]
+    N13["drift: 8bf50cabc8b5985f1275f8a88d269322d2c71db6"]
+    N14["finding: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:NG01"]
+    N15["finding: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:NG02"]
+    N16["finding: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:NG03"]
+    N17["evaluation: 8bf50cabc8b5985f1275f8a88d269322d2c71db6"]
+    N18["check_result: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:posi"]
+    N19["check_result: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:same"]
+    N20["check_result: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:dist"]
+    N21["check_result: 8bf50cabc8b5985f1275f8a88d269322d2c71db6:conf"]
+    N22["commit: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N23["checkpoint: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N24["drift: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N25["finding: caa518169bae09ef9c50dd60845b78c7253f47c8:NG01"]
+    N26["finding: caa518169bae09ef9c50dd60845b78c7253f47c8:NG02"]
+    N27["finding: caa518169bae09ef9c50dd60845b78c7253f47c8:NG03"]
+    N28["evaluation: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N29["check_result: caa518169bae09ef9c50dd60845b78c7253f47c8:posi"]
+    N30["check_result: caa518169bae09ef9c50dd60845b78c7253f47c8:same"]
+    N31["check_result: caa518169bae09ef9c50dd60845b78c7253f47c8:dist"]
+    N32["check_result: caa518169bae09ef9c50dd60845b78c7253f47c8:conf"]
+    N33["decision: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N34["approval: 4be398b73df85c51a5ddb8d82fcba708bd4f051682589"]
+    N35["merge_result: caa518169bae09ef9c50dd60845b78c7253f47c8"]
+    N0 -->|requires| N1
+    N1 -->|acceptance| N2
+    N1 -->|maps_to| N3
+    N0 -->|requires| N4
+    N4 -->|acceptance| N5
+    N4 -->|acceptance| N6
+    N4 -->|acceptance| N7
+    N4 -->|maps_to| N3
+    N0 -->|constrains| N8
+    N0 -->|constrains| N9
+    N0 -->|constrains| N10
+    N12 -->|observes| N11
+    N0 -->|has_checkpoint| N12
+    N11 -->|changes| N3
+    N12 -->|checked_by| N13
+    N13 -->|reports| N14
+    N14 -->|checks| N8
+    N13 -->|reports| N15
+    N15 -->|checks| N9
+    N13 -->|reports| N16
+    N16 -->|checks| N10
+    N12 -->|evaluated_by| N17
+    N17 -->|produces| N18
+    N18 -->|checks| N2
+    N17 -->|produces| N19
+    N19 -->|checks| N5
+    N17 -->|produces| N20
+    N20 -->|checks| N6
+    N17 -->|produces| N21
+    N21 -->|checks| N7
+    N23 -->|observes| N22
+    N0 -->|has_checkpoint| N23
+    N22 -->|changes| N3
+    N23 -->|checked_by| N24
+    N24 -->|reports| N25
+    N25 -->|checks| N8
+    N24 -->|reports| N26
+    N26 -->|checks| N9
+    N24 -->|reports| N27
+    N27 -->|checks| N10
+    N23 -->|evaluated_by| N28
+    N28 -->|produces| N29
+    N29 -->|checks| N2
+    N28 -->|produces| N30
+    N30 -->|checks| N5
+    N28 -->|produces| N31
+    N31 -->|checks| N6
+    N28 -->|produces| N32
+    N32 -->|checks| N7
+    N0 -->|subject_to| N33
+    N23 -->|evidence_for| N33
+    N28 -->|evidence_for| N33
+    N24 -->|evidence_for| N33
+    N34 -->|considered_by| N33
+    N33 -->|determines| N35

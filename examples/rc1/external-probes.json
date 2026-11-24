@@ -1,0 +1,26 @@
+{
+  "release": "1.0.0-rc.1",
+  "profile": "external-qualification-probes",
+  "production_ready": false,
+  "probes": {
+    "docker": {
+      "status": "NOT_RUN"
+    },
+    "claude": {
+      "status": "NOT_RUN"
+    },
+    "codex": {
+      "status": "NOT_RUN"
+    },
+    "github_app_preflight": {
+      "status": "NOT_RUN"
+    }
+  },
+  "remaining": [
+    "merge_group enforcement",
+    "live independent control services",
+    "hostile-code isolation",
+    "authenticated publication/revocation and merge-queue lifecycle",
+    "live comparative benchmark"
+  ]
+}

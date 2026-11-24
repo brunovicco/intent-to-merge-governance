@@ -1,0 +1,64 @@
+flowchart TD
+    N0["intent: PAY-104"]
+    N1["requirement: R01"]
+    N2["criterion: positive_amount"]
+    N3["path: app/payments.py"]
+    N4["requirement: R02"]
+    N5["criterion: same_key_same_payment"]
+    N6["criterion: distinct_keys"]
+    N7["criterion: conflicting_payload"]
+    N8["non_goal: NG01"]
+    N9["non_goal: NG02"]
+    N10["non_goal: NG03"]
+    N11["commit: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N12["checkpoint: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N13["drift: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N14["finding: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG01"]
+    N15["finding: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG02"]
+    N16["finding: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG03"]
+    N17["evaluation: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N18["check_result: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:posi"]
+    N19["check_result: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:same"]
+    N20["check_result: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:dist"]
+    N21["check_result: 02ddbccef723b876ef03ee3aa611a05eb4500a1a:conf"]
+    N22["decision: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N23["approval: abbe48b7a1c40ad41b958419849abbc7b2db3bc248aa1"]
+    N24["approval: a9da61c1bf8df8873656670b1d950ab76174e7df40732"]
+    N25["merge_result: 02ddbccef723b876ef03ee3aa611a05eb4500a1a"]
+    N0 -->|requires| N1
+    N1 -->|acceptance| N2
+    N1 -->|maps_to| N3
+    N0 -->|requires| N4
+    N4 -->|acceptance| N5
+    N4 -->|acceptance| N6
+    N4 -->|acceptance| N7
+    N4 -->|maps_to| N3
+    N0 -->|constrains| N8
+    N0 -->|constrains| N9
+    N0 -->|constrains| N10
+    N12 -->|observes| N11
+    N0 -->|has_checkpoint| N12
+    N11 -->|changes| N3
+    N12 -->|checked_by| N13
+    N13 -->|reports| N14
+    N14 -->|checks| N8
+    N13 -->|reports| N15
+    N15 -->|checks| N9
+    N13 -->|reports| N16
+    N16 -->|checks| N10
+    N12 -->|evaluated_by| N17
+    N17 -->|produces| N18
+    N18 -->|checks| N2
+    N17 -->|produces| N19
+    N19 -->|checks| N5
+    N17 -->|produces| N20
+    N20 -->|checks| N6
+    N17 -->|produces| N21
+    N21 -->|checks| N7
+    N0 -->|subject_to| N22
+    N12 -->|evidence_for| N22
+    N17 -->|evidence_for| N22
+    N13 -->|evidence_for| N22
+    N23 -->|considered_by| N22
+    N24 -->|considered_by| N22
+    N22 -->|determines| N25

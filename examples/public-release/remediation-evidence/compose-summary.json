@@ -1,0 +1,55 @@
+{
+  "profile": "distributed-synthetic-lab-v1",
+  "status": "PASS",
+  "expected_matches": 15,
+  "total": 15,
+  "production_ready": false,
+  "merge_authority": false,
+  "decisions": {
+    "happy": "ALLOW",
+    "scope": "BLOCK",
+    "behavior": "BLOCK",
+    "provenance": "BLOCK",
+    "loop": "BLOCK",
+    "missing_approval": "BLOCK",
+    "circuit_open": "BLOCK",
+    "unavailable": "BLOCK",
+    "delayed": "BLOCK",
+    "wrong_candidate": "BLOCK",
+    "wrong_nonce": "BLOCK",
+    "wrong_identity": "BLOCK",
+    "expired": "BLOCK",
+    "tampered": "BLOCK",
+    "duplicate": "BLOCK"
+  },
+  "lifecycle": {
+    "before": {
+      "state": "CURRENT",
+      "reason": null,
+      "merge_authority": false
+    },
+    "after": {
+      "state": "REVOKED",
+      "reason": "synthetic_review_withdrawn",
+      "merge_authority": false
+    },
+    "no_restore": {
+      "state": "REVOKED",
+      "reason": "synthetic_review_withdrawn",
+      "merge_authority": false
+    },
+    "expired": {
+      "state": "REVOKED",
+      "reason": "expired",
+      "merge_authority": false
+    },
+    "after_restart": {
+      "state": "REVOKED",
+      "reason": "synthetic_review_withdrawn",
+      "merge_authority": false
+    }
+  },
+  "signature_replay": "not_revalidated_public_trust_missing",
+  "source": "maintainer supplied report from pre-final container build",
+  "trust_digest": "7818754266d195dcfb8d2de578bc0a59bb728aef9bf5f776c1a72ebc55e6763e"
+}

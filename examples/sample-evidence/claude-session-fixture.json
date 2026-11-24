@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "session": {
+    "schema_version": "1.0",
+    "provider": "anthropic",
+    "runtime": "claude-code",
+    "session_id": "34e075506e539fdf6bcd9570ccb08060f34f9c44bf57c932b3db5447a1d70fce",
+    "agent_id": "coding-agent",
+    "tool_types": [
+      "write"
+    ],
+    "claimed_requirements": [],
+    "trust": "self_reported"
+  },
+  "source_sha256": "1673d80d4a8e769231863bf02079afd5cda3a5dfc1600b583da8f89a8088d3b9",
+  "event_count": 3,
+  "claimed_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "commit_binding": "self_reported",
+  "trust": "self_reported",
+  "merge_authority": false,
+  "note": "Native stream imported, not authenticated; no prompts, commands, tool arguments or outputs retained.",
+  "fixture": true
+}

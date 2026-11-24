@@ -1,0 +1,65 @@
+[
+  {
+    "action": "continue",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 318,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "positive_amount",
+      "property_invariants",
+      "requirement_coverage",
+      "same_key_same_payment"
+    ],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "facfac70b6967466a1267bd6c063d17c225e1fd4"
+  },
+  {
+    "action": "continue",
+    "cumulative_cases": 74,
+    "cycle_length": null,
+    "diff_bytes": 0,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "positive_amount",
+      "property_invariants",
+      "requirement_coverage",
+      "same_key_same_payment"
+    ],
+    "iteration": 2,
+    "no_progress": 1,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "37e43ac01615ea0889ebc2cb98e05d7d5c3df13d"
+  },
+  {
+    "action": "repeated_tree",
+    "cumulative_cases": 111,
+    "cycle_length": 2,
+    "diff_bytes": 318,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "positive_amount",
+      "property_invariants",
+      "requirement_coverage",
+      "same_key_same_payment"
+    ],
+    "iteration": 3,
+    "no_progress": 2,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": 1,
+    "resolved": [],
+    "tree": "facfac70b6967466a1267bd6c063d17c225e1fd4"
+  }
+]

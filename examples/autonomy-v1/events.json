@@ -1,0 +1,340 @@
+[
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "dd455e767362bfab05cc78adbc6b4acd6b16a191d1aaa32848206ea4abdc693b",
+    "kind": "incident",
+    "payload": {
+      "id": "INC-424242",
+      "severity": "critical"
+    },
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "seq": 0,
+    "signature": "9c4dab5f6104b6c0f618047cb6facc4bbe17ce1ca6520107f292caba4fcb9fa0a13f0090475e29361192f9e6477b87ed38b8b455e0110826fb7c9b399fdfbb09",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "8bba8e00d08827b32e56683ed9be7838d319a5ffe4f84c4e15c0b004eb8870d2",
+    "kind": "propose_eval",
+    "payload": {
+      "id": "E-424242",
+      "incident": "INC-424242",
+      "operations": [
+        [
+          "register",
+          "edge",
+          424242
+        ],
+        [
+          "register",
+          "edge",
+          424242
+        ],
+        [
+          "register",
+          "edge",
+          424243
+        ]
+      ]
+    },
+    "prev": "dd455e767362bfab05cc78adbc6b4acd6b16a191d1aaa32848206ea4abdc693b",
+    "seq": 1,
+    "signature": "35156e1efb17a7f67ac1bb96370e19eda73c9ea6cdd7a0c00f0bb701e6b12528e72d07d16a332a8bae8b0f23188424d5b711eca74c0b84e613acf445cef64803",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "37fd2f1efb8a0bb9e95d2a927d38a8ecbbffd7201ae4269c11356488ebd9c825",
+    "kind": "approve_eval",
+    "payload": {
+      "case_digest": "b81019f39ea12bf3913adf0cd66cf6ac82178d2ea93e3e06f8a70f258ccb3ec1",
+      "id": "E-424242"
+    },
+    "prev": "8bba8e00d08827b32e56683ed9be7838d319a5ffe4f84c4e15c0b004eb8870d2",
+    "seq": 2,
+    "signature": "f5280a7ed247a17e313e69e97d609350fe64b7f7ec03228bb7fc03138d5c8b8fa697e97e908801d5c77a37c15b1ebe22e9d483e69146f289274501b3e774290f",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "a0ff4f958eee91223abc673d69cf27d3aaa15aad4f34ed8128fbcad4553f408d",
+    "kind": "eval_result",
+    "payload": {
+      "case_digest": "b81019f39ea12bf3913adf0cd66cf6ac82178d2ea93e3e06f8a70f258ccb3ec1",
+      "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+      "id": "E-424242",
+      "observations": [
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "error": "ValueError",
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          }
+        }
+      ],
+      "root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f"
+    },
+    "prev": "37fd2f1efb8a0bb9e95d2a927d38a8ecbbffd7201ae4269c11356488ebd9c825",
+    "seq": 3,
+    "signature": "ca12f6c7fb1ad609bfb60ef53d6d2ff4dc2d135d224589896474243ce64d1c5be5940a7611af2380ffbbb55019af9b891d4d53be1c8a82ab61d774a7f915f901",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "297bef68c1ef7f26209ceefb54bc2d13174315ea8da515a625210eb9fd6bb306",
+    "kind": "resolve",
+    "payload": {
+      "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+      "id": "INC-424242",
+      "root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f"
+    },
+    "prev": "a0ff4f958eee91223abc673d69cf27d3aaa15aad4f34ed8128fbcad4553f408d",
+    "seq": 4,
+    "signature": "d1fdbf508c9516792cc50e79415b4a5aabc7d0f0ddeb8f19caa9834f395f45f5b71696056bf57dfb34e74537fdc362e18aee0d13230a481f70c6536e43bdb808",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "e072254aed279dc2cd626edea530f32d61b585354cafe4a0091588ee9b071e1a",
+    "kind": "eval_result",
+    "payload": {
+      "case_digest": "b81019f39ea12bf3913adf0cd66cf6ac82178d2ea93e3e06f8a70f258ccb3ec1",
+      "head": "f1c38b00b03ff9a08af7547724cc7b7631591c82",
+      "id": "E-424242",
+      "observations": [
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "error": "ValueError",
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          }
+        }
+      ],
+      "root": "c75b6751fe96aa908c8ee6cc5e6fca718609580b49f1077f33fbb671fabdc141"
+    },
+    "prev": "297bef68c1ef7f26209ceefb54bc2d13174315ea8da515a625210eb9fd6bb306",
+    "seq": 5,
+    "signature": "8bba621e008e698e3fb538e1ae933785d5e194764ac271f424be2822f3ec5c2578269c161d175a3a47f323a7c073e25ba3b3849bebcc815b5ab8561035140304",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "536a2f5ee833e932487194212cafc7a9ccf5beb38743737b8e9293905f7f16f2",
+    "kind": "outcome",
+    "payload": {
+      "head": "f1c38b00b03ff9a08af7547724cc7b7631591c82",
+      "root": "c75b6751fe96aa908c8ee6cc5e6fca718609580b49f1077f33fbb671fabdc141",
+      "status": "clean"
+    },
+    "prev": "e072254aed279dc2cd626edea530f32d61b585354cafe4a0091588ee9b071e1a",
+    "seq": 6,
+    "signature": "2f1c8361ba588a990049eccc45aa25ad5e4534bdff4f5ec5e48dc956cd4a846b408def32a49e65abc87d945394e3a9f565f43d29d11e46c9da3ca0049fa9d80e",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "ff91b0524f1e324e281c6523bbb778957aa9809355eebaa5761b24e175a8299d",
+    "kind": "eval_result",
+    "payload": {
+      "case_digest": "b81019f39ea12bf3913adf0cd66cf6ac82178d2ea93e3e06f8a70f258ccb3ec1",
+      "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "id": "E-424242",
+      "observations": [
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "error": "ValueError",
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          }
+        }
+      ],
+      "root": "0d7d1794715454766c8486a0901de5a07025f93ec5232ccea5314413e1935dcd"
+    },
+    "prev": "536a2f5ee833e932487194212cafc7a9ccf5beb38743737b8e9293905f7f16f2",
+    "seq": 7,
+    "signature": "a5f11fb8e1764ccda2624004a6f9eac08e1ae243b11a59e9a7f328a099754f2d234228021de2bd9144c50ff8a14275c99f29966144c11bb64c668656614cad0d",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "b8d0c0da8096abc7771467bac07b4afd4b3ca558244434945b60001a27fd5ac5",
+    "kind": "outcome",
+    "payload": {
+      "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "root": "0d7d1794715454766c8486a0901de5a07025f93ec5232ccea5314413e1935dcd",
+      "status": "clean"
+    },
+    "prev": "ff91b0524f1e324e281c6523bbb778957aa9809355eebaa5761b24e175a8299d",
+    "seq": 8,
+    "signature": "b2ca195523c1f72d2532fd85db4b17edb45410692e6a1e1ac5a77ab02d4b357deaf58baa847c5cdf4e8223578df2bd3f9abf801c4e7e0d6445d69f420d7bfe05",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "ae58f31b41fc2472a85839574ff38b417781342f752c099054f6912965fa68cb",
+    "kind": "promote",
+    "payload": {
+      "level": 2
+    },
+    "prev": "b8d0c0da8096abc7771467bac07b4afd4b3ca558244434945b60001a27fd5ac5",
+    "seq": 9,
+    "signature": "29188a96a9d16a6862fae8b0709ebd769f5a8469b2e242a5ba931326a7f3d1357318c71e9f29ebe2ceec6c462f071469bafb87b002bb310d324340bd4aa8ef0e",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "cfc81e6afa0017e8276f20c451c7f00050a8defa47ffef670d64d664cc6811f5",
+    "kind": "eval_result",
+    "payload": {
+      "case_digest": "b81019f39ea12bf3913adf0cd66cf6ac82178d2ea93e3e06f8a70f258ccb3ec1",
+      "head": "67ac7ac959a6fed4d8130dc52d6184595d0a5b36",
+      "id": "E-424242",
+      "observations": [
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          },
+          "value": {
+            "amount": 424242,
+            "id": 1
+          }
+        },
+        {
+          "error": "ValueError",
+          "store": {
+            "edge": {
+              "amount": 424242,
+              "id": 1
+            }
+          }
+        }
+      ],
+      "root": "598abc5976d40f7cde21ad3228c3b7193b1f8fe1e10a4626f3384438010d2ebd"
+    },
+    "prev": "ae58f31b41fc2472a85839574ff38b417781342f752c099054f6912965fa68cb",
+    "seq": 10,
+    "signature": "38d260cc12010112a96fff9f4870f156bdf7b88456f96d76a59214c8062333f896969b1c9697709f7645181e0babb930e0309b3792eef29eb5efafef4cf9ff0b",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "b5d5ab173948949548e1bcc75110d8812f475c7af9f657759c57cacd008ce9b5",
+    "kind": "outcome",
+    "payload": {
+      "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+      "root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+      "status": "adverse"
+    },
+    "prev": "cfc81e6afa0017e8276f20c451c7f00050a8defa47ffef670d64d664cc6811f5",
+    "seq": 11,
+    "signature": "b50eec416763c36237b8a8f76de4d600e60a915a4517ac5e54e4ef90f78d65a3079ec47979234f4771de5e5a870fe7a38d84350b72da74b564daf777a01aa103",
+    "version": 1
+  },
+  {
+    "config": "b405aa0a3cad5f8df9f908a3efa5119c2d956f53b4ce857917917983bd2d55c6",
+    "hash": "8334b2f17715a45c061c815adc425c1ea08ec83f9885c9e552d1671f09cb7dd4",
+    "kind": "outcome",
+    "payload": {
+      "head": "67ac7ac959a6fed4d8130dc52d6184595d0a5b36",
+      "root": "598abc5976d40f7cde21ad3228c3b7193b1f8fe1e10a4626f3384438010d2ebd",
+      "status": "adverse"
+    },
+    "prev": "b5d5ab173948949548e1bcc75110d8812f475c7af9f657759c57cacd008ce9b5",
+    "seq": 12,
+    "signature": "8d06832cf82acdfb627e317176f6486741698a8ffeab40ef3c74d03c82dd6f9c1afaaacb9cfbc9f38d7cd9c1b21d9152784540a7096ee275a5285cf5d6420209",
+    "version": 1
+  }
+]

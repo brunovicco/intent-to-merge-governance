@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+results/
+*.egg-info/
+
+*.pem
+
+# Local control-plane keys and state
+.itm-lab-keys/
+*.pem
+*.key
+
+# Runtime artifacts and local secrets
+.env
+.env.*
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db

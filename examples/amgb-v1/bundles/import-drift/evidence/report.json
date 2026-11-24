@@ -1,0 +1,73 @@
+{
+  "base": "063b77a42e86ff46b1f71e22adaf20f003a61448",
+  "candidate": "117413f7466a3126ea2fa09dd8d72846fd107cbb",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "check_failed:intent_drift",
+      "missing_approval:engineering",
+      "missing_approval:security"
+    ],
+    "required_roles": [
+      "engineering",
+      "security"
+    ],
+    "risk": "high",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 35,
+    "nodes": 24
+  },
+  "history": [
+    {
+      "head": "117413f7466a3126ea2fa09dd8d72846fd107cbb",
+      "iteration": 1,
+      "passed": 12,
+      "total": 13
+    }
+  ],
+  "ledger_root": "ca0411d182a55e01a5bdaf06e3f0d833f3f0733c175db95da5a06684d3d532ae",
+  "main": "063b77a42e86ff46b1f71e22adaf20f003a61448",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "positive_amount": true
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": true
+    },
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "conflicting_payload": true,
+        "distinct_keys": true,
+        "same_key_same_payment": true
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": true
+    }
+  ],
+  "scenario": "import-drift",
+  "termination": "intent_drift",
+  "verification_cases_per_candidate": 37
+}

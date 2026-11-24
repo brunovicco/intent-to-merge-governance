@@ -1,0 +1,38 @@
+[
+  {
+    "binding": {
+      "base": "a2d335c512997aa1417057709a67b3f83ec6f767",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "f90fa6e746614e2841ef87c07fe3755abc84dfad223cc1c325d7217fdb1600e0",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "010699d15a5af70e88250bbba36dff7bd233f93989d9255d614273087cf2547d",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "safe-refactor-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "efe4d12992bdc189646b49a4ce406f652bb197a5823d550c5cfa0025fd4699dc",
+    "source": "agent_proposal",
+    "tree": "cff1f4de15618008584f6b9ea0c8bfcf100451d2",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

@@ -1,0 +1,23 @@
+test_actual_database_rollback_detected (test_rc6.JournalSecurity.test_actual_database_rollback_detected) ... ok
+test_binding_event_before_registration (test_rc6.JournalSecurity.test_binding_event_before_registration) ... ok
+test_candidate_report_mismatch (test_rc6.JournalSecurity.test_candidate_report_mismatch) ... ok
+test_checkpoint_replay (test_rc6.JournalSecurity.test_checkpoint_replay) ... ok
+test_checkpoint_tamper (test_rc6.JournalSecurity.test_checkpoint_tamper) ... ok
+test_concurrent_register_and_withdraw (test_rc6.JournalSecurity.test_concurrent_register_and_withdraw) ... ok
+test_duplicate_json_keys (test_rc6.JournalSecurity.test_duplicate_json_keys) ... ok
+test_event_before_registration (test_rc6.JournalSecurity.test_event_before_registration) ... ok
+test_fresh_receipt_cannot_restore_revoked_binding (test_rc6.JournalSecurity.test_fresh_receipt_cannot_restore_revoked_binding) ... ok
+test_git_environment_ignored (test_rc6.JournalSecurity.test_git_environment_ignored) ... ok
+test_git_replace_ref_ignored (test_rc6.JournalSecurity.test_git_replace_ref_ignored) ... ok
+test_legacy_journal_rejected (test_rc6.JournalSecurity.test_legacy_journal_rejected) ... ok
+test_stale_snapshot_rejected (test_rc6.JournalSecurity.test_stale_snapshot_rejected) ... ok
+test_nonzero (test_rc6.OutputLimits.test_nonzero) ... ok
+test_normal_output (test_rc6.OutputLimits.test_normal_output) ... ok
+test_stderr_cap (test_rc6.OutputLimits.test_stderr_cap) ... ok
+test_stdout_cap (test_rc6.OutputLimits.test_stdout_cap) ... ok
+test_timeout (test_rc6.OutputLimits.test_timeout) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 24.153s
+
+OK

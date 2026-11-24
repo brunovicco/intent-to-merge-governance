@@ -1,0 +1,372 @@
+{
+  "bundles": 8,
+  "counterfactually_eligible": 2,
+  "historically_authorized": 1,
+  "limitations": [
+    "Historical observations and convergence are held fixed.",
+    "Historical verified identities are reused hypothetically, not re-signed or accepted as new approvals.",
+    "Unknown checks fail closed; changes to execution, convergence, or identity policy are rejected.",
+    "Eligibility is not merge authority, safety proof, or a forecast of production outcomes."
+  ],
+  "mode": "decision_only_counterfactual",
+  "proposed_policy_digest": "b4358de5173634f0eb2b8b0ac8aed7e730c5bc684ccfc621ed16680c59ddf5d2",
+  "rows": [
+    {
+      "candidate": "dd100fc90e6ed60fdd305d44d8eb9dbb499cc8fd",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": true,
+        "reasons": [],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historical_decision": {
+        "authorized": true,
+        "reasons": [],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historically_verified_actors": [
+        "reviewer",
+        "security"
+      ],
+      "ledger_root": "6145f41b0429dff6ff2e3749769b1ae75fa47f907c78e5ccec09b7c29f1fdd65",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "happy",
+      "transition": "unchanged_allow"
+    },
+    {
+      "candidate": "2815d73134b6e2bb2dc2c1fa6797ed54b435799c",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": true,
+        "reasons": [],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering"
+        ]
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "missing_approval:security"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering"
+        ]
+      },
+      "historically_verified_actors": [
+        "reviewer"
+      ],
+      "ledger_root": "b656b344a0910c062d3a5d4365e612664796befc7c30be16c3127e6c5d23b572",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "missing-approval",
+      "transition": "would_allow"
+    },
+    {
+      "candidate": "621276f1808e2cdb36fe91674b7d43a5431b4da5",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "check_failed:contract_flow",
+          "check_failed:intent_drift",
+          "missing_approval:engineering"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "check_failed:contract_flow",
+          "check_failed:intent_drift",
+          "missing_approval:engineering",
+          "missing_approval:security"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historically_verified_actors": [],
+      "ledger_root": "a2e59ba358c9d33add15732f6235e6a0396ad4a790a0296d5b0ab90c3bbd0d1f",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "intent-drift",
+      "transition": "unchanged_deny"
+    },
+    {
+      "candidate": "6034fdb652d93fde06e938de6572343ec5b01890",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "missing_approval:engineering"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "missing_approval:engineering",
+          "missing_approval:security"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historically_verified_actors": [],
+      "ledger_root": "8adcb5b6a5e0fa5e3e70b9dd373ae4d4ea5f2a94417339ca1e3b045ab9f7dfee",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "stale-approval",
+      "transition": "unchanged_deny"
+    },
+    {
+      "candidate": "3d600c283151c16478cdbe72af61b8d911836356",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "check_failed:property_invariants",
+          "missing_approval:engineering"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "check_failed:property_invariants",
+          "missing_approval:engineering",
+          "missing_approval:security"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historically_verified_actors": [],
+      "ledger_root": "cc22785077267c40c94931f26f047e0aa7cc6bd855d71c1453ce1fd9d8d432b2",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "property-regression",
+      "transition": "unchanged_deny"
+    },
+    {
+      "candidate": "d9126ffbd14f2fc9b372a6b2b831a7e866e98180",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "stale_evaluation"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "stale_evaluation"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historically_verified_actors": [
+        "reviewer",
+        "security"
+      ],
+      "ledger_root": "db5bfadc5855295bed04c192660ca463e00bda2be803515b83c0e35cd4aea6b2",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "stale-eval",
+      "transition": "unchanged_deny"
+    },
+    {
+      "candidate": "e7ac1788c88e2e71f68bd7729b08d58203fb76ce",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "stale_base"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "stale_base"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": [
+          "engineering",
+          "security"
+        ]
+      },
+      "historically_verified_actors": [
+        "reviewer",
+        "security"
+      ],
+      "ledger_root": "39e8f3ad77903c818eccd953d263c3c11a26fb9c669c7eef0cbeab1ce61cbb6a",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "stale-base",
+      "transition": "unchanged_deny"
+    },
+    {
+      "candidate": "4871d059665c7feb63fd193305f216b55c325ae9",
+      "changed_fields": [
+        "risk_rules"
+      ],
+      "counterfactual_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "outside_spec",
+          "stale_evaluation",
+          "check_failed:checkpoint_binding",
+          "check_failed:conflicting_payload",
+          "check_failed:contract_flow",
+          "check_failed:differential_compatibility",
+          "check_failed:distinct_keys",
+          "check_failed:intent_drift",
+          "check_failed:mutation_adequacy",
+          "check_failed:positive_amount",
+          "check_failed:property_invariants",
+          "check_failed:requirement_coverage",
+          "check_failed:same_key_same_payment",
+          "check_failed:scope",
+          "missing_approval:engineering"
+        ],
+        "required_roles": [
+          "engineering"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historical_decision": {
+        "authorized": false,
+        "reasons": [
+          "not_converged",
+          "outside_spec",
+          "stale_evaluation",
+          "check_failed:checkpoint_binding",
+          "check_failed:conflicting_payload",
+          "check_failed:contract_flow",
+          "check_failed:differential_compatibility",
+          "check_failed:distinct_keys",
+          "check_failed:intent_drift",
+          "check_failed:mutation_adequacy",
+          "check_failed:positive_amount",
+          "check_failed:property_invariants",
+          "check_failed:requirement_coverage",
+          "check_failed:same_key_same_payment",
+          "check_failed:scope",
+          "missing_approval:engineering",
+          "missing_approval:security"
+        ],
+        "required_roles": [
+          "engineering",
+          "security"
+        ],
+        "risk": "high",
+        "verified_roles": []
+      },
+      "historically_verified_actors": [],
+      "ledger_root": "1bbdf86617af2ab38476c817643aad4365d2d6d788cfead5fe5b26773c0b1ef6",
+      "original_policy_digest": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "requires_fresh_authorization": true,
+      "scenario": "scope-violation",
+      "transition": "unchanged_deny"
+    }
+  ],
+  "transitions": {
+    "unchanged_allow": 1,
+    "unchanged_deny": 6,
+    "would_allow": 1,
+    "would_deny": 0
+  }
+}

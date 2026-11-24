@@ -1,0 +1,76 @@
+{
+  "base": "9b48007d139df9107f12540ca0f5956996db6b6c",
+  "candidate": "10e78f7a47be5e6903a63c9b859fec89e678ceba",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "empty_change",
+      "check_failed:conflicting_payload",
+      "check_failed:contract_flow",
+      "check_failed:positive_amount",
+      "check_failed:property_invariants",
+      "check_failed:requirement_coverage",
+      "check_failed:same_key_same_payment"
+    ],
+    "required_roles": [],
+    "risk": "low",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 53,
+    "nodes": 35
+  },
+  "history": [
+    {
+      "head": "d88e9370d4ae85477797c2698021993cba24533a",
+      "iteration": 1,
+      "passed": 9,
+      "total": 13
+    },
+    {
+      "head": "10e78f7a47be5e6903a63c9b859fec89e678ceba",
+      "iteration": 2,
+      "passed": 7,
+      "total": 13
+    }
+  ],
+  "ledger_root": "1faeaacd98b34f3dbf4ed93011bc90842414347a694dcacdd82849b61e189eca",
+  "main": "9b48007d139df9107f12540ca0f5956996db6b6c",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [],
+      "criteria": {
+        "positive_amount": false
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": false
+    },
+    {
+      "changed_paths": [],
+      "criteria": {
+        "conflicting_payload": false,
+        "distinct_keys": true,
+        "same_key_same_payment": false
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": false
+    }
+  ],
+  "scenario": "regression-loop",
+  "termination": "regression_budget",
+  "verification_cases_per_candidate": 37
+}

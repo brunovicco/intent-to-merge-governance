@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="620" viewBox="0 0 1120 620" role="img" aria-label="AMGB synthetic benchmark: unsafe allows decline from ten to zero across five strategies">
+<rect width="1120" height="620" rx="20" fill="#10202e"/>
+<g font-family="system-ui, sans-serif" fill="#edf3f8">
+<text x="48" y="48" font-size="17" letter-spacing="2" fill="#6dd7c3">INTENT-TO-MERGE / AMGB V1</text>
+<text x="48" y="100" font-size="42" font-weight="700">A green CI is not enough.</text>
+<text x="48" y="137" font-size="20" fill="#b5c6d4">Unsafe eligibility across cumulative governance gates</text>
+<text x="48" y="215" font-size="18" font-weight="600">S0</text>
+<text x="95" y="215" font-size="18">Acceptance checks</text>
+<rect x="400" y="195" width="540" height="29" rx="5" fill="#263c4c"/>
+<rect x="400" y="195" width="360.0" height="29" rx="5" fill="#db7957"/>
+<text x="960" y="216" font-size="20" font-weight="700" fill="#db7957">10/15</text>
+<text x="48" y="280" font-size="18" font-weight="600">S1</text>
+<text x="95" y="280" font-size="18">Extended verification</text>
+<rect x="400" y="260" width="540" height="29" rx="5" fill="#263c4c"/>
+<rect x="400" y="260" width="288.0" height="29" rx="5" fill="#db7957"/>
+<text x="960" y="281" font-size="20" font-weight="700" fill="#db7957">8/15</text>
+<text x="48" y="345" font-size="18" font-weight="600">S2</text>
+<text x="95" y="345" font-size="18">Intent, scope &amp; provenance</text>
+<rect x="400" y="325" width="540" height="29" rx="5" fill="#263c4c"/>
+<rect x="400" y="325" width="216.0" height="29" rx="5" fill="#db7957"/>
+<text x="960" y="346" font-size="20" font-weight="700" fill="#db7957">6/15</text>
+<text x="48" y="410" font-size="18" font-weight="600">S3</text>
+<text x="95" y="410" font-size="18">Convergence governor</text>
+<rect x="400" y="390" width="540" height="29" rx="5" fill="#263c4c"/>
+<rect x="400" y="390" width="180.0" height="29" rx="5" fill="#db7957"/>
+<text x="960" y="411" font-size="20" font-weight="700" fill="#db7957">5/15</text>
+<text x="48" y="475" font-size="18" font-weight="600">S4</text>
+<text x="95" y="475" font-size="18">Deterministic authorization</text>
+<rect x="400" y="455" width="540" height="29" rx="5" fill="#263c4c"/>
+<rect x="400" y="455" width="0.0" height="29" rx="5" fill="#34b69e"/>
+<text x="960" y="476" font-size="20" font-weight="700" fill="#34b69e">0/15</text>
+<path d="M48 535 H1072" stroke="#344958"/>
+<text x="48" y="566" font-size="19" fill="#6dd7c3" font-weight="600">All 4 valid scenarios remained eligible.</text>
+<text x="48" y="594" font-size="15" fill="#b5c6d4">19 synthetic fixtures · 95 paired decisions · Fixed traces · Not a vendor or production comparison</text>
+</g></svg>

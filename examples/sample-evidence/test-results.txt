@@ -1,0 +1,24 @@
+test_scenarios (test_governance.IntegrationTests.test_scenarios) ... ok
+test_tampered_manifest (test_governance.IntegrationTests.test_tampered_manifest) ... ok
+test_tampering (test_governance.IntegrationTests.test_tampering) ... ok
+test_invalid_signature_and_duplicate (test_governance.PolicyTests.test_invalid_signature_and_duplicate) ... ok
+test_unknown_check_fails_closed (test_governance.PolicyTests.test_unknown_check_fails_closed) ... ok
+test_coverage_not_agent_claim (test_intent.IntentTests.test_coverage_not_agent_claim) ... ok
+test_drift_with_functional_checks_green (test_intent.IntentTests.test_drift_with_functional_checks_green) ... ok
+test_graph_reconstruction_detects_inconsistent_derived_artifact (test_intent.IntentTests.test_graph_reconstruction_detects_inconsistent_derived_artifact) ... ok
+test_incomplete_mapping (test_intent.IntentTests.test_incomplete_mapping) ... ok
+test_missing_symbol_and_invalid_syntax_fail_closed (test_intent.IntentTests.test_missing_symbol_and_invalid_syntax_fail_closed) ... ok
+test_portable_session_privacy_and_validation (test_intent.IntentTests.test_portable_session_privacy_and_validation) ... ok
+test_structural_rules (test_intent.IntentTests.test_structural_rules) ... ok
+test_unmapped_path (test_intent.IntentTests.test_unmapped_path) ... ok
+test_docker_command_restrictions (test_verification.VerificationTests.test_docker_command_restrictions) ... ok
+test_governor_budget_and_regression (test_verification.VerificationTests.test_governor_budget_and_regression) ... ok
+test_malformed_output_fails_closed (test_verification.VerificationTests.test_malformed_output_fails_closed) ... ok
+test_missing_docker_never_falls_back (test_verification.VerificationTests.test_missing_docker_never_falls_back) ... ok
+test_mutations (test_verification.VerificationTests.test_mutations) ... ok
+test_oracle_and_properties (test_verification.VerificationTests.test_oracle_and_properties) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 83.286s
+
+OK

@@ -1,0 +1,108 @@
+[
+  {
+    "binding": {
+      "base": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "8a3079c11ccec997ca0217f20d73645af8bac799",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "1dbc4b29be94bf071282ad07be8695db4a1892a2a2af485f350b806844765bd2",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "77fb962c9ab5da1100a17a672c684a1402a88be7d2cc95989c726465f94f0fa4",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "loop-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "b05bb465641b7379b5cc19e0e9c43d96b855e6d90d7bc772c3809b2266f8a90e",
+    "source": "agent_proposal",
+    "tree": "facfac70b6967466a1267bd6c063d17c225e1fd4",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "9ea128e43dd928f1d3b809da6f724f90ed67a079",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "intent_id": "PAY-104",
+    "paths": [],
+    "proposal_event_hash": "fad4980f2d4289905c260daa2b4daa154fbbceefa4594bff25bfdceef743308e",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "loop-2",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "4e66fdbf27f92493a150504e4e5626b27c9dfe53ae6c53a323aed05c3e8d5dbc",
+    "source": "agent_proposal",
+    "tree": "37e43ac01615ea0889ebc2cb98e05d7d5c3df13d",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  },
+  {
+    "binding": {
+      "base": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "a22b07bdd94f42b51e66fd6445e911d353e59b1f",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "1dbc4b29be94bf071282ad07be8695db4a1892a2a2af485f350b806844765bd2",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "5193d5426a47d0b930351be26684c69bbba8ae5e6c404cce20f8ea77e26774c8",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "loop-3",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "514eefa0a356183bb55a2c1e92c1d6dfc11bdc03d4771ca14773a1cc132fb13e",
+    "source": "agent_proposal",
+    "tree": "facfac70b6967466a1267bd6c063d17c225e1fd4",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

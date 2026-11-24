@@ -1,0 +1,22 @@
+{
+  "acceptance.py": "bc07e54043abd883e5b57f4bf8ca953cf5b609f4b2f12316be33d05628d7fb90",
+  "baseline-observations.json": "05aeb074108cdb8c43a1655c7d46ce7d1095aad6b362e9a2357ad8745e949ffe",
+  "baseline.py": "6300b42a2bee8d2fc8a0c35907661a770a7d522cd70be164b1ba3eb8642f9f63",
+  "candidate-1.py": "541826dc2992296702aefa2728211f0e985d339b27d6f98e8c086eb73ead8e0a",
+  "candidate-2.py": "7899f771e2853cc6a85d56bd58f5f6aa6f03bcdd660733d0615fa3e405ed8e2d",
+  "checkpoints.json": "1dbdcb9291e57f536ed1843276cfb50d81bb348ac6b40e088927f30ddfe8f1ba",
+  "convergence.json": "7456bba12f9b10f5b94479e0012d29cbee6bc7d0303b2c4e36386248801cef6f",
+  "intent-drift.json": "88e907a7506562c9d110c387e9fb1373dd377c17c1bd4942496d339f0c89165e",
+  "intent-graph.json": "a04e3afbb0cf311fe79f0da88396c36158e2d03d36e8c48a57971daa344fbf6e",
+  "intent-graph.mmd": "fa326e81c9b238775243969bfcfa9702c3a00652e93e473a62fd67195c501b97",
+  "iteration-1.diff": "453ed32f9187558a066c14896ce59d5a7e766950438e6099db9f4f552aecdc7d",
+  "iteration-2.diff": "0d1446dda2cf96a5eee81cac50f6f3bc869030b14f2f6c87001d5aff1dc3c48c",
+  "ledger.jsonl": "6753e8249ba90a252bd059997ddec2f4e1f7cccfee424e58c3f148e88925c46b",
+  "mutation-report.json": "a4738e77c3c73577bd641a4f02b985fb54ff1c24b402efade8c96b7dc395d594",
+  "policy.toml": "922b02900d2627d4a2b99b7d7ac603ba4eb7056efbc4bfa672998f2f0e95b2f6",
+  "report.json": "25ab0b2755351e20ada363c480efa7a8fc046e1adaca591d881991cb114b1e02",
+  "requirement-coverage.json": "887ea440df1ec1afd77649c0d14d15c20f467f678780a98d613c6a7bf77765d3",
+  "spec.toml": "03a5af9651ace74505ef3009fc2385abf0ee799afd8aa68ccfb1081a93419834",
+  "verification-plan.json": "0db2f7d7f3b2e8e9233864b39ace00f581c162f1e325485fa77310963bc3c2c0",
+  "verification.json": "bf32b5800cc11f3f02ece6f05c97cb206a598dbad2f7a63b37b9e748cdb15fe1"
+}

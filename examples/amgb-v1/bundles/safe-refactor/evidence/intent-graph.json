@@ -1,0 +1,340 @@
+{
+  "edges": [
+    {
+      "from": "intent:PAY-104",
+      "kind": "requires",
+      "to": "req:R01"
+    },
+    {
+      "from": "req:R01",
+      "kind": "acceptance",
+      "to": "criterion:positive_amount"
+    },
+    {
+      "from": "req:R01",
+      "kind": "maps_to",
+      "to": "path:app/payments.py"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "requires",
+      "to": "req:R02"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:same_key_same_payment"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:distinct_keys"
+    },
+    {
+      "from": "req:R02",
+      "kind": "acceptance",
+      "to": "criterion:conflicting_payload"
+    },
+    {
+      "from": "req:R02",
+      "kind": "maps_to",
+      "to": "path:app/payments.py"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG01"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG02"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "constrains",
+      "to": "non-goal:NG03"
+    },
+    {
+      "from": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "observes",
+      "to": "commit:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "has_checkpoint",
+      "to": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "commit:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "changes",
+      "to": "path:app/payments.py"
+    },
+    {
+      "from": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "checked_by",
+      "to": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "reports",
+      "to": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG01"
+    },
+    {
+      "from": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG01",
+      "kind": "checks",
+      "to": "non-goal:NG01"
+    },
+    {
+      "from": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "reports",
+      "to": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG02"
+    },
+    {
+      "from": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG02",
+      "kind": "checks",
+      "to": "non-goal:NG02"
+    },
+    {
+      "from": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "reports",
+      "to": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG03"
+    },
+    {
+      "from": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG03",
+      "kind": "checks",
+      "to": "non-goal:NG03"
+    },
+    {
+      "from": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "evaluated_by",
+      "to": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "produces",
+      "to": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:positive_amount"
+    },
+    {
+      "from": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:positive_amount",
+      "kind": "checks",
+      "to": "criterion:positive_amount"
+    },
+    {
+      "from": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "produces",
+      "to": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:same_key_same_payment"
+    },
+    {
+      "from": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:same_key_same_payment",
+      "kind": "checks",
+      "to": "criterion:same_key_same_payment"
+    },
+    {
+      "from": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "produces",
+      "to": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:distinct_keys"
+    },
+    {
+      "from": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:distinct_keys",
+      "kind": "checks",
+      "to": "criterion:distinct_keys"
+    },
+    {
+      "from": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "produces",
+      "to": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:conflicting_payload"
+    },
+    {
+      "from": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:conflicting_payload",
+      "kind": "checks",
+      "to": "criterion:conflicting_payload"
+    },
+    {
+      "from": "intent:PAY-104",
+      "kind": "subject_to",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "evidence_for",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "evidence_for",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "evidence_for",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "approval:abbe48b7a1c40ad41b958419849abbc7b2db3bc248aa1a9575b19119e4e9d9e1",
+      "kind": "considered_by",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "approval:a9da61c1bf8df8873656670b1d950ab76174e7df40732fb8f066ee8ab3285279",
+      "kind": "considered_by",
+      "to": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "from": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "determines",
+      "to": "merge:02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    }
+  ],
+  "intent_id": "PAY-104",
+  "nodes": [
+    {
+      "description": "Make payment registration idempotent and reject invalid amounts.",
+      "digest": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885",
+      "id": "intent:PAY-104",
+      "kind": "intent"
+    },
+    {
+      "description": "Reject invalid amounts",
+      "id": "req:R01",
+      "kind": "requirement"
+    },
+    {
+      "id": "criterion:positive_amount",
+      "kind": "criterion"
+    },
+    {
+      "id": "path:app/payments.py",
+      "kind": "path"
+    },
+    {
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "req:R02",
+      "kind": "requirement"
+    },
+    {
+      "id": "criterion:same_key_same_payment",
+      "kind": "criterion"
+    },
+    {
+      "id": "criterion:distinct_keys",
+      "kind": "criterion"
+    },
+    {
+      "id": "criterion:conflicting_payload",
+      "kind": "criterion"
+    },
+    {
+      "description": "Do not change authorization logic",
+      "id": "non-goal:NG01",
+      "kind": "non_goal"
+    },
+    {
+      "description": "Do not change the register API signature",
+      "id": "non-goal:NG02",
+      "kind": "non_goal"
+    },
+    {
+      "description": "Do not introduce new imports",
+      "id": "non-goal:NG03",
+      "kind": "non_goal"
+    },
+    {
+      "id": "commit:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "commit",
+      "sha": "02ddbccef723b876ef03ee3aa611a05eb4500a1a"
+    },
+    {
+      "digest": "61474bcba2bbcb1fdec29d356317069c4575ad35de866d3b59e6f19b680ee20c",
+      "id": "checkpoint:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "checkpoint"
+    },
+    {
+      "id": "drift:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "drift",
+      "passed": true
+    },
+    {
+      "detail": "invariant preserved",
+      "id": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG01",
+      "kind": "finding",
+      "passed": true
+    },
+    {
+      "detail": "invariant preserved",
+      "id": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG02",
+      "kind": "finding",
+      "passed": true
+    },
+    {
+      "detail": "invariant preserved",
+      "id": "finding:02ddbccef723b876ef03ee3aa611a05eb4500a1a:NG03",
+      "kind": "finding",
+      "passed": true
+    },
+    {
+      "checks": {
+        "checkpoint_binding": true,
+        "conflicting_payload": true,
+        "contract_flow": true,
+        "differential_compatibility": true,
+        "distinct_keys": true,
+        "intent_drift": true,
+        "mutation_adequacy": true,
+        "positive_amount": true,
+        "property_invariants": true,
+        "requirement_coverage": true,
+        "same_key_same_payment": true,
+        "scope": true,
+        "trusted_harness": true
+      },
+      "id": "eval:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "evaluation"
+    },
+    {
+      "id": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:positive_amount",
+      "kind": "check_result",
+      "passed": true
+    },
+    {
+      "id": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:same_key_same_payment",
+      "kind": "check_result",
+      "passed": true
+    },
+    {
+      "id": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:distinct_keys",
+      "kind": "check_result",
+      "passed": true
+    },
+    {
+      "id": "outcome:02ddbccef723b876ef03ee3aa611a05eb4500a1a:conflicting_payload",
+      "kind": "check_result",
+      "passed": true
+    },
+    {
+      "authorized": true,
+      "id": "decision:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "decision",
+      "reasons": []
+    },
+    {
+      "actor": "reviewer",
+      "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "id": "approval:abbe48b7a1c40ad41b958419849abbc7b2db3bc248aa1a9575b19119e4e9d9e1",
+      "kind": "approval"
+    },
+    {
+      "actor": "security",
+      "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "id": "approval:a9da61c1bf8df8873656670b1d950ab76174e7df40732fb8f066ee8ab3285279",
+      "kind": "approval"
+    },
+    {
+      "id": "merge:02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "kind": "merge_result",
+      "main": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+      "merged": true
+    }
+  ],
+  "schema_version": "1.0"
+}

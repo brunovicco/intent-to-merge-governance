@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "session": {
+    "schema_version": "1.0",
+    "provider": "openai",
+    "runtime": "codex",
+    "session_id": "ba1511b445d26ef8c772b2cc76bf8af97415c66ac9f874030c1ffb1c24d961f5",
+    "agent_id": "coding-agent",
+    "tool_types": [
+      "write"
+    ],
+    "claimed_requirements": [],
+    "trust": "self_reported"
+  },
+  "source_sha256": "9ca1db064b8a74928fc4f7bfb26108d8ca2a97c0e5d465b5cf1793e72eb517e8",
+  "event_count": 4,
+  "claimed_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "commit_binding": "self_reported",
+  "trust": "self_reported",
+  "merge_authority": false,
+  "note": "Native stream imported, not authenticated; no prompts, commands, tool arguments or outputs retained.",
+  "fixture": true
+}

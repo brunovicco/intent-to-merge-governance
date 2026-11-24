@@ -1,0 +1,36 @@
+{
+  "statement": {
+    "profile": "integrated-candidate-lab-v1",
+    "control": "verification",
+    "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+    "head": "af9e621c7df2b6a2d3e23b28b5e648ae9cc3ee94",
+    "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+    "artifact_digest": "1d3a0bf7cdd1ad1c49b2ce35cb96234cd2cfd2bc898b758d4471845a39ed7850",
+    "convergence_digest": "f99cee2b54d3215a315120e33c481877fcd9d45de6ff6b3249e9d70f847f01e5",
+    "issued_at": 1795545426,
+    "expires_at": 1795545486,
+    "passed": true,
+    "merge_authority": false
+  },
+  "artifact": {
+    "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+    "head": "af9e621c7df2b6a2d3e23b28b5e648ae9cc3ee94",
+    "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+    "source_digest": "f38eb2bd58ddf6965420886dccc042adfe7fda5f67469a38e54140da524b5f9a",
+    "scenario_digest": "cb3eff1272c5c94fa545d0ca72593aca0803a9a9ee9b37132c1e5783903c38a6",
+    "verification": {
+      "cases": 20,
+      "passed_cases": 20,
+      "weak_ci_passed": true,
+      "structural_passed": true,
+      "passed": true,
+      "executor": {
+        "backend": "local",
+        "image_id": null,
+        "timeout_seconds": 15,
+        "isolation": "none_fixture_only"
+      }
+    }
+  },
+  "signature": "Ja6iPJlDv5HNBRXhuxh7do9NmRYEyrVZG3jKyBgb8il/3gQ5PQ0/Qtk7oY0b5klM4RP20Gu7Z+dwReesTfzsBA=="
+}

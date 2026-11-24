@@ -1,0 +1,79 @@
+{
+  "base": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+  "candidate": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "outside_spec",
+      "stale_evaluation",
+      "check_failed:checkpoint_binding",
+      "check_failed:conflicting_payload",
+      "check_failed:contract_flow",
+      "check_failed:differential_compatibility",
+      "check_failed:distinct_keys",
+      "check_failed:intent_drift",
+      "check_failed:mutation_adequacy",
+      "check_failed:positive_amount",
+      "check_failed:property_invariants",
+      "check_failed:requirement_coverage",
+      "check_failed:same_key_same_payment",
+      "check_failed:scope",
+      "missing_approval:engineering",
+      "missing_approval:security"
+    ],
+    "required_roles": [
+      "engineering",
+      "security"
+    ],
+    "risk": "high",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 13,
+    "nodes": 13
+  },
+  "history": [],
+  "ledger_root": "d861e1095862b3b0ad521bc464330cb190f8585ec940129e02af6fb34f2c9e91",
+  "main": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "positive_amount": false
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": false
+    },
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "conflicting_payload": false,
+        "distinct_keys": false,
+        "same_key_same_payment": false
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": false
+    }
+  ],
+  "scenario": "scope-violation",
+  "termination": "scope_rejected",
+  "verification_cases_per_candidate": 37
+}

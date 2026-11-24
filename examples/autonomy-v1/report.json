@@ -1,0 +1,470 @@
+{
+  "events": 13,
+  "incident_case": {
+    "operations": [
+      [
+        "register",
+        "edge",
+        424242
+      ],
+      [
+        "register",
+        "edge",
+        424242
+      ],
+      [
+        "register",
+        "edge",
+        424243
+      ]
+    ]
+  },
+  "limitations": [
+    "Operational events are simulated, signed by distinct generated keys; no production telemetry or human identities.",
+    "Historical AMGB bundles already record local merges; this overlay evaluates eligibility only, never performs or authorizes a new merge.",
+    "Observer and verifier signatures attest claims; they do not independently prove deployment outcomes or trustworthy execution.",
+    "Externally pinned config and latest root are required; sample anchor is demonstration-only."
+  ],
+  "profile": "synthetic-demo",
+  "regression_fixture_original_cases_passed": 37,
+  "regression_fixture_original_cases_total": 37,
+  "regression_fixture_passed": false,
+  "regression_observations": [
+    {
+      "store": {
+        "edge": {
+          "amount": 424242,
+          "id": 1
+        }
+      },
+      "value": {
+        "amount": 424242,
+        "id": 1
+      }
+    },
+    {
+      "store": {
+        "edge": {
+          "amount": 424242,
+          "id": 2
+        }
+      },
+      "value": {
+        "amount": 424242,
+        "id": 2
+      }
+    },
+    {
+      "error": "ValueError",
+      "store": {
+        "edge": {
+          "amount": 424242,
+          "id": 2
+        }
+      }
+    }
+  ],
+  "scope": {
+    "agent": "coding-agent",
+    "bundle_signer": "5cbeb51a3fca45335919db4365b5656452803d30ae1ef26340975804ce31159d",
+    "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+    "model": "fixture-v1",
+    "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+    "profile": "synthetic-demo",
+    "repository": "demo/payments",
+    "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+  },
+  "stages": [
+    {
+      "clean_streak": 0,
+      "event_count": 0,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "0000000000000000000000000000000000000000000000000000000000000000",
+        "profile": "synthetic-demo",
+        "reasons": [],
+        "status": "ELIGIBLE"
+      },
+      "label": "Initial eligibility",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 1,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 0,
+        "merge_authority": false,
+        "operational_root": "dd455e767362bfab05cc78adbc6b4acd6b16a191d1aaa32848206ea4abdc693b",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "open_incidents",
+          "circuit_open"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Critical incident: circuit open",
+      "level": 0,
+      "open_incidents": [
+        "INC-424242"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 3,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 0,
+        "merge_authority": false,
+        "operational_root": "37fd2f1efb8a0bb9e95d2a927d38a8ecbbffd7201ae4269c11356488ebd9c825",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "open_incidents",
+          "circuit_open",
+          "regression_missing_or_failed:E-424242"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Independent regression approval",
+      "level": 0,
+      "open_incidents": [
+        "INC-424242"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 4,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 0,
+        "merge_authority": false,
+        "operational_root": "a0ff4f958eee91223abc673d69cf27d3aaa15aad4f34ed8128fbcad4553f408d",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "open_incidents",
+          "circuit_open"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Regression passes; incident still open",
+      "level": 0,
+      "open_incidents": [
+        "INC-424242"
+      ],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 5,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 1,
+        "merge_authority": false,
+        "operational_root": "297bef68c1ef7f26209ceefb54bc2d13174315ea8da515a625210eb9fd6bb306",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "manual_release_required"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Incident resolved: manual release only",
+      "level": 1,
+      "open_incidents": [],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 1,
+      "event_count": 7,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "c75b6751fe96aa908c8ee6cc5e6fca718609580b49f1077f33fbb671fabdc141",
+        "head": "f1c38b00b03ff9a08af7547724cc7b7631591c82",
+        "level": 1,
+        "merge_authority": false,
+        "operational_root": "536a2f5ee833e932487194212cafc7a9ccf5beb38743737b8e9293905f7f16f2",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "manual_release_required"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Clean outcome: safe-first",
+      "level": 1,
+      "open_incidents": [],
+      "scenario": "safe-first"
+    },
+    {
+      "clean_streak": 2,
+      "event_count": 9,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "0d7d1794715454766c8486a0901de5a07025f93ec5232ccea5314413e1935dcd",
+        "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+        "level": 1,
+        "merge_authority": false,
+        "operational_root": "b8d0c0da8096abc7771467bac07b4afd4b3ca558244434945b60001a27fd5ac5",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "manual_release_required"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Clean outcome: safe-refactor",
+      "level": 1,
+      "open_incidents": [],
+      "scenario": "safe-refactor"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 10,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "0d7d1794715454766c8486a0901de5a07025f93ec5232ccea5314413e1935dcd",
+        "head": "02ddbccef723b876ef03ee3aa611a05eb4500a1a",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "ae58f31b41fc2472a85839574ff38b417781342f752c099054f6912965fa68cb",
+        "profile": "synthetic-demo",
+        "reasons": [],
+        "status": "ELIGIBLE"
+      },
+      "label": "Governance-approved recovery",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "safe-refactor"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 10,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "598abc5976d40f7cde21ad3228c3b7193b1f8fe1e10a4626f3384438010d2ebd",
+        "head": "67ac7ac959a6fed4d8130dc52d6184595d0a5b36",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "ae58f31b41fc2472a85839574ff38b417781342f752c099054f6912965fa68cb",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "regression_missing_or_failed:E-424242"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "New candidate lacks regression evidence",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "safe-delayed"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 11,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "598abc5976d40f7cde21ad3228c3b7193b1f8fe1e10a4626f3384438010d2ebd",
+        "head": "67ac7ac959a6fed4d8130dc52d6184595d0a5b36",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "cfc81e6afa0017e8276f20c451c7f00050a8defa47ffef670d64d664cc6811f5",
+        "profile": "synthetic-demo",
+        "reasons": [],
+        "status": "ELIGIBLE"
+      },
+      "label": "Fresh regression evidence restores eligibility",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "safe-delayed"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 11,
+      "gate": {
+        "base_authorized": false,
+        "bundle_root": "f0993cf96065e8f9071da747d2d31e35e3a859f0ab287f24510b98f6be5a3b13",
+        "head": "f2d2c95e20cab1e0fb89ea7a94db6a23072a8c50",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "cfc81e6afa0017e8276f20c451c7f00050a8defa47ffef670d64d664cc6811f5",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "base_policy_denied",
+          "regression_missing_or_failed:E-424242"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Base policy denial is never overridden",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "missing-approval"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 12,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "23401322d149127615ed56875c291990d63a0879a22f7d997501f6742d384a2f",
+        "head": "0a7e433d9a0d020993e727fcf69c7c8e827b836b",
+        "level": 2,
+        "merge_authority": false,
+        "operational_root": "b5d5ab173948949548e1bcc75110d8812f475c7af9f657759c57cacd008ce9b5",
+        "profile": "synthetic-demo",
+        "reasons": [],
+        "status": "ELIGIBLE"
+      },
+      "label": "First adverse observation",
+      "level": 2,
+      "open_incidents": [],
+      "scenario": "happy"
+    },
+    {
+      "clean_streak": 0,
+      "event_count": 13,
+      "gate": {
+        "base_authorized": true,
+        "bundle_root": "598abc5976d40f7cde21ad3228c3b7193b1f8fe1e10a4626f3384438010d2ebd",
+        "head": "67ac7ac959a6fed4d8130dc52d6184595d0a5b36",
+        "level": 1,
+        "merge_authority": false,
+        "operational_root": "8334b2f17715a45c061c815adc425c1ea08ec83f9885c9e552d1671f09cb7dd4",
+        "profile": "synthetic-demo",
+        "reasons": [
+          "manual_release_required"
+        ],
+        "status": "BLOCKED"
+      },
+      "label": "Adverse threshold: automatic downgrade",
+      "level": 1,
+      "open_incidents": [],
+      "scenario": "safe-delayed"
+    }
+  ],
+  "state": {
+    "clean_streak": 0,
+    "history": [
+      {
+        "clean_streak": 0,
+        "event": "incident",
+        "level_after": 0,
+        "level_before": 2,
+        "open_incidents": 1,
+        "seq": 0
+      },
+      {
+        "clean_streak": 0,
+        "event": "propose_eval",
+        "level_after": 0,
+        "level_before": 0,
+        "open_incidents": 1,
+        "seq": 1
+      },
+      {
+        "clean_streak": 0,
+        "event": "approve_eval",
+        "level_after": 0,
+        "level_before": 0,
+        "open_incidents": 1,
+        "seq": 2
+      },
+      {
+        "clean_streak": 0,
+        "event": "eval_result",
+        "level_after": 0,
+        "level_before": 0,
+        "open_incidents": 1,
+        "seq": 3
+      },
+      {
+        "clean_streak": 0,
+        "event": "resolve",
+        "level_after": 1,
+        "level_before": 0,
+        "open_incidents": 0,
+        "seq": 4
+      },
+      {
+        "clean_streak": 0,
+        "event": "eval_result",
+        "level_after": 1,
+        "level_before": 1,
+        "open_incidents": 0,
+        "seq": 5
+      },
+      {
+        "clean_streak": 1,
+        "event": "outcome",
+        "level_after": 1,
+        "level_before": 1,
+        "open_incidents": 0,
+        "seq": 6
+      },
+      {
+        "clean_streak": 1,
+        "event": "eval_result",
+        "level_after": 1,
+        "level_before": 1,
+        "open_incidents": 0,
+        "seq": 7
+      },
+      {
+        "clean_streak": 2,
+        "event": "outcome",
+        "level_after": 1,
+        "level_before": 1,
+        "open_incidents": 0,
+        "seq": 8
+      },
+      {
+        "clean_streak": 0,
+        "event": "promote",
+        "level_after": 2,
+        "level_before": 1,
+        "open_incidents": 0,
+        "seq": 9
+      },
+      {
+        "clean_streak": 0,
+        "event": "eval_result",
+        "level_after": 2,
+        "level_before": 2,
+        "open_incidents": 0,
+        "seq": 10
+      },
+      {
+        "clean_streak": 0,
+        "event": "outcome",
+        "level_after": 2,
+        "level_before": 2,
+        "open_incidents": 0,
+        "seq": 11
+      },
+      {
+        "clean_streak": 0,
+        "event": "outcome",
+        "level_after": 1,
+        "level_before": 2,
+        "open_incidents": 0,
+        "seq": 12
+      }
+    ],
+    "level": 1,
+    "open_incidents": [],
+    "required_evals": [
+      "E-424242"
+    ],
+    "root": "8334b2f17715a45c061c815adc425c1ea08ec83f9885c9e552d1671f09cb7dd4"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "base": "ec70c1fda038a37f847e8004864db519a16d36a8",
+  "candidate": "ec70c1fda038a37f847e8004864db519a16d36a8",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "outside_spec",
+      "protected_path",
+      "stale_evaluation",
+      "check_failed:checkpoint_binding",
+      "check_failed:conflicting_payload",
+      "check_failed:contract_flow",
+      "check_failed:differential_compatibility",
+      "check_failed:distinct_keys",
+      "check_failed:intent_drift",
+      "check_failed:mutation_adequacy",
+      "check_failed:positive_amount",
+      "check_failed:property_invariants",
+      "check_failed:requirement_coverage",
+      "check_failed:same_key_same_payment",
+      "check_failed:scope",
+      "unclassified_path:tests/acceptance.py",
+      "missing_approval:engineering",
+      "missing_approval:security"
+    ],
+    "required_roles": [
+      "engineering",
+      "security"
+    ],
+    "risk": "high",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 13,
+    "nodes": 13
+  },
+  "history": [],
+  "ledger_root": "957b7bfef8b47b64d00465e21516b5b37741b349e2ca1edf148fe6999cdaa036",
+  "main": "ec70c1fda038a37f847e8004864db519a16d36a8",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "positive_amount": false
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": false
+    },
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "conflicting_payload": false,
+        "distinct_keys": false,
+        "same_key_same_payment": false
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": false
+    }
+  ],
+  "scenario": "protected-path",
+  "termination": "scope_rejected",
+  "verification_cases_per_candidate": 37
+}

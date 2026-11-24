@@ -1,0 +1,207 @@
+{
+  "approvals": [
+    {
+      "component": "payments",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "2e11800b53bf82d613ee3232f99651d828b9fd877d1a77bbd4e4c2c3687f1951",
+      "signature": "f188c6183e88339d951f7336ee7afbf4a1564fa99b0a334e6af872c0522b8a208f5e50447d5b96c90930340c1744ba67c9735e72e979444dd652d5a103801e08"
+    },
+    {
+      "component": "checkout",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "2e11800b53bf82d613ee3232f99651d828b9fd877d1a77bbd4e4c2c3687f1951",
+      "signature": "44faa8b1aa0a60d4abcd1048d0f1184f52a16548e02517e8f22f9789b9d45a3ddec3c8c75d4487d48d7f52631c927460e8f97c62d9b8ab7836029a91fab8eb07"
+    },
+    {
+      "component": "portal",
+      "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+      "plan_digest": "2e11800b53bf82d613ee3232f99651d828b9fd877d1a77bbd4e4c2c3687f1951",
+      "signature": "f8d6a8b2f2e58a93796e6b5dc831cbaf50cc2fa56094acf2f2ea76b8bce0bca0d2bce665b40d1edc34cf2d8f228f8a6f2f824b628b6e84897e8ef3f5dfc28800"
+    }
+  ],
+  "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+  "events": [
+    {
+      "hash": "1f80eccf44e59601780e5b8dc32d11f01701b09c8ad2dc75ec84242262783e30",
+      "kind": "start",
+      "payload": {
+        "refs": {
+          "checkout": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+          "payments": "9550c78ed0919074056bf65cd66310a6a36aafce",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+      "seq": 0
+    },
+    {
+      "hash": "6d2edcc9d495dee255b4bfad2e3cb0cbf07cd6377bff8c36f07ed01a2fd5cb45",
+      "kind": "merged",
+      "payload": {
+        "component": "payments",
+        "refs": {
+          "checkout": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+          "payments": "847ca06f323afbdd02f7cff14a0e39a5114c8a4e",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "1f80eccf44e59601780e5b8dc32d11f01701b09c8ad2dc75ec84242262783e30",
+      "seq": 1
+    },
+    {
+      "hash": "91ed243b63b1b828a93624a65b122e85ae493100bc366115b671274e59b1a8d7",
+      "kind": "merge_failed",
+      "payload": {
+        "component": "checkout",
+        "reason": "synthetic merge failure",
+        "refs": {
+          "checkout": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+          "payments": "847ca06f323afbdd02f7cff14a0e39a5114c8a4e",
+          "portal": "2626a6d82945262d99240f7cdade6abd68b38fe5"
+        }
+      },
+      "prev": "6d2edcc9d495dee255b4bfad2e3cb0cbf07cd6377bff8c36f07ed01a2fd5cb45",
+      "seq": 2
+    },
+    {
+      "hash": "11ec8173c51c8855e7b7bc23f2a313f17b0c8a6908f7607b3349c9e86f01ae74",
+      "kind": "compensation_failed",
+      "payload": {
+        "component": "payments",
+        "reason": "ref drift before compensation",
+        "refs": {
+          "checkout": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+          "payments": "847ca06f323afbdd02f7cff14a0e39a5114c8a4e",
+          "portal": "77d5e1970f0560698623a52584a573ee9b3ff69f"
+        }
+      },
+      "prev": "91ed243b63b1b828a93624a65b122e85ae493100bc366115b671274e59b1a8d7",
+      "seq": 3
+    },
+    {
+      "hash": "0a19986f423942f35c9c74722f389ad66b2cd792cf6f7124f52f495ade65f605",
+      "kind": "finish",
+      "payload": {
+        "refs": {
+          "checkout": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+          "payments": "847ca06f323afbdd02f7cff14a0e39a5114c8a4e",
+          "portal": "77d5e1970f0560698623a52584a573ee9b3ff69f"
+        },
+        "status": "MANUAL_INTERVENTION"
+      },
+      "prev": "11ec8173c51c8855e7b7bc23f2a313f17b0c8a6908f7607b3349c9e86f01ae74",
+      "seq": 4
+    }
+  ],
+  "merge_authority": false,
+  "plan": {
+    "components": {
+      "checkout": {
+        "base": "1f7f6acdfc39728e4fa4d5756649017282c2ccf7",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {
+            "payments": "v1"
+          }
+        },
+        "fast_forward": true,
+        "head": "512a1440149f30acd7754f4b39948c8bda630a7d",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {
+            "payments": "v2"
+          }
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      },
+      "payments": {
+        "base": "9550c78ed0919074056bf65cd66310a6a36aafce",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {}
+        },
+        "fast_forward": true,
+        "head": "847ca06f323afbdd02f7cff14a0e39a5114c8a4e",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {}
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      },
+      "portal": {
+        "base": "2626a6d82945262d99240f7cdade6abd68b38fe5",
+        "base_contract": {
+          "provides": [
+            "v1"
+          ],
+          "requires": {
+            "checkout": "v1"
+          }
+        },
+        "fast_forward": true,
+        "head": "77d5e1970f0560698623a52584a573ee9b3ff69f",
+        "head_contract": {
+          "provides": [
+            "v1",
+            "v2"
+          ],
+          "requires": {
+            "checkout": "v2"
+          }
+        },
+        "paths": [
+          "app.txt",
+          "contract.json"
+        ]
+      }
+    },
+    "config_digest": "5a9dc43dd5034c76884b512f3647700e9e4228c49c6e986c9e81300a9e2e9dcd",
+    "eligible": true,
+    "intent_id": "payment-contract-v2",
+    "issues": [],
+    "merge_authority": false,
+    "order": [
+      "payments",
+      "checkout",
+      "portal"
+    ],
+    "stages": [
+      {
+        "after": null,
+        "violations": []
+      },
+      {
+        "after": "payments",
+        "violations": []
+      },
+      {
+        "after": "checkout",
+        "violations": []
+      },
+      {
+        "after": "portal",
+        "violations": []
+      }
+    ],
+    "version": 1
+  },
+  "signature": "c263d0ef3b0ab351a5f49a6d10827c30cab9ad60f3cec7e041294ea474a98d891e7c5422008e07cf6a1deb0e333f3fec52d3c8a823977416290987040ab0c208",
+  "status": "MANUAL_INTERVENTION",
+  "version": 1
+}

@@ -1,0 +1,1 @@
+{"schema_version":"1.0","provider":"openai","runtime":"codex","session_id":"synthetic-codex-001","agent_id":"demo-agent","tool_types":["read","write","test"],"claimed_requirements":["R01","R02"]}

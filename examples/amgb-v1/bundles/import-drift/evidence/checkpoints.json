@@ -1,0 +1,38 @@
+[
+  {
+    "binding": {
+      "base": "063b77a42e86ff46b1f71e22adaf20f003a61448",
+      "harness": "b230976af148534e666fbffe0a49761251184a07e64345f2a487679f9823ab19",
+      "head": "117413f7466a3126ea2fa09dd8d72846fd107cbb",
+      "policy": "4c4be6f38fd07d720fbaf92ae020a1a8459242694fe8c92aa36805d762f55a4a",
+      "spec": "b71e650ee681562c0f2138f1e73f5281761b65edc916e67cbe7dc0698e8b8885"
+    },
+    "diff_sha256": "801bc12612953a635b7ffb11d5c91cb5cf549272684e033fe01661df3600aec9",
+    "intent_id": "PAY-104",
+    "paths": [
+      "app/payments.py"
+    ],
+    "proposal_event_hash": "aa02a44311b1e42428b11553768355d772cf9219b3f8c86ab7383d314e2ee595",
+    "schema_version": "1.0",
+    "session": {
+      "agent_id": "coding-agent",
+      "claimed_requirements": [],
+      "provider": "fixture",
+      "runtime": "fixture",
+      "schema_version": "1.0",
+      "session_id": "import-drift-1",
+      "tool_types": [
+        "write"
+      ],
+      "trust": "self_reported"
+    },
+    "session_digest": "62f8ce9aa6d977cd40a18ab8faa9208a6ab62051aff808617198f5e576a708da",
+    "source": "agent_proposal",
+    "tree": "49130db2d6d1fcdec13324dca7e7665dea6c1812",
+    "trust": {
+      "git_and_diff": "harness_observed",
+      "independent_attestation": false,
+      "session_identity": "self_reported"
+    }
+  }
+]

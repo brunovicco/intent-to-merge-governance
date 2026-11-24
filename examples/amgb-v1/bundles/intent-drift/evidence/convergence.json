@@ -1,0 +1,19 @@
+[
+  {
+    "action": "intent_drift",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 566,
+    "failed": [
+      "contract_flow",
+      "intent_drift"
+    ],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "daa71ab3b9cad58f76dc8582f12649b4976f90f6"
+  }
+]

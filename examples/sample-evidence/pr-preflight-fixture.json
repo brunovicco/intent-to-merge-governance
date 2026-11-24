@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "profile": "github-live-preflight",
+  "repository": "OWNER/REPO",
+  "pr": 42,
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "base_ref": "main",
+  "policy_digest": "6d12c32891da8d9477e5719de6bdb69763f2fb46d01a0191e37516d22f7b478d",
+  "paths": [
+    "app/payments.py"
+  ],
+  "gates": [
+    {
+      "name": "open_non_draft_target",
+      "passed": true
+    },
+    {
+      "name": "scope:app/payments.py",
+      "passed": true
+    },
+    {
+      "name": "check:trusted-ci",
+      "passed": true
+    },
+    {
+      "name": "approval:engineering",
+      "passed": true
+    },
+    {
+      "name": "approval:security",
+      "passed": false
+    }
+  ],
+  "reasons": [
+    "approval:security"
+  ],
+  "decision": "BLOCK",
+  "full_itm_authorization": false,
+  "note": "Synthetic API fixture; no GitHub request made.",
+  "fixture": true
+}

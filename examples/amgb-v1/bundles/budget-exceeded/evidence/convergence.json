@@ -1,0 +1,16 @@
+[
+  {
+    "action": "budget_exceeded",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 15553,
+    "failed": [],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "8524bab7638b3aed962f5cb721ea4f447958c9bb"
+  }
+]

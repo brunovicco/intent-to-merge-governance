@@ -1,0 +1,94 @@
+flowchart TD
+    N0["intent: PAY-104"]
+    N1["requirement: R01"]
+    N2["criterion: positive_amount"]
+    N3["path: app/payments.py"]
+    N4["requirement: R02"]
+    N5["criterion: same_key_same_payment"]
+    N6["criterion: distinct_keys"]
+    N7["criterion: conflicting_payload"]
+    N8["non_goal: NG01"]
+    N9["non_goal: NG02"]
+    N10["non_goal: NG03"]
+    N11["commit: 4397e965c225ef211a4ad8d428bccd2986a122fd"]
+    N12["checkpoint: 4397e965c225ef211a4ad8d428bccd2986a122fd"]
+    N13["drift: 4397e965c225ef211a4ad8d428bccd2986a122fd"]
+    N14["finding: 4397e965c225ef211a4ad8d428bccd2986a122fd:NG01"]
+    N15["finding: 4397e965c225ef211a4ad8d428bccd2986a122fd:NG02"]
+    N16["finding: 4397e965c225ef211a4ad8d428bccd2986a122fd:NG03"]
+    N17["evaluation: 4397e965c225ef211a4ad8d428bccd2986a122fd"]
+    N18["check_result: 4397e965c225ef211a4ad8d428bccd2986a122fd:posi"]
+    N19["check_result: 4397e965c225ef211a4ad8d428bccd2986a122fd:same"]
+    N20["check_result: 4397e965c225ef211a4ad8d428bccd2986a122fd:dist"]
+    N21["check_result: 4397e965c225ef211a4ad8d428bccd2986a122fd:conf"]
+    N22["commit: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N23["checkpoint: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N24["drift: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N25["finding: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:NG01"]
+    N26["finding: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:NG02"]
+    N27["finding: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:NG03"]
+    N28["evaluation: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N29["check_result: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:posi"]
+    N30["check_result: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:same"]
+    N31["check_result: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:dist"]
+    N32["check_result: 0a7e433d9a0d020993e727fcf69c7c8e827b836b:conf"]
+    N33["decision: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N34["approval: 740206e427628ed1f9249d2b5fac34d02c1976f177b16"]
+    N35["approval: 52c7522ac3479837e649f03b526bf5f3fc64e7dcc5e93"]
+    N36["merge_result: 0a7e433d9a0d020993e727fcf69c7c8e827b836b"]
+    N0 -->|requires| N1
+    N1 -->|acceptance| N2
+    N1 -->|maps_to| N3
+    N0 -->|requires| N4
+    N4 -->|acceptance| N5
+    N4 -->|acceptance| N6
+    N4 -->|acceptance| N7
+    N4 -->|maps_to| N3
+    N0 -->|constrains| N8
+    N0 -->|constrains| N9
+    N0 -->|constrains| N10
+    N12 -->|observes| N11
+    N0 -->|has_checkpoint| N12
+    N11 -->|changes| N3
+    N12 -->|checked_by| N13
+    N13 -->|reports| N14
+    N14 -->|checks| N8
+    N13 -->|reports| N15
+    N15 -->|checks| N9
+    N13 -->|reports| N16
+    N16 -->|checks| N10
+    N12 -->|evaluated_by| N17
+    N17 -->|produces| N18
+    N18 -->|checks| N2
+    N17 -->|produces| N19
+    N19 -->|checks| N5
+    N17 -->|produces| N20
+    N20 -->|checks| N6
+    N17 -->|produces| N21
+    N21 -->|checks| N7
+    N23 -->|observes| N22
+    N0 -->|has_checkpoint| N23
+    N22 -->|changes| N3
+    N23 -->|checked_by| N24
+    N24 -->|reports| N25
+    N25 -->|checks| N8
+    N24 -->|reports| N26
+    N26 -->|checks| N9
+    N24 -->|reports| N27
+    N27 -->|checks| N10
+    N23 -->|evaluated_by| N28
+    N28 -->|produces| N29
+    N29 -->|checks| N2
+    N28 -->|produces| N30
+    N30 -->|checks| N5
+    N28 -->|produces| N31
+    N31 -->|checks| N6
+    N28 -->|produces| N32
+    N32 -->|checks| N7
+    N0 -->|subject_to| N33
+    N23 -->|evidence_for| N33
+    N28 -->|evidence_for| N33
+    N24 -->|evidence_for| N33
+    N34 -->|considered_by| N33
+    N35 -->|considered_by| N33
+    N33 -->|determines| N36

@@ -1,0 +1,43 @@
+{
+  "release": "1.0.0-rc.2",
+  "promotion": "HOLD",
+  "production_ready": false,
+  "local": {
+    "new_tests": {
+      "passed": 8,
+      "total": 8
+    },
+    "workspace_self_test": {
+      "passed": 5,
+      "total": 5
+    },
+    "benchmark_reference_trials": {
+      "passed": 10,
+      "total": 10,
+      "mode": "synthetic_fixture"
+    },
+    "inherited_regression": {
+      "passed": 139,
+      "total": 139
+    }
+  },
+  "external_rc1_user_reported": {
+    "docker": "PASS",
+    "claude": "PASS",
+    "codex": "PASS",
+    "github_negative_preflight": "PASS",
+    "github_check_publication": "PASS",
+    "github_ruleset_state": "blocked",
+    "source": "user terminal outputs and prior GitHub API observation; original files retained on user machine"
+  },
+  "rc2_external": {
+    "live_benchmark": "NOT_RUN",
+    "strict_evidence_gate_negative": "NOT_RUN",
+    "transport_lifecycle": "NOT_RUN",
+    "independent_human_positive": "NOT_RUN",
+    "independent_control_services": "NOT_RUN",
+    "authorization_revocation": "NOT_RUN",
+    "merge_queue": "NOT_RUN",
+    "hostile_isolation": "NOT_RUN"
+  }
+}

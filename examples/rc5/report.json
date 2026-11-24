@@ -1,0 +1,149 @@
+{
+  "profile": "integrated-candidate-lab-v1",
+  "status": "PASS",
+  "decision": "BLOCK",
+  "merge_authority": false,
+  "production_ready": false,
+  "convergence": {
+    "profile": "integrated-candidate-lab-v1",
+    "mode": "synthetic_fixture",
+    "fixture": "repair",
+    "provider": "claude",
+    "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+    "head": "af9e621c7df2b6a2d3e23b28b5e648ae9cc3ee94",
+    "status": "PASSED",
+    "attempts": [
+      {
+        "attempt": 1,
+        "tree": "67dec3e33b10670a8474c5cebca15b7cc58893bf",
+        "usage": {
+          "input_total": 100,
+          "uncached": 100,
+          "cache_write": 0,
+          "cache_read": 0,
+          "output": 20,
+          "trust": "self_reported"
+        },
+        "cumulative_observed_tokens": 120,
+        "cumulative_elapsed_ms": 812,
+        "state": "READY",
+        "merge_authority": false,
+        "head": "79a068d9d13c849025194eedece0901d48948b28",
+        "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+        "scope_valid": true,
+        "verification": {
+          "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+          "head": "79a068d9d13c849025194eedece0901d48948b28",
+          "tree": "67dec3e33b10670a8474c5cebca15b7cc58893bf",
+          "source_digest": "5fd8186612552d51bc256b80ca9655939ecf6f594927fa2d367ec2e356d54ac4",
+          "scenario_digest": "cb3eff1272c5c94fa545d0ca72593aca0803a9a9ee9b37132c1e5783903c38a6",
+          "verification": {
+            "cases": 20,
+            "passed_cases": 15,
+            "weak_ci_passed": true,
+            "structural_passed": true,
+            "passed": false,
+            "executor": {
+              "backend": "local",
+              "image_id": null,
+              "timeout_seconds": 15,
+              "isolation": "none_fixture_only"
+            }
+          }
+        },
+        "observation_digest": "ad05bc3dc7fa92bda6b6fdc5fc747ea201d5c04b7682d631b885eadf671f7afb",
+        "telemetry_trust": "synthetic"
+      },
+      {
+        "attempt": 2,
+        "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+        "usage": {
+          "input_total": 100,
+          "uncached": 100,
+          "cache_write": 0,
+          "cache_read": 0,
+          "output": 20,
+          "trust": "self_reported"
+        },
+        "cumulative_observed_tokens": 240,
+        "cumulative_elapsed_ms": 1720,
+        "state": "PASSED",
+        "merge_authority": false,
+        "head": "af9e621c7df2b6a2d3e23b28b5e648ae9cc3ee94",
+        "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+        "scope_valid": true,
+        "verification": {
+          "base": "38dc356600454fc4f0bed07b6b45bdd7b220cda4",
+          "head": "af9e621c7df2b6a2d3e23b28b5e648ae9cc3ee94",
+          "tree": "026a7c1ce93a32d148c1237583b792414720d3ad",
+          "source_digest": "f38eb2bd58ddf6965420886dccc042adfe7fda5f67469a38e54140da524b5f9a",
+          "scenario_digest": "cb3eff1272c5c94fa545d0ca72593aca0803a9a9ee9b37132c1e5783903c38a6",
+          "verification": {
+            "cases": 20,
+            "passed_cases": 20,
+            "weak_ci_passed": true,
+            "structural_passed": true,
+            "passed": true,
+            "executor": {
+              "backend": "local",
+              "image_id": null,
+              "timeout_seconds": 15,
+              "isolation": "none_fixture_only"
+            }
+          }
+        },
+        "observation_digest": "0d9d29834f20307f3b267fd905b2c8cbb173a3f40c82131ee5aa340b82618d8b",
+        "telemetry_trust": "synthetic"
+      }
+    ],
+    "limits": {
+      "attempts": 3,
+      "observed_tokens": 400000,
+      "elapsed_ms": 180000
+    },
+    "error_type": null,
+    "merge_authority": false,
+    "production_ready": false,
+    "executor": {
+      "backend": "local",
+      "image_id": null,
+      "timeout_seconds": 15,
+      "isolation": "none_fixture_only"
+    }
+  },
+  "gate": {
+    "profile": "integrated-candidate-lab-v1",
+    "candidate_verified": true,
+    "decision": "BLOCK",
+    "reasons": [
+      "independent_human_approval_missing",
+      "external_control_inventory_missing"
+    ],
+    "merge_authority": false,
+    "production_ready": false
+  },
+  "external_gate_compatibility": "REJECTED_LAB_PROFILE",
+  "lifecycle": {
+    "before": {
+      "state": "CURRENT",
+      "reason": null,
+      "merge_authority": false
+    },
+    "after": {
+      "state": "REVOKED",
+      "reason": "review_withdrawn",
+      "merge_authority": false
+    },
+    "duplicate": "DUPLICATE",
+    "no_restore": {
+      "state": "REVOKED",
+      "reason": "review_withdrawn",
+      "merge_authority": false
+    },
+    "restart": {
+      "state": "REVOKED",
+      "reason": "review_withdrawn",
+      "merge_authority": false
+    }
+  }
+}

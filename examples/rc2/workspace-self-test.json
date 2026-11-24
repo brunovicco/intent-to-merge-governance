@@ -1,0 +1,11 @@
+{
+  "probe_build": "rc1-workspace-diagnostics-v3",
+  "script_path": "/mnt/data/intent-to-merge-governance-v1.0.0-rc.2/scripts/rc1_external.py",
+  "self_test": {
+    "allowed_edit": "PASS",
+    "extra_file": "PASS",
+    "staged_edit": "PASS",
+    "changed_head": "PASS",
+    "wrong_observed_head": "PASS"
+  }
+}

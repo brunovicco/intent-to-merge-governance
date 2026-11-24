@@ -1,0 +1,72 @@
+{
+  "profile": "synthetic-fixture-smoke",
+  "production_ready": false,
+  "merge_authority": false,
+  "seed": 104,
+  "schedule": [
+    [
+      "claude",
+      "DATA-403",
+      1
+    ],
+    [
+      "codex",
+      "API-302",
+      1
+    ],
+    [
+      "claude",
+      "API-302",
+      1
+    ],
+    [
+      "codex",
+      "PAY-104",
+      1
+    ],
+    [
+      "codex",
+      "REF-504",
+      1
+    ],
+    [
+      "claude",
+      "AUTH-201",
+      1
+    ],
+    [
+      "codex",
+      "DATA-403",
+      1
+    ],
+    [
+      "claude",
+      "REF-504",
+      1
+    ],
+    [
+      "codex",
+      "AUTH-201",
+      1
+    ],
+    [
+      "claude",
+      "PAY-104",
+      1
+    ]
+  ],
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "timeout_seconds": 15,
+    "isolation": "none_fixture_only"
+  },
+  "scenario_digest": "fc17691185ee25fe7030286b9ff72cd3c3dd489290da1d134aa30513af7faf87",
+  "limitations": [
+    "single attempt per trial; convergence not measured",
+    "tokens and costs unavailable",
+    "weak CI is a predefined partial oracle, not representative of industry CI",
+    "candidate execution shares interpreter with observation worker; not hostile isolation",
+    "no human authorization or merge"
+  ]
+}

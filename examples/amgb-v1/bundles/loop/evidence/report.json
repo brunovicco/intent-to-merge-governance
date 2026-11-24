@@ -1,0 +1,90 @@
+{
+  "base": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+  "candidate": "a22b07bdd94f42b51e66fd6445e911d353e59b1f",
+  "decision": {
+    "authorized": false,
+    "reasons": [
+      "not_converged",
+      "check_failed:conflicting_payload",
+      "check_failed:contract_flow",
+      "check_failed:positive_amount",
+      "check_failed:property_invariants",
+      "check_failed:requirement_coverage",
+      "check_failed:same_key_same_payment",
+      "missing_approval:engineering",
+      "missing_approval:security"
+    ],
+    "required_roles": [
+      "engineering",
+      "security"
+    ],
+    "risk": "high",
+    "verified_roles": []
+  },
+  "executor": {
+    "backend": "local",
+    "image_id": null,
+    "isolation": "none_fixture_only",
+    "timeout_seconds": 15
+  },
+  "graph": {
+    "edges": 72,
+    "nodes": 46
+  },
+  "history": [
+    {
+      "head": "8a3079c11ccec997ca0217f20d73645af8bac799",
+      "iteration": 1,
+      "passed": 7,
+      "total": 13
+    },
+    {
+      "head": "9ea128e43dd928f1d3b809da6f724f90ed67a079",
+      "iteration": 2,
+      "passed": 7,
+      "total": 13
+    },
+    {
+      "head": "a22b07bdd94f42b51e66fd6445e911d353e59b1f",
+      "iteration": 3,
+      "passed": 7,
+      "total": 13
+    }
+  ],
+  "ledger_root": "f56edefee89f68e1a461150dc1b3b5b76fef7824fc34734a2f9b140822dbc8f1",
+  "main": "0a93452cad7c31be5d8ab42cf164487e712a7b35",
+  "merged": false,
+  "mutation_score": {
+    "killed": 3,
+    "total": 3
+  },
+  "requirement_coverage": [
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "positive_amount": false
+      },
+      "description": "Reject invalid amounts",
+      "id": "R01",
+      "verified": false
+    },
+    {
+      "changed_paths": [
+        "app/payments.py"
+      ],
+      "criteria": {
+        "conflicting_payload": false,
+        "distinct_keys": true,
+        "same_key_same_payment": false
+      },
+      "description": "Maintain payment idempotency and conflict handling",
+      "id": "R02",
+      "verified": false
+    }
+  ],
+  "scenario": "loop",
+  "termination": "repeated_tree",
+  "verification_cases_per_candidate": 37
+}

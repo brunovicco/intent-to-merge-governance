@@ -1,0 +1,12 @@
+test_diagnostics (test_public_release.PublicInventoryTests.test_diagnostics) ... ok
+test_draft_requires_lock_for_final (test_public_release.PublicInventoryTests.test_draft_requires_lock_for_final) ... ok
+test_seal_only_new_lock (test_public_release.PublicInventoryTests.test_seal_only_new_lock) ... ok
+test_seal_refuses_failed_uv_check (test_public_release.PublicInventoryTests.test_seal_refuses_failed_uv_check) ... ok
+test_seal_rejects_other_changes (test_public_release.PublicInventoryTests.test_seal_rejects_other_changes) ... ok
+test_secret_file_rejected (test_public_release.PublicInventoryTests.test_secret_file_rejected) ... ok
+test_symlink_rejected (test_public_release.PublicInventoryTests.test_symlink_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.007s
+
+OK

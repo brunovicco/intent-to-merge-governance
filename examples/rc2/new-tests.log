@@ -1,0 +1,13 @@
+test_claude_permissions (test_rc2.RC2Tests.test_claude_permissions) ... ok
+test_fixture_trial (test_rc2.RC2Tests.test_fixture_trial) ... ok
+test_negative_real_path_mock_api (test_rc2.RC2Tests.test_negative_real_path_mock_api) ... ok
+test_reference_and_baseline_oracles (test_rc2.RC2Tests.test_reference_and_baseline_oracles) ... ok
+test_structural_guard (test_rc2.RC2Tests.test_structural_guard) ... ok
+test_transport_lost_response_journal (test_rc2.RC2Tests.test_transport_lost_response_journal) ... ok
+test_transport_mock_api (test_rc2.RC2Tests.test_transport_mock_api) ... ok
+test_transport_must_not_be_required (test_rc2.RC2Tests.test_transport_must_not_be_required) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 8.349s
+
+OK

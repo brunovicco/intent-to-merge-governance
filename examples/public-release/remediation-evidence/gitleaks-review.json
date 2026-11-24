@@ -1,0 +1,33 @@
+{
+  "status": "REVIEWED_PUBLIC_KEYS_ONLY",
+  "reviewed": [
+    {
+      "rule": "generic-api-key",
+      "file": "examples/changeset-v1/config.json",
+      "line": 11,
+      "end": 11
+    },
+    {
+      "rule": "generic-api-key",
+      "file": "examples/changeset-v1/config.json",
+      "line": 19,
+      "end": 19
+    },
+    {
+      "rule": "generic-api-key",
+      "file": "examples/changeset-v1/config.json",
+      "line": 29,
+      "end": 29
+    },
+    {
+      "rule": "generic-api-key",
+      "file": "examples/changeset-v1/config.json",
+      "line": 32,
+      "end": 32
+    }
+  ],
+  "remaining": [],
+  "fixture_digest_matches": true,
+  "publication_ready": false,
+  "merge_authority": false
+}

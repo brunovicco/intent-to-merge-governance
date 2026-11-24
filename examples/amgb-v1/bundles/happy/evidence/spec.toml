@@ -1,0 +1,37 @@
+id = "PAY-104"
+intent = "Make payment registration idempotent and reject invalid amounts."
+allowed_paths = ["app/payments.py"]
+criteria = ["positive_amount", "same_key_same_payment", "distinct_keys", "conflicting_payload"]
+
+
+[[requirements]]
+id = "R01"
+description = "Reject invalid amounts"
+criteria = ["positive_amount"]
+paths = ["app/payments.py"]
+
+[[requirements]]
+id = "R02"
+description = "Maintain payment idempotency and conflict handling"
+criteria = ["same_key_same_payment", "distinct_keys", "conflicting_payload"]
+paths = ["app/payments.py"]
+
+[[non_goals]]
+id = "NG01"
+description = "Do not change authorization logic"
+kind = "preserve_symbol"
+path = "app/payments.py"
+symbol = "authorize"
+
+[[non_goals]]
+id = "NG02"
+description = "Do not change the register API signature"
+kind = "preserve_signature"
+path = "app/payments.py"
+symbol = "register"
+
+[[non_goals]]
+id = "NG03"
+description = "Do not introduce new imports"
+kind = "no_new_imports"
+path = "app/payments.py"

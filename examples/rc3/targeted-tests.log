@@ -1,0 +1,40 @@
+test_claude_permissions (test_rc2.RC2Tests.test_claude_permissions) ... ok
+test_fixture_trial (test_rc2.RC2Tests.test_fixture_trial) ... ok
+test_negative_real_path_mock_api (test_rc2.RC2Tests.test_negative_real_path_mock_api) ... ok
+test_reference_and_baseline_oracles (test_rc2.RC2Tests.test_reference_and_baseline_oracles) ... ok
+test_structural_guard (test_rc2.RC2Tests.test_structural_guard) ... ok
+test_transport_lost_response_journal (test_rc2.RC2Tests.test_transport_lost_response_journal) ... ok
+test_transport_mock_api (test_rc2.RC2Tests.test_transport_mock_api) ... ok
+test_transport_must_not_be_required (test_rc2.RC2Tests.test_transport_must_not_be_required) ... ok
+test_explorer_verified (test_integration_v05.AgentExplorerTests.test_explorer_verified) ... ok
+test_incomplete (test_integration_v05.AgentExplorerTests.test_incomplete) ... ok
+test_mixed_session (test_integration_v05.AgentExplorerTests.test_mixed_session) ... ok
+test_native_import (test_integration_v05.AgentExplorerTests.test_native_import) ... ok
+test_dismissed (test_integration_v05.GitHubTests.test_dismissed) ... ok
+test_fork (test_integration_v05.GitHubTests.test_fork) ... ok
+test_latest_rerun_fails (test_integration_v05.GitHubTests.test_latest_rerun_fails) ... ok
+test_missing_files (test_integration_v05.GitHubTests.test_missing_files) ... ok
+test_moved_head (test_integration_v05.GitHubTests.test_moved_head) ... ok
+test_pass_read_only (test_integration_v05.GitHubTests.test_pass_read_only) ... ok
+test_policy_overlap (test_integration_v05.GitHubTests.test_policy_overlap) ... ok
+test_protected_rename (test_integration_v05.GitHubTests.test_protected_rename) ... ok
+test_publish_sha (test_integration_v05.GitHubTests.test_publish_sha) ... ok
+test_self_approval (test_integration_v05.GitHubTests.test_self_approval) ... ok
+test_stale_review (test_integration_v05.GitHubTests.test_stale_review) ... ok
+test_wrong_app (test_integration_v05.GitHubTests.test_wrong_app) ... ok
+test_convergence_repeated_tree (test_rc3.AdversarialTests.test_convergence_repeated_tree) ... ok
+test_denominators (test_rc3.AdversarialTests.test_denominators) ... ok
+test_exact_git_scope_and_oracle (test_rc3.AdversarialTests.test_exact_git_scope_and_oracle) ... ok
+test_inventory_labels (test_rc3.AdversarialTests.test_inventory_labels) ... ok
+test_signed_control_faults (test_rc3.AdversarialTests.test_signed_control_faults) ... ok
+test_strategies_monotonic_and_fail_closed (test_rc3.AdversarialTests.test_strategies_monotonic_and_fail_closed) ... ok
+test_fixture_challenge_rejected (test_rc3.ChallengeTests.test_fixture_challenge_rejected) ... ok
+test_untrusted_marker_blocks_before_verification (test_rc3.ChallengeTests.test_untrusted_marker_blocks_before_verification) ... ok
+test_ambiguity_and_invalid (test_rc3.TelemetryTests.test_ambiguity_and_invalid) ... ok
+test_claude_projection (test_rc3.TelemetryTests.test_claude_projection) ... ok
+test_codex_fixture (test_rc3.TelemetryTests.test_codex_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 18.426s
+
+OK

@@ -1,0 +1,64 @@
+[
+  {
+    "action": "continue",
+    "cumulative_cases": 37,
+    "cycle_length": null,
+    "diff_bytes": 295,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "positive_amount",
+      "property_invariants",
+      "requirement_coverage",
+      "same_key_same_payment"
+    ],
+    "iteration": 1,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [],
+    "tree": "a5f9f54f05737d16fd51154db4bde2150dca8928"
+  },
+  {
+    "action": "continue",
+    "cumulative_cases": 74,
+    "cycle_length": null,
+    "diff_bytes": 451,
+    "failed": [
+      "conflicting_payload",
+      "contract_flow",
+      "property_invariants",
+      "requirement_coverage"
+    ],
+    "iteration": 2,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [
+      "positive_amount",
+      "same_key_same_payment"
+    ],
+    "tree": "ac0c0eb10bbc5d05f6054da415af7d688b219578"
+  },
+  {
+    "action": "passed",
+    "cumulative_cases": 111,
+    "cycle_length": null,
+    "diff_bytes": 548,
+    "failed": [],
+    "iteration": 3,
+    "no_progress": 0,
+    "regressions": 0,
+    "reopened": [],
+    "repeated_from": null,
+    "resolved": [
+      "conflicting_payload",
+      "contract_flow",
+      "property_invariants",
+      "requirement_coverage"
+    ],
+    "tree": "875c8974f5be5a72a6910b5736c3a9485e532060"
+  }
+]

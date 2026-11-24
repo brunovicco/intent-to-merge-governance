@@ -1,0 +1,21 @@
+test_explorer_verified (test_integration_v05.AgentExplorerTests.test_explorer_verified) ... ok
+test_incomplete (test_integration_v05.AgentExplorerTests.test_incomplete) ... ok
+test_mixed_session (test_integration_v05.AgentExplorerTests.test_mixed_session) ... ok
+test_native_import (test_integration_v05.AgentExplorerTests.test_native_import) ... ok
+test_dismissed (test_integration_v05.GitHubTests.test_dismissed) ... ok
+test_fork (test_integration_v05.GitHubTests.test_fork) ... ok
+test_latest_rerun_fails (test_integration_v05.GitHubTests.test_latest_rerun_fails) ... ok
+test_missing_files (test_integration_v05.GitHubTests.test_missing_files) ... ok
+test_moved_head (test_integration_v05.GitHubTests.test_moved_head) ... ok
+test_pass_read_only (test_integration_v05.GitHubTests.test_pass_read_only) ... ok
+test_policy_overlap (test_integration_v05.GitHubTests.test_policy_overlap) ... ok
+test_protected_rename (test_integration_v05.GitHubTests.test_protected_rename) ... ok
+test_publish_sha (test_integration_v05.GitHubTests.test_publish_sha) ... ok
+test_self_approval (test_integration_v05.GitHubTests.test_self_approval) ... ok
+test_stale_review (test_integration_v05.GitHubTests.test_stale_review) ... ok
+test_wrong_app (test_integration_v05.GitHubTests.test_wrong_app) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.040s
+
+OK
