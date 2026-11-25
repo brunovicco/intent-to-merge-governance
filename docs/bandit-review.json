@@ -427,7 +427,7 @@
       "rule": "B608",
       "severity": "MEDIUM",
       "confidence": "MEDIUM",
-      "source_sha256": "c0291b4894549b20e6891e180dffd60bbf410ae4f2562aa7e0f32a53d7ca9634",
+      "source_sha256": "10f4e564abd6e1265cfe2015d6d200491ddb5447824e18e581a821dd8728a94b",
       "line_sha256": "6a6638caf818f61068fcde6a6c9225963db01d7fc4b323f05f3cbc1588fdd662",
       "disposition": "reviewed_fixed_sql",
       "rationale": "transition checks field names against report/external_id/check_id; values, ID and state are bound parameters."

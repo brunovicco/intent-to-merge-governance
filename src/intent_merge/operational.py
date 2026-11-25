@@ -145,6 +145,30 @@ def work_once(journal,client,policy,assertion_dir,verifier_key,*,app_id,tracer=N
         payload={'name':NAME,'head_sha':latest['head'],'external_id':external,'status':'completed','conclusion':'success' if latest['decision']=='PASS' else 'failure','output':{'title':'ITM '+latest['decision'],'summary':'Snapshot gate; no merge authority. '+', '.join(latest['reasons'])[:1000]}}
         try:
             with span(tracer,'itm.publish'):
+                # The strict gate may have sampled its clock before slow API
+                # collection. Check again after the write-ahead journal commit,
+                # immediately before starting a success request. The explicit
+                # now override is only for trusted deterministic lab callers.
+                if latest.get('profile') == 'github-strict-snapshot' and latest['decision'] == 'PASS':
+                    checked_at = int(time.time() if now is None else now)
+                    expiry = latest.get('expires_at')
+                    evaluated_at = latest.get('evaluated_at')
+                    first_evaluated_at = report.get('evaluated_at')
+                    if (type(evaluated_at) is not int or type(first_evaluated_at) is not int
+                            or not 0 <= first_evaluated_at <= evaluated_at <= checked_at):
+                        reason = 'evidence_clock_invalid_before_publication'
+                    elif type(expiry) is not int or checked_at >= expiry:
+                        reason = 'evidence_expired_before_publication'
+                    else:
+                        reason = None
+                    if reason is not None:
+                        blocked = {**latest, 'decision': 'BLOCK',
+                                   'reasons': [*latest['reasons'], reason],
+                                   'publication_checked_at': checked_at,
+                                   'publication_attempted': False}
+                        journal.transition(id, 'PUBLISHING', 'BLOCKED_BEFORE_PUBLICATION',
+                                           report=json.dumps(blocked), external_id=None)
+                        return blocked
                 result=client.request('/repos/'+job['repo']+'/check-runs',payload)
             require(result.get('external_id')==external and result.get('head_sha')==latest['head'] and (result.get('app') or {}).get('id')==app_id and result.get('name')==NAME and result.get('status')=='completed' and result.get('conclusion')==payload['conclusion'] and type(result.get('id')) is int,'unexpected check response')
             journal.transition(id,'PUBLISHING','DONE',check_id=result['id'])
