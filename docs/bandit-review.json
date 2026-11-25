@@ -1,6 +1,6 @@
 {
   "profile": "itm-bandit-review-v1",
-  "scope": "Bandit 1.8.6 on Python 3.11; historical report, unchanged runner finding lines re-pinned after policy and approval hardening; fresh scan required; residual risks limited to research lab",
+  "scope": "Bandit 1.8.6 on Python 3.11; historical report, unchanged call sites and import-only finding re-pinned after policy, approval and challenge hardening; fresh scan required; residual risks limited to research lab",
   "source_report_sha256": "162fe306a70555dfb32c7a954b3243930ceeedc798ae28cb5b1802ee8230b7bf",
   "findings": [
     {
@@ -482,8 +482,8 @@
       "rule": "B404",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
-      "line_sha256": "1779b44a8edd944692673390a4e9158fc8621a7ad2fe25e4999bd600b6024cf9",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "line_sha256": "7271c91d28337376deffcfba1a3622dc93a776679b344a794d2f03bae9778a7a",
       "disposition": "reviewed_import",
       "rationale": "Import only; assess the individual process call sites separately."
     },
@@ -493,7 +493,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "ffe287857a50492a3e2f84f2a004043e2e425e8d440a0f5512e3ba57d79b7ff8",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -504,7 +504,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "ffe287857a50492a3e2f84f2a004043e2e425e8d440a0f5512e3ba57d79b7ff8",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
@@ -515,7 +515,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "5a08a9296156de4c97c450732c247e5c9ce9a29bf10161176b81c5d44fcc1fdf",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -526,7 +526,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "5a08a9296156de4c97c450732c247e5c9ce9a29bf10161176b81c5d44fcc1fdf",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
@@ -537,7 +537,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "652af281994df4df4bdea9e8bada97fbd6903d359373ca99a8ea0c6927d7b383",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -548,7 +548,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae",
+      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
       "line_sha256": "652af281994df4df4bdea9e8bada97fbd6903d359373ca99a8ea0c6927d7b383",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."

@@ -70,6 +70,10 @@
       "bytes": 2720,
       "sha256": "47c48ae607dccebdbe8bc3d05fb0d16697ad443696cb8a08e2148bb287fd1ae7"
     },
+    "docs/approval-challenge-registry-draft.md": {
+      "bytes": 2292,
+      "sha256": "948050a0825e14f654bd84f08f98566367bb9df1e71081c415626eaab1b0b690"
+    },
     "docs/approval-envelope-v2-draft.md": {
       "bytes": 2677,
       "sha256": "f620b5873b602632e9ddf29c28d1415f0c10de0a4002fe6ae4784647991e5ce7"
@@ -83,8 +87,8 @@
       "sha256": "526034397d8c87f10e7f7b0e6a9a9ee3fd66eba56e4f3782947674f7fad86e66"
     },
     "docs/bandit-review.json": {
-      "bytes": 34078,
-      "sha256": "a3ea13c89f59e8c03032b96aeb076696574d161d0d7de6d69d627ec9c36311eb"
+      "bytes": 34103,
+      "sha256": "e05c083203fe2f414e5777c724e04efff2b9a5601301bacb1da2ac81f3c9fb2c"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -2566,6 +2570,10 @@
       "bytes": 1772,
       "sha256": "7a9e075bc1f99ec1135c3192d901c7ede0bebe006433c19791a77067051f93b1"
     },
+    "src/intent_merge/approval_registry.py": {
+      "bytes": 9514,
+      "sha256": "7fadc26fce214d06d385e23a272226be53ac54f9c92d1f8b031c9a2e065ac49d"
+    },
     "src/intent_merge/approvals.py": {
       "bytes": 5637,
       "sha256": "d6778e6949eed1143dbf62eb186d572f0f361120300354b0bbac779398a50bc0"
@@ -2671,12 +2679,12 @@
       "sha256": "0ccfaf8b5c7785c442a0644016aa799edc580f4b48a80277509c6302fce843a4"
     },
     "src/intent_merge/replay.py": {
-      "bytes": 4757,
-      "sha256": "d61cea3e97b01f813909fc089732ccd40c237942a162ebe80a74ac59ff7af811"
+      "bytes": 5071,
+      "sha256": "b9b74f2e4671ca8d8e71657f0f18a86d5b3fe9da793e15c1f34a4c9aa287ce54"
     },
     "src/intent_merge/runner.py": {
-      "bytes": 24357,
-      "sha256": "12d7eca34ca1c7277e2bf73ee51e14cfd1845d5fba5699489be49ec1401535ae"
+      "bytes": 25212,
+      "sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07"
     },
     "src/intent_merge/secure_executor.py": {
       "bytes": 3924,
@@ -2685,6 +2693,10 @@
     "src/intent_merge/verification.py": {
       "bytes": 7872,
       "sha256": "74c96cca7a8ee1a209451ce0ee5a25d2226233a099d36cd66d582030170da4e1"
+    },
+    "tests/test_approval_registry.py": {
+      "bytes": 7432,
+      "sha256": "74be121d5fa73cb4fa0e3f29755a2f240c244d1f3d3eca5082832bf970068169"
     },
     "tests/test_approval_v2.py": {
       "bytes": 6645,

@@ -7,6 +7,7 @@ from pathlib import Path
 from .bundle import verify
 from .core import digest, load_config, verified_actors, evaluate_decision
 from .path_policy import LEGACY_V1
+from .approval_registry import PROFILE as REGISTRY_PROFILE, gate_decision, verify_recorded_claim
 
 DECISION_FIELDS={'required_checks','protected_paths','risk_rules'}
 
@@ -43,6 +44,8 @@ def replay(bundles, public_key, proposed_policy):
         if eval_binding is not None and i['binding'].get('policy')==digest(old) and eval_binding.get('policy')==digest(old):
             eval_binding={**eval_binding,'policy':digest(proposed)}
         candidate=evaluate_decision(spec,proposed,i['paths'],i['checks'],binding,actors,termination=i['termination'],current_head=i['current_head'],current_base=i['current_base'],eval_binding=eval_binding,_historical_semantics=events[0]['payload'].get('path_semantics', LEGACY_V1))
+        if events[0]["payload"].get("challenge_profile") == REGISTRY_PROFILE:
+            candidate = gate_decision(candidate, verify_recorded_claim(events, i, json.loads((bundle/"approval-trust.json").read_text())))
         state=('unchanged_allow' if actual['authorized'] else 'unchanged_deny') if actual['authorized']==candidate['authorized'] else ('would_allow' if candidate['authorized'] else 'would_deny')
         if not changed and actual!=candidate: raise ValueError('identity replay mismatch')
         rows.append({'scenario':json.loads((ev/'report.json').read_text())['scenario'],'ledger_root':verified['ledger_root'],'candidate':i['current_head'],'original_policy_digest':digest(old),'changed_fields':changed,'historical_decision':actual,'counterfactual_decision':candidate,'transition':state,'historically_verified_actors':sorted(actors),'requires_fresh_authorization':True})

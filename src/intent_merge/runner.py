@@ -1,6 +1,5 @@
 from __future__ import annotations
-import json, os, secrets, subprocess, sys, shutil
-import time
+import json, os, subprocess, sys, shutil
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
@@ -12,7 +11,8 @@ from .verification import WORKER, Executor, plan, evaluate, harness_digest, muta
 from .convergence import Governor
 from .path_policy import SEGMENT_V2, LEGACY_V1
 from .policy_schema import invalid_configuration
-from .approvals import PROFILE as APPROVAL_PROFILE, MAX_TTL, decision_context, sign_approval, valid_context
+from .approvals import PROFILE as APPROVAL_PROFILE, decision_context, sign_approval, valid_context
+from .approval_registry import ApprovalRegistry, PROFILE as REGISTRY_PROFILE, gate_decision, verify_recorded_claim
 
 SCENARIOS = ('happy', 'missing-approval', 'stale-approval', 'scope-violation', 'protected-path', 'loop', 'failed-eval', 'self-approval', 'stale-base', 'stale-eval', 'intent-drift', 'signature-drift', 'import-drift', 'property-regression', 'budget-exceeded', 'regression-loop')
 
@@ -95,7 +95,7 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     (repo/'app').mkdir(); (repo/'app/payments.py').write_text(BASE)
     git(repo,'add','.'); git(repo,'commit','-m','Baseline'); base = git(repo,'rev-parse','HEAD'); git(repo,'checkout','-b','candidate')
     (ev/'baseline.py').write_text(BASE)
-    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',path_semantics=SEGMENT_V2,approval_profile=APPROVAL_PROFILE,executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
+    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',path_semantics=SEGMENT_V2,approval_profile=APPROVAL_PROFILE,challenge_profile=REGISTRY_PROFILE,executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
     governor=Governor(policy); required=set(spec['criteria'])|set(policy['required_checks']); agent = FixtureAgent(scenario); feedback = {}; termination = 'iteration_budget'; author = 'coding-agent'; paths = []; checks = {}; binding = {}; history = []
     for i in range(1, policy['max_iterations']+1):
         p = agent.propose(i,feedback)
@@ -120,8 +120,10 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     eval_binding = binding.copy() if history else None
     ledger.add('termination', reason=termination, iterations=len(history))
     approvals = []
-    nonce = secrets.token_hex(16)
-    issued_at = int(time.time())
+    registry = ApprovalRegistry(out / "approval-challenges.sqlite", create=True)
+    challenge = registry.issue(binding, author, public_keys)
+    nonce, issued_at = challenge["nonce"], challenge["issued_at"]
+    ledger.add("approval_challenge_issued", challenge=challenge)
     signing_context = decision_context(nonce, issued_at)
     if termination == 'passed':
         actors = list(policy['approvers'])
@@ -129,7 +131,7 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
         if scenario == 'self-approval': actors = ['coding-agent']
         approvals = [sign_approval(a, policy['approvers'].get(a, 'self'), author,
                                    binding, signing_context, pairs[a], issued_at=issued_at,
-                                   expires_at=issued_at + MAX_TTL) for a in actors]
+                                   expires_at=challenge["expires_at"]) for a in actors]
         if scenario == 'stale-approval':
             # New commit retains identical code; old approvals/evaluations cannot authorize it.
             git(repo,'commit','--allow-empty','-m','New candidate after approval'); binding = {**binding,'head':git(repo,'rev-parse','HEAD')}
@@ -140,8 +142,10 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     ledger.add('approvals', approvals=approvals, simulated=True)
     current_head = git(repo,'rev-parse','candidate'); current_base = git(repo,'rev-parse','main')
     inputs = dict(paths=paths, checks=checks, binding=binding, approvals=approvals, author=author, termination=termination, current_head=current_head, current_base=current_base, eval_binding=eval_binding)
-    inputs["approval_context"] = decision_context(nonce, int(time.time()))
-    decision = evaluate_policy(spec,policy,keys=public_keys,**inputs)
+    claim = registry.claim(nonce, binding, author, public_keys)
+    ledger.add("approval_challenge_claimed", receipt=claim)
+    inputs["approval_context"] = claim["context"]
+    decision = gate_decision(evaluate_policy(spec,policy,keys=public_keys,**inputs), claim["reason"])
     ledger.add('policy_decision', inputs=inputs, decision=decision)
     merged = False
     if decision['authorized']:
@@ -189,6 +193,11 @@ def audit(out, anchor_path, trust_path):
     elif profile is not None or 'approval_context' in inputs:
         raise ValueError('unknown or inconsistent approval profile')
     replay = evaluate_policy(spec,policy,keys=keys,_historical_semantics=semantics,**inputs)
+    challenge_profile = init.get("challenge_profile")
+    if challenge_profile == REGISTRY_PROFILE and profile == APPROVAL_PROFILE:
+        replay = gate_decision(replay, verify_recorded_claim(events, inputs, keys))
+    elif challenge_profile is not None or any(e["kind"].startswith("approval_challenge_") for e in events):
+        raise ValueError("unknown or inconsistent challenge profile")
     if replay != d['decision']: raise ValueError('policy replay mismatch')
     result = events[-1]['payload']; report = json.loads((ev/'report.json').read_text())
     if report['ledger_root'] != root or report['decision'] != replay or report['merged'] != result['merged'] or report['main'] != result['main']: raise ValueError('report mismatch')
