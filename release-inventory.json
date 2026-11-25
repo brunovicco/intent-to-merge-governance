@@ -88,7 +88,7 @@
     },
     "docs/bandit-review.json": {
       "bytes": 35006,
-      "sha256": "9e3587627b675f417e654555d07d80dd7f7925d731927ce5db195b3cd290844e"
+      "sha256": "333940023b4b31875c4ea3df2facbeb84527d0704043c85a12b8a5821bb2d43b"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -157,6 +157,10 @@
     "docs/rc1-publication-freshness-review.md": {
       "bytes": 1680,
       "sha256": "e6c896383ba105bb69494a97395a35b53a6a363776374414a81ae615350fabc9"
+    },
+    "docs/rc1-semantic-evidence-review.md": {
+      "bytes": 1351,
+      "sha256": "f7912af832e6c8ac7f537acb23c1a85507f7660734939fa828a0178a5d25d5bd"
     },
     "docs/rc2-runbook.md": {
       "bytes": 6117,
@@ -2606,6 +2610,10 @@
       "bytes": 5637,
       "sha256": "d6778e6949eed1143dbf62eb186d572f0f361120300354b0bbac779398a50bc0"
     },
+    "src/intent_merge/audit_consistency.py": {
+      "bytes": 6256,
+      "sha256": "c4e6fee9df7a1a75e00b1cc3c935a55701dc8a30c2db203d38e6cbf1fc1ede20"
+    },
     "src/intent_merge/autonomy.py": {
       "bytes": 10011,
       "sha256": "4dde261f9f1dc288594ba09ef9cd686b6c11b4236338b5a4a1e0a95a5008190c"
@@ -2715,8 +2723,8 @@
       "sha256": "b9b74f2e4671ca8d8e71657f0f18a86d5b3fe9da793e15c1f34a4c9aa287ce54"
     },
     "src/intent_merge/runner.py": {
-      "bytes": 25212,
-      "sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07"
+      "bytes": 25387,
+      "sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c"
     },
     "src/intent_merge/secure_executor.py": {
       "bytes": 3924,
@@ -2737,6 +2745,10 @@
     "tests/test_approval_v2.py": {
       "bytes": 6645,
       "sha256": "bbbf822806885d25bac02a0e072e55292cf37757a8a86e70e41275a431521e45"
+    },
+    "tests/test_audit_consistency.py": {
+      "bytes": 6067,
+      "sha256": "933e34067d9fb9edf1ea97cf9974100aa83b5588d96c14464540318e615613a3"
     },
     "tests/test_autonomy.py": {
       "bytes": 6106,

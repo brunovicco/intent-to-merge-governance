@@ -202,6 +202,9 @@ def audit(out, anchor_path, trust_path):
     result = events[-1]['payload']; report = json.loads((ev/'report.json').read_text())
     if report['ledger_root'] != root or report['decision'] != replay or report['merged'] != result['merged'] or report['main'] != result['main']: raise ValueError('report mismatch')
     if result['merged'] != replay['authorized'] or (result['merged'] and result['main'] != inputs['binding']['head']): raise ValueError('merge authorization mismatch')
+    if challenge_profile == REGISTRY_PROFILE:
+        from .audit_consistency import verify_current_evidence
+        verify_current_evidence(ev, spec, policy, events, report)
     return {'integrity':'verified','policy_replay':'verified','intent_graph':'verified','checkpoint_contract':'verified','structural_drift_replay':'verified','verification_replay':'verified','convergence_replay':'verified','merged':result['merged'],'ledger_root':root,'limitations':'Does not re-execute tests or attest an external Git server.'}
 
 

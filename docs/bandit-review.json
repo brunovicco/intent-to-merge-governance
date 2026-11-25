@@ -493,7 +493,7 @@
       "rule": "B404",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "7271c91d28337376deffcfba1a3622dc93a776679b344a794d2f03bae9778a7a",
       "disposition": "reviewed_import",
       "rationale": "Import only; assess the individual process call sites separately."
@@ -504,7 +504,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "ffe287857a50492a3e2f84f2a004043e2e425e8d440a0f5512e3ba57d79b7ff8",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -515,7 +515,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "ffe287857a50492a3e2f84f2a004043e2e425e8d440a0f5512e3ba57d79b7ff8",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
@@ -526,7 +526,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "5a08a9296156de4c97c450732c247e5c9ce9a29bf10161176b81c5d44fcc1fdf",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -537,7 +537,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "5a08a9296156de4c97c450732c247e5c9ce9a29bf10161176b81c5d44fcc1fdf",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
@@ -548,7 +548,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "652af281994df4df4bdea9e8bada97fbd6903d359373ca99a8ea0c6927d7b383",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -559,7 +559,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "a7e30c4ac4220ef8c270a32d9d4d3adb2db62ef20e2b9e259646bc93efc35d07",
+      "source_sha256": "dae1e0cd2787d588734a33fd7a636f8d504de0f594ba53f9917da9dbf5f6784c",
       "line_sha256": "652af281994df4df4bdea9e8bada97fbd6903d359373ca99a8ea0c6927d7b383",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
