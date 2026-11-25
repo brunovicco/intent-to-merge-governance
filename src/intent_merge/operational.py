@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, ed25519
 from cryptography.exceptions import InvalidSignature
 from .core import canonical, digest
-from .github import GitHub, NoRedirect, REPO, SHA, preflight
+from .github import GitHub, NoRedirect, REPO, SHA, preflight, valid_token
 
 NAME='ITM / evidence gate'
 CONTROLS={'intent','provenance','verification','convergence','authorization','operational_autonomy'}
@@ -37,7 +37,9 @@ def installation_client(app_id, installation_id, private_key, repository):
         with build_opener(NoRedirect()).open(req,timeout=30) as response: raw=response.read(65537)
     except (HTTPError,URLError): raise ValueError('installation authentication failed') from None
     require(len(raw)<=65536,'token response too large')
-    return GitHub(json.loads(raw)['token'])
+    body = json.loads(raw)
+    require(isinstance(body, dict) and valid_token(body.get('token')), 'invalid installation token response')
+    return GitHub(body['token'], installation_app_id=app_id)
 
 def delivery(raw,signature,event,delivery_id,secret,repo,installation):
     require(len(raw)<=MAX_BODY,'webhook too large')

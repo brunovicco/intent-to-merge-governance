@@ -88,7 +88,7 @@
     },
     "docs/bandit-review.json": {
       "bytes": 35006,
-      "sha256": "333940023b4b31875c4ea3df2facbeb84527d0704043c85a12b8a5821bb2d43b"
+      "sha256": "91c038a998522a15adb6ebffdfe5455613c75cda1c3b70b69558560ec3efbc98"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -153,6 +153,10 @@
     "docs/rc1-changeset-recovery-review.md": {
       "bytes": 2100,
       "sha256": "d7e3e34e75c94f3d1e4771b9fbba8e53716bceb60e8f31c4ec1421d72a7fe09a"
+    },
+    "docs/rc1-publication-contract-review.md": {
+      "bytes": 1533,
+      "sha256": "905fb35439a3361f7749d88223641f5c71b4b1dd21d94a97b781841896c4ece7"
     },
     "docs/rc1-publication-freshness-review.md": {
       "bytes": 1680,
@@ -2647,12 +2651,12 @@
       "sha256": "dcb54d24221c2748e298c9627f9833b69d53bbae8b111af6c4753323d4905a1f"
     },
     "src/intent_merge/cli.py": {
-      "bytes": 10070,
-      "sha256": "99abb6830681a9786d57b8bf8972252e05430751b51dcaee9a27da8bec939168"
+      "bytes": 10195,
+      "sha256": "ad5ef97637ea62ab2a39a7e319e576d833a103927596b7dccd1b884a825cf389"
     },
     "src/intent_merge/cli_errors.py": {
-      "bytes": 1801,
-      "sha256": "ab31482e8aee41aa73b21b9b55aa85235496f17a43d462c1898351f31773cd74"
+      "bytes": 2020,
+      "sha256": "580e5a8bb6586235ad8a12ad861d8fea49cf5a19a61826576c0e458550f1a819"
     },
     "src/intent_merge/control_plane.py": {
       "bytes": 14919,
@@ -2675,8 +2679,8 @@
       "sha256": "6494499658185c5e9a6e74d0f5a93efb8035bbcf7302848393feebdcc568cae0"
     },
     "src/intent_merge/github.py": {
-      "bytes": 8327,
-      "sha256": "0eea59e6d02c12c4f75a2f4d1ed1cf8a36a730dac301ba70633b1ea3a1e73a86"
+      "bytes": 10203,
+      "sha256": "be5e6de6ee78d167f8fe04f8010e357c26260a45c332f413bf958bba2dd7cd59"
     },
     "src/intent_merge/hardening.py": {
       "bytes": 15561,
@@ -2699,8 +2703,8 @@
       "sha256": "49d713eedd52fc82d9d65adb49a909599f7d9889d6f0e468f58d874d88e11050"
     },
     "src/intent_merge/operational.py": {
-      "bytes": 13408,
-      "sha256": "10f4e564abd6e1265cfe2015d6d200491ddb5447824e18e581a821dd8728a94b"
+      "bytes": 13575,
+      "sha256": "de52b65e25c4e4d3344fb47ecb460b5a371894c89f97fa1d28361d86b30c8d39"
     },
     "src/intent_merge/operations_demo.py": {
       "bytes": 8404,
@@ -2791,8 +2795,8 @@
       "sha256": "073a56d99c001f929307d4c29f485991d3e8beb784d63bed4bc11e543ede674f"
     },
     "tests/test_integration_v05.py": {
-      "bytes": 5330,
-      "sha256": "160c1f5c388b086cfd8c5b39551d5400a28a0e37ca3fc82e1c075bee21c7f2c6"
+      "bytes": 5410,
+      "sha256": "064aa389b64c5fa2af02d2ba68d15bafa6eeb662053845f3e30f031e846944f1"
     },
     "tests/test_intent.py": {
       "bytes": 3913,
@@ -2809,6 +2813,10 @@
     "tests/test_public_release.py": {
       "bytes": 3303,
       "sha256": "61579b4b20ccbd6da414c308b6a795052a9facba3378eac2775fe8d2433d465c"
+    },
+    "tests/test_publication_contract.py": {
+      "bytes": 5974,
+      "sha256": "62abfe23e14ab500e4b68f679384ced3a0af93de48ee3130afc9ea64e5200392"
     },
     "tests/test_rc2.py": {
       "bytes": 4528,

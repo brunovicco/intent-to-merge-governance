@@ -89,6 +89,8 @@ def main():
                 if not coverage: raise ValueError('unknown requirement')
             result={'verified_requirements':coverage,'drift':json.loads((ev/'intent-drift.json').read_text()),'decision':report['decision'],'note':'Recorded evidence; run audit for integrity verification.'}
         print(json.dumps(result,indent=2))
+        if args.cmd == 'demo' and result.get('decision', {}).get('status') == 'INVALID_CONFIGURATION':
+            p.exit(2)
     except Exception as exc:
         emit_failure(args.cmd, exc, remote_write_possible=getattr(args, 'publish', False))
         p.exit(1)

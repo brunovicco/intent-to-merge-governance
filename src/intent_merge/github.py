@@ -15,10 +15,29 @@ class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
 
+def valid_token(token):
+    # Treat tokens as opaque; do not hard-code an evolving GitHub prefix.
+    return isinstance(token, str) and 0 < len(token) <= 16384 and all(
+        33 <= ord(c) <= 126 for c in token
+    )
+
+
+class CheckPublicationUnconfirmed(ValueError):
+    """A diagnostic POST may have taken effect; never retry it blindly."""
+    def __init__(self, repo, app_id, payload):
+        super().__init__('check publication not confirmed')
+        self.correlation = {'repository': repo, 'app_id': app_id,
+                            **{k: payload[k] for k in ('name', 'head_sha', 'external_id', 'conclusion')}}
+
+
 class GitHub:
-    def __init__(self, token=None):
-        self.token = token or os.environ.get('ITM_GITHUB_TOKEN')
-        if not self.token: raise ValueError('ITM_GITHUB_TOKEN is required')
+    def __init__(self, token=None, *, installation_app_id=None):
+        if installation_app_id is not None:
+            if type(installation_app_id) is not int or installation_app_id <= 0 or not valid_token(token):
+                raise ValueError('invalid installation credentials')
+        self.installation_app_id = installation_app_id
+        self.token = os.environ.get('ITM_GITHUB_TOKEN') if token is None else token
+        if not valid_token(self.token): raise ValueError('valid GitHub token required')
         self.opener = build_opener(NoRedirect())
     def request(self, path, payload=None, *, method=None):
         if not path.startswith('/repos/'): raise ValueError('invalid API route')
@@ -75,6 +94,9 @@ def identity(pr):
 
 def preflight(client, repo, number, policy, *, publish=False):
     validate_policy(policy)
+    app_id = getattr(client, 'installation_app_id', None)
+    if publish and (type(app_id) is not int or app_id <= 0):
+        raise ValueError('publication requires expected installation App identity')
     if not REPO.fullmatch(repo) or type(number) is not int or number<=0 or policy['repository'].lower()!=repo.lower(): raise ValueError('repository/PR does not match policy')
     prefix='/repos/'+repo; route=prefix+f'/pulls/{number}'
     pr=client.request(route); before=identity(pr); head,base,ref,state,draft,head_repo,base_repo,count,author=before
@@ -110,5 +132,16 @@ def preflight(client, repo, number, policy, *, publish=False):
     if publish:
         if identity(client.request(route))!=before: raise ValueError('PR changed before publication')
         payload={'name':CHECK_NAME,'head_sha':head,'status':'completed','conclusion':'failure' if reasons else 'success','external_id':digest(report),'output':{'title':'ITM preflight '+report['decision'],'summary':f'{sum(g["passed"] for g in gates)}/{len(gates)} gates passed. Base {base}. This is not full ITM merge authorization.'}}
-        result=client.request(prefix+'/check-runs',payload); report['published_check_id']=result['id']
+        try:
+            result = client.request(prefix+'/check-runs', payload)
+            if (not isinstance(result, dict) or type(result.get('id')) is not int or result['id'] <= 0
+                    or not isinstance(result.get('app'), dict)
+                    or type(result['app'].get('id')) is not int or result['app']['id'] != app_id
+                    or any(result.get(k) != payload[k] for k in ('name', 'head_sha', 'status', 'conclusion', 'external_id'))):
+                raise ValueError('unexpected check response')
+        except Exception:
+            raise CheckPublicationUnconfirmed(repo, app_id, payload) from None
+        report['published_check_id'] = result['id']
+        report['publication_confirmation'] = 'RESPONSE_MATCHED'
+        report['published_external_id'] = payload['external_id']
     return report

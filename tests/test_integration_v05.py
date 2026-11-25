@@ -11,9 +11,9 @@ class FixtureAPI:
         self.files=[{'filename':'app/payments.py','status':'modified'}]
         self.reviews=[{'id':i,'user':{'id':uid,'type':'User'},'state':'APPROVED','commit_id':HEAD} for i,uid in [(1,10001),(2,10002)]]
         self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success'}]
-        self.posts=[]; self.reads=0; self.move=False
+        self.posts=[]; self.reads=0; self.move=False; self.installation_app_id=789
     def request(self,path,payload=None):
-        if payload is not None: self.posts.append((path,payload)); return {'id':44}
+        if payload is not None: self.posts.append((path,payload)); return {**payload, 'id':44, 'app':{'id':self.installation_app_id}}
         self.reads+=1; obj=copy.deepcopy(self.pr)
         if self.move and self.reads>1: obj['head']['sha']='c'*40
         return obj

@@ -306,7 +306,7 @@
       "rule": "B404",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "ab31482e8aee41aa73b21b9b55aa85235496f17a43d462c1898351f31773cd74",
+      "source_sha256": "580e5a8bb6586235ad8a12ad861d8fea49cf5a19a61826576c0e458550f1a819",
       "line_sha256": "7d8752c4c7ea34c2c6d04a15aa31a1f25f62848f8c3c82528fd62439c01a225b",
       "disposition": "reviewed_import",
       "rationale": "Import only. The sole subprocess attribute reference is SubprocessError in an isinstance check for redacted operational error classification; this module does not start a subprocess. Reviewed against the exact increment-6 source and maintainer-provided Bandit review output. Fresh raw scanner run remains required."
@@ -423,11 +423,11 @@
     },
     {
       "file": "src/intent_merge/operational.py",
-      "line": 93,
+      "line": 95,
       "rule": "B608",
       "severity": "MEDIUM",
       "confidence": "MEDIUM",
-      "source_sha256": "10f4e564abd6e1265cfe2015d6d200491ddb5447824e18e581a821dd8728a94b",
+      "source_sha256": "de52b65e25c4e4d3344fb47ecb460b5a371894c89f97fa1d28361d86b30c8d39",
       "line_sha256": "6a6638caf818f61068fcde6a6c9225963db01d7fc4b323f05f3cbc1588fdd662",
       "disposition": "reviewed_fixed_sql",
       "rationale": "transition checks field names against report/external_id/check_id; values, ID and state are bound parameters."
