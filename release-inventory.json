@@ -170,6 +170,10 @@
       "bytes": 3319,
       "sha256": "0c44968c84a2415e51005024e54555aa756892204e6238305d5f7e8d7daf0d13"
     },
+    "docs/trust-profiles-draft.md": {
+      "bytes": 2046,
+      "sha256": "beffd393978a258e618ebaee7442b18e9b636d4ea21d697a3f11faebcc437758"
+    },
     "examples/amgb-v1/bundles/budget-exceeded/anchor.json": {
       "bytes": 170,
       "sha256": "2f387b49e92baa5d150b7db1a7ad48a781a51b7d02c6ad2cf4f5abd182554405"
@@ -2615,8 +2619,8 @@
       "sha256": "dcb54d24221c2748e298c9627f9833b69d53bbae8b111af6c4753323d4905a1f"
     },
     "src/intent_merge/cli.py": {
-      "bytes": 8274,
-      "sha256": "a6ffa8ce2c7ee998c6e905c674293fa0603fb759b2032447fa3bc09fb79a11ef"
+      "bytes": 8998,
+      "sha256": "ae158404368c04fea5183aeb9a5be254767b846cabe4c2a3127584e35b01b887"
     },
     "src/intent_merge/control_plane.py": {
       "bytes": 14919,
@@ -2693,6 +2697,10 @@
     "src/intent_merge/secure_executor.py": {
       "bytes": 3924,
       "sha256": "a9f18a4fe050de3e034dc61f24ef31f6a2fede9840aea33bc92bb88a694a55dd"
+    },
+    "src/intent_merge/trust.py": {
+      "bytes": 6162,
+      "sha256": "cf015573df5c89afded33d1b92e9f08a6768609c617384fde1b2cab1bdde1f5f"
     },
     "src/intent_merge/verification.py": {
       "bytes": 7872,
@@ -2781,6 +2789,10 @@
     "tests/test_security_remediation.py": {
       "bytes": 3005,
       "sha256": "1c08d1315121b7006a25d564d1eb13a5e5eddfde17644be7b7da40626c125db6"
+    },
+    "tests/test_trust_profiles.py": {
+      "bytes": 6681,
+      "sha256": "f548f2fba160a1309b1ed0cb37aef3bcf1fb5ad44e91afbeea9c3d2c891a41e0"
     },
     "tests/test_verification.py": {
       "bytes": 2791,

@@ -1,6 +1,7 @@
 import argparse, json
 from pathlib import Path
-from .runner import run, audit, SCENARIOS
+from .runner import run, SCENARIOS
+from .trust import audit_synthetic, audit_anchored
 from .checkpoints import normalize_session
 from .bundle import keygen, pack, verify
 from .replay import replay
@@ -18,6 +19,12 @@ def main():
     sub = p.add_subparsers(dest='cmd',required=True)
     d = sub.add_parser('demo'); d.add_argument('--scenario',choices=SCENARIOS,default='happy'); d.add_argument('--out',type=Path,required=True); d.add_argument('--spec',type=Path,default=Path('examples/spec.toml')); d.add_argument('--policy',type=Path,default=Path('examples/policy.toml')); d.add_argument('--executor',choices=['local','docker'],default='local'); d.add_argument('--image',default='python:3.11-slim')
     a = sub.add_parser('audit'); a.add_argument('--out',type=Path,required=True); a.add_argument('--anchor',type=Path,required=True); a.add_argument('--trust',type=Path,required=True)
+    aa = sub.add_parser('audit-anchored', help='Replay current lab evidence against externally supplied pins (historical only)')
+    aa.add_argument('--out', type=Path, required=True)
+    aa.add_argument('--anchor', type=Path, required=True)
+    aa.add_argument('--trust', type=Path, required=True)
+    aa.add_argument('--expected-anchor-sha256', required=True)
+    aa.add_argument('--expected-trust-sha256', required=True)
     n = sub.add_parser('normalize-session', help='Normalize a portable, self-reported session export'); n.add_argument('--input',type=Path,required=True)
     g = sub.add_parser('inspect', help='Inspect recorded intent evidence (not an audit)'); g.add_argument('--out',type=Path,required=True); g.add_argument('--requirement')
     k=sub.add_parser('keygen',help='Generate an external evidence signing key'); k.add_argument('--private-key',type=Path,required=True); k.add_argument('--public-key',type=Path,required=True)
@@ -37,7 +44,11 @@ def main():
     args = p.parse_args()
     try:
         if args.cmd=='demo': result = run(args.scenario,args.out,args.spec,args.policy,args.executor,args.image)
-        elif args.cmd=='audit': result = audit(args.out,args.anchor,args.trust)
+        elif args.cmd=='audit': result = audit_synthetic(args.out,args.anchor,args.trust)
+        elif args.cmd=='audit-anchored':
+            result = audit_anchored(args.out, args.anchor, args.trust,
+                expected_anchor_sha256=args.expected_anchor_sha256,
+                expected_trust_sha256=args.expected_trust_sha256)
         elif args.cmd=='normalize-session': result = normalize_session(json.loads(args.input.read_text()))
         elif args.cmd=='keygen': result=keygen(args.private_key,args.public_key)
         elif args.cmd=='bundle': result=pack(args.out,args.bundle,args.private_key)
