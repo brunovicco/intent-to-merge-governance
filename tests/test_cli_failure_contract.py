@@ -125,3 +125,52 @@ class FailureContractTests(unittest.TestCase):
                                        '--out', 'results/not-run'])
         self.assertEqual(result['reason'], 'OPERATIONAL_ERROR')
         self.assertFalse(result['merged'])
+
+    def test_benchmark_validates_typed_fields_before_hashing(self):
+        from tempfile import TemporaryDirectory
+
+        spec = (ROOT/'examples/spec.toml').read_text()
+        values = ('2026-11-25', '2026-11-25T12:00:00Z', '12:00:00', '1.5', 'true',
+                  '["configuration-secret"]', '{secret = "configuration-secret"}')
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            spec_path = root/'spec.toml'
+            for value in values:
+                with self.subTest(value=value):
+                    spec_path.write_text(spec.replace('id = "PAY-104"', f'id = {value}', 1))
+                    stdout, stderr = io.StringIO(), io.StringIO()
+                    argv = ['intent-merge', 'benchmark', '--out', str(root/'out'),
+                            '--spec', str(spec_path), '--policy', str(ROOT/'examples/policy.toml')]
+                    with patch('sys.argv', argv), contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as exc:
+                        cli.main()
+                    self.assertEqual(exc.exception.code, 2)
+                    result = json.loads(stderr.getvalue())
+                    self.assertEqual(result['status'], 'INVALID_CONFIGURATION')
+                    self.assertFalse(result['authorized'])
+                    self.assertFalse(result['merged'])
+                    self.assertFalse((root/'out').exists())
+                    self.assertNotIn('configuration-secret', stdout.getvalue()+stderr.getvalue())
+
+    def test_nested_json_configuration_errors_are_redacted(self):
+        from tempfile import TemporaryDirectory
+
+        cases = (
+            ('autonomy-replay', 'examples/autonomy-v1/config.json', 'scope',
+             ['configuration-secret'], ['--events', 'unused', '--expected-root', 'unused']),
+            ('changeset-verify', 'examples/changeset-v1/config.json', 'components',
+             {'payments': {'depends_on': [{'secret': 'configuration-secret'}]}},
+             ['--receipt', 'unused', '--expected-config-digest', 'unused']),
+        )
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp)/'config.json'
+            for command, original, field, value, extra in cases:
+                with self.subTest(command=command):
+                    source = json.loads((ROOT/original).read_text())
+                    source[field] = value
+                    path.write_text(json.dumps(source))
+                    stderr = io.StringIO()
+                    with patch('sys.argv', ['intent-merge', command, '--config', str(path), *extra]), contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as exc:
+                        cli.main()
+                    self.assertEqual(exc.exception.code, 2)
+                    self.assertEqual(json.loads(stderr.getvalue())['status'], 'INVALID_CONFIGURATION')
+                    self.assertNotIn('configuration-secret', stderr.getvalue())

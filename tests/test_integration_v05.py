@@ -7,6 +7,8 @@ from intent_merge.explorer import render
 ROOT=Path(__file__).resolve().parents[1]
 HEAD='a'*40; BASE='b'*40
 class FixtureAPI:
+    installation_id = 1
+    installation_repository = 'OWNER/REPO'
     def __init__(self):
         self.pr={'head':{'sha':HEAD,'repo':{'full_name':'OWNER/REPO'}},'base':{'sha':BASE,'ref':'main','repo':{'full_name':'OWNER/REPO'}},'state':'open','draft':False,'changed_files':1,'user':{'id':99}}
         self.files=[{'filename':'app/payments.py','status':'modified'}]

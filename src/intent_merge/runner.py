@@ -3,6 +3,7 @@ import json, os, subprocess, sys, shutil
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+from .evidence_inventory import evidence_files, regular_file
 from .core import Ledger, Proposal, digest, file_hash, load_config, load_user_config, matches, evaluate_policy, verify_chain, unique_json_members
 from .fixtures import BASE, PARTIAL, FIXED, BROKEN, HARNESS, DRIFTED, SIGNATURE_DRIFT, IMPORT_DRIFT
 from .intent import validate_spec, drift, requirement_coverage, build_graph, graph_mermaid
@@ -41,12 +42,14 @@ class FixtureAgent:
         return Proposal(files, f'Fixture proposal {iteration}; failed criteria: {sorted(k for k,v in feedback.items() if not v)}')
 
 def git(repo, *args):
-    return subprocess.run(['git','-C',str(repo),*args], check=True, text=True, capture_output=True, timeout=30).stdout.strip()
+    return subprocess.run(['git', '-C', str(repo), '-c', 'diff.orderFile=' + os.devnull, *args],
+                          check=True, text=True, capture_output=True, timeout=30).stdout.strip()
 
 def write_json(path, obj): Path(path).write_text(json.dumps(obj, indent=2, sort_keys=True)+'\n')
 
 def snapshot(repo, base):
-    return git(repo, 'diff', '--name-only', base, 'HEAD').splitlines()
+    return git(repo, 'diff', '--name-only', '--no-ext-diff', '--no-renames',
+               '--no-color', '--no-relative', '-O' + os.devnull, base, 'HEAD', '--').splitlines()
 
 def run_checks(repo, harness, spec, policy, paths, trusted_hash, executor, plan_data, mutations_ok, source, baseline_execution):
     scope = not any(not matches(p,spec['allowed_paths']) or matches(p,policy['protected_paths']) for p in paths)
@@ -57,7 +60,18 @@ def run_checks(repo, harness, spec, policy, paths, trusted_hash, executor, plan_
 
 def record_candidate(repo,ev,ledger,spec,policy,harness,trusted_hash,paths,binding,i,session,proposal_hash,executor,plan_data,mutations_ok,baseline_execution,*,source='agent_proposal'):
     head,base=binding['head'],binding['base']; tree=git(repo,'rev-parse',head+'^{tree}')
-    diff_path=ev/f'iteration-{i}.diff'; diff_path.write_bytes(subprocess.run(['git','-C',str(repo),'diff','--no-ext-diff','--no-textconv','--no-renames','--no-color','--src-prefix=a/','--dst-prefix=b/',base,head],check=True,capture_output=True,timeout=30).stdout)
+    diff_env = {k: v for k, v in os.environ.items()
+                if k not in {'GIT_DIFF_OPTS', 'GIT_EXTERNAL_DIFF', 'GIT_ATTR_SOURCE'}}
+    diff_env.update(GIT_ATTR_NOSYSTEM='1', LC_ALL='C')
+    diff_path = ev / f'iteration-{i}.diff'
+    diff_path.write_bytes(subprocess.run([
+        'git', '-C', str(repo), '-c', 'diff.suppressBlankEmpty=false',
+        '-c', 'core.attributesFile=' + os.devnull, 'diff', '--patch', '--full-index',
+        '--no-ext-diff', '--no-textconv', '--no-renames', '--no-color',
+        '--no-relative', '--diff-algorithm=myers', '--no-indent-heuristic',
+        '--unified=3', '--inter-hunk-context=0', '-O' + os.devnull,
+        '--src-prefix=a/', '--dst-prefix=b/', base, head, '--',
+    ], check=True, capture_output=True, timeout=30, env=diff_env).stdout)
     candidate_path=ev/f'candidate-{i}.py'; candidate_path.write_bytes(subprocess.run(['git','-C',str(repo),'show',head+':app/payments.py'],check=True,capture_output=True,timeout=30).stdout)
     checkpoint=make_checkpoint(spec['id'],session,binding,tree,paths,file_hash(diff_path),proposal_hash,source=source)
     ledger.add('checkpoint',iteration=i,binding=binding,tree=tree,author='coding-agent',paths=paths,diff_hash=file_hash(diff_path),candidate_hash=file_hash(candidate_path),universal=checkpoint)
@@ -66,7 +80,7 @@ def record_candidate(repo,ev,ledger,spec,policy,harness,trusted_hash,paths,bindi
     checks,execution,verification=run_checks(repo,harness,spec,policy,paths,trusted_hash,executor,plan_data,mutations_ok,candidate_path.read_text(),baseline_execution)
     ledger.add('verification',iteration=i,binding=binding,execution=execution,result=verification)
     coverage=requirement_coverage(spec,checks,paths)
-    checks.update(intent_drift=result['passed'],requirement_coverage=all(r['verified'] for r in coverage),checkpoint_binding=(head==git(repo,'rev-parse','HEAD') and checkpoint['binding']==binding and digest(candidate_path.read_text())==next(e['payload']['files']['app/payments.py'] for e in ledger.events if e['hash']==proposal_hash)))
+    checks.update(intent_drift=result['passed'],requirement_coverage=all(r['verified'] for r in coverage),checkpoint_binding=(head==git(repo,'rev-parse','HEAD') and checkpoint['binding']==binding and digest(candidate_path.read_bytes().decode('utf-8'))==next(e['payload']['files']['app/payments.py'] for e in ledger.events if e['hash']==proposal_hash)))
     ledger.add('evaluation',iteration=i,binding=binding,checks=checks,score=sum(checks.values()),evaluator='host-oracle-v1')
     return checks,execution
 
@@ -191,22 +205,30 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     return report
 
 def audit(out, anchor_path, trust_path, *, profile=CURRENT):
-    out = Path(out).resolve(); ev = out/'evidence'; anchor = json.loads(Path(anchor_path).read_text()); keys = json.loads(Path(trust_path).read_text())
-    if file_hash(out/'manifest.json') != anchor['manifest']: raise ValueError('manifest anchor mismatch')
-    manifest = json.loads((out/'manifest.json').read_text()); actual = {p.name:file_hash(p) for p in ev.iterdir() if p.is_file()}
-    if manifest != actual: raise ValueError('artifact integrity mismatch')
+    out = Path(out)
+    ev = out / 'evidence'
+    files = evidence_files(out)
+    anchor = json.loads(regular_file(anchor_path).read_text(), object_pairs_hook=unique_json_members)
+    keys = json.loads(regular_file(trust_path).read_text(), object_pairs_hook=unique_json_members)
+    manifest_path = regular_file(out / 'manifest.json')
+    if file_hash(manifest_path) != anchor['manifest']: raise ValueError('manifest anchor mismatch')
+    manifest = json.loads(manifest_path.read_text(), object_pairs_hook=unique_json_members)
+    if not isinstance(manifest, dict) or manifest.keys() != files.keys():
+        raise ValueError('artifact inventory mismatch')
+    if manifest != {name: file_hash(path) for name, path in files.items()}:
+        raise ValueError('artifact integrity mismatch')
     events = [json.loads(line, object_pairs_hook=unique_json_members)
               for line in (ev/'ledger.jsonl').read_text().splitlines()]
     root = verify_chain(events)
     if root != anchor['ledger_root']: raise ValueError('ledger anchor mismatch')
     spec = load_config(ev/'spec.toml'); policy = load_config(ev/'policy.toml'); init = events[0]['payload']
-    if init['spec'] != digest(spec) or init['policy'] != digest(policy) or init['harness'] != harness_digest(ev/'acceptance.py',ev/'verification-plan.json'): raise ValueError('configuration provenance mismatch')
     d = next(e['payload'] for e in events if e['kind']=='policy_decision'); inputs = d['inputs']
     semantics = validate_profile(profile, events, inputs)
     if profile == CURRENT:
         validate_runner_configuration(spec, policy)
     else:
         validate_spec(spec, semantics=semantics)
+    if init['spec'] != digest(spec) or init['policy'] != digest(policy) or init['harness'] != harness_digest(ev/'acceptance.py',ev/'verification-plan.json'): raise ValueError('configuration provenance mismatch')
     verify_intent_evidence(ev,spec,events,semantics=semantics)
     verify_verification_evidence(ev,spec,policy,events)
     replay = evaluate_policy(spec,policy,keys=keys,_historical_semantics=semantics,**inputs)
@@ -232,8 +254,12 @@ def verify_intent_evidence(ev,spec,events,*,semantics=SEGMENT_V2):
     if not len(cp_events)==len(drift_events)==len(eval_events): raise ValueError('incomplete candidate evidence')
     for cp,dr,evl in zip(cp_events,drift_events,eval_events):
         i=cp['iteration']; binding=cp['binding']; uni=cp['universal']; proposal=proposals.get(uni['proposal_event_hash'])
-        if proposal is None or cp['diff_hash'] != file_hash(ev/f'iteration-{i}.diff') or cp['candidate_hash'] != file_hash(ev/f'candidate-{i}.py'): raise ValueError('checkpoint provenance mismatch')
-        if digest((ev/f'candidate-{i}.py').read_text()) != proposal['files'].get('app/payments.py'): raise ValueError('proposal content mismatch')
+        if type(i) is not int or i <= 0:
+            raise ValueError('invalid checkpoint iteration')
+        candidate = ev / f'candidate-{i}.py'
+        if proposal is None or cp['diff_hash'] != file_hash(ev/f'iteration-{i}.diff') or cp['candidate_hash'] != file_hash(candidate): raise ValueError('checkpoint provenance mismatch')
+        content = candidate.read_bytes().decode('utf-8') if semantics == SEGMENT_V2 else candidate.read_text()
+        if digest(content) != proposal['files'].get(PAYMENT_PATH): raise ValueError('proposal content mismatch')
         expected=make_checkpoint(spec['id'],proposal['session'],binding,cp['tree'],cp['paths'],cp['diff_hash'],uni['proposal_event_hash'],source=uni['source'])
         if uni!=expected or binding!=dr['binding'] or binding!=evl['binding'] or i!=dr['iteration'] or i!=evl['iteration']: raise ValueError('checkpoint binding mismatch')
         observed=drift(spec,{'app/payments.py':(ev/'baseline.py').read_text()},{'app/payments.py':(ev/f'candidate-{i}.py').read_text()},cp['paths'],semantics=semantics)

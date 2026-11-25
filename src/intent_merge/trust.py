@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 from .core import unique_json_members
+from .evidence_inventory import evidence_files, regular_file
 from .evidence_profile import CURRENT
 from .runner import audit
 
@@ -37,8 +38,7 @@ def _require(condition, message):
 
 
 def _read(path, limit):
-    path = Path(path)
-    _require(not path.is_symlink() and path.is_file(), "expected regular file")
+    path = regular_file(path)
     with path.open("rb") as file:
         data = file.read(limit + 1)
     _require(len(data) <= limit, "audit artifact too large")
@@ -94,9 +94,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
     _public_trust(_decode(trust_bytes))
 
     source = Path(out)
-    ev = source / "evidence"
-    _require(not source.is_symlink() and source.is_dir() and not ev.is_symlink()
-             and ev.is_dir(), "invalid audit directory")
+    files = evidence_files(source)
     manifest_bytes = _read(source / "manifest.json", MAX_METADATA)
     _require(_sha(manifest_bytes) == anchor["manifest"], "manifest anchor mismatch")
     manifest = _decode(manifest_bytes)
@@ -105,7 +103,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
     for name, digest in manifest.items():
         _require(isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", name)
                  and name not in {".", ".."} and _hex(digest), "invalid manifest entry")
-    _require({p.name for p in ev.iterdir()} == set(manifest), "artifact inventory mismatch")
+    _require(files.keys() == manifest.keys(), "artifact inventory mismatch")
 
     # The exact checked bytes, not the caller's mutable files, reach the auditor.
     # This is a private temporary copy, not a hostile same-user security boundary.
@@ -115,7 +113,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
         staged_ev.mkdir()
         total = 0
         for name, digest in manifest.items():
-            data = _read(ev / name, MAX_ARTIFACT)
+            data = _read(files[name], MAX_ARTIFACT)
             total += len(data)
             _require(total <= MAX_TOTAL, "audit snapshot too large")
             _require(_sha(data) == digest, "artifact integrity mismatch")

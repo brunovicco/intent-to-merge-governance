@@ -49,7 +49,10 @@ class OpsTests(unittest.TestCase):
         self.assertEqual(self.j.get('d1')['state'],'UNCERTAIN');self.assertIsNone(self.work(publish=True));self.assertEqual(len(self.api.posts),1)
         self.assertEqual(reconcile(self.j,self.api,'d1',APP)['state'],'DONE');self.assertEqual(len(self.api.posts),1)
     def test_crash_before_response(self):
-        self.j.claim();self.j.transition('d1','RUNNING','PUBLISHING',report=json.dumps({'head':HEAD,'decision':'PASS'}),external_id='missing');self.j.recover();self.assertEqual(self.j.get('d1')['state'],'UNCERTAIN');self.assertEqual(reconcile(self.j,self.api,'d1',APP)['state'],'UNCERTAIN');self.assertFalse(self.api.posts)
+        self.j.claim()
+        with self.j.db:
+            self.j.db.execute("UPDATE jobs SET state='PUBLISHING', report=?, external_id='missing' WHERE id='d1'", (json.dumps({'head':HEAD,'decision':'PASS'}),))
+        self.j.recover();self.assertEqual(self.j.get('d1')['state'],'UNCERTAIN');self.assertEqual(reconcile(self.j,self.api,'d1',APP)['state'],'UNCERTAIN');self.assertFalse(self.api.posts)
     def test_jwt(self):
         key=rsa.generate_private_key(public_exponent=65537,key_size=2048);a,b,c=app_jwt(APP,key,NOW).split('.');decode=lambda s:base64.urlsafe_b64decode(s+'='*(-len(s)%4));key.public_key().verify(decode(c),(a+'.'+b).encode(),padding.PKCS1v15(),hashes.SHA256());self.assertEqual(json.loads(decode(b))['iss'],str(APP))
     def test_delivery(self):

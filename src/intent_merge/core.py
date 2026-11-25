@@ -1,5 +1,7 @@
 from __future__ import annotations
 import hashlib, hmac, json, tomllib
+from datetime import date, time
+from math import isfinite
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Protocol
@@ -35,9 +37,29 @@ def load_config(path):
 def load_user_config(path):
     """Parse user TOML. Filesystem errors remain operational failures."""
     try:
-        return load_config(path)
-    except (tomllib.TOMLDecodeError, UnicodeDecodeError):
+        config = load_config(path)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError, RecursionError):
         raise InvalidConfiguration('invalid_toml') from None
+    pending = [config]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, dict):
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+        elif isinstance(value, (date, time)) or (type(value) is float and not isfinite(value)):
+            raise InvalidConfiguration('unsupported_configuration_scalar')
+    return config
+
+
+def load_user_json_config(path, validate):
+    """Parse and validate configuration while leaving file errors operational."""
+    try:
+        config = json.loads(Path(path).read_text(), object_pairs_hook=unique_json_members)
+        validate(config)
+    except (ValueError, TypeError, KeyError, RecursionError):
+        raise InvalidConfiguration('invalid_json_configuration') from None
+    return config
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,7 @@ from functools import partial
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 from intent_merge.core import digest
-from intent_merge.github import policy_from,preflight,validate_check_response
+from intent_merge.github import policy_from,preflight,validate_check_response,positive_id
 from intent_merge.operational import CONTROLS,NAME,Journal,installation_client,work_once
 from intent_merge.hardening import strict_gate
 
@@ -46,6 +46,8 @@ def transport(client,policy,pr,app_id,out):
     # Guard against accidentally making this check required in an active ruleset.
     # Public repository ruleset reads require no administration write permission.
     for item in client.pages(prefix+'/rulesets'):
+        if not isinstance(item, dict) or not positive_id(item.get('id')):
+            raise ValueError('invalid ruleset identity')
         rule=client.request(prefix+'/rulesets/'+str(item['id']))
         for entry in rule.get('rules',[]):
             if entry.get('type')=='required_status_checks' and any(c.get('context')==TRANSPORT for c in entry['parameters']['required_status_checks']):raise ValueError('transport check must never be required')

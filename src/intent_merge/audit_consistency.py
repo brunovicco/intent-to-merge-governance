@@ -3,6 +3,9 @@
 This checks recorded observations, not the existence of external Git objects.
 Historical v1 replay deliberately retains its original decision semantics.
 """
+import hashlib
+import re
+
 from .approvals import valid_binding
 from .core import digest
 from .evidence_patch import PAYMENT_PATH, candidate_tree, rejected_paths, verify_patch
@@ -56,7 +59,16 @@ def verify_current_evidence(ev, spec, policy, events, report):
     recorded_artifacts = {p.name for p in ev.iterdir()
                           if p.name.startswith(('candidate-', 'iteration-'))}
     _require(recorded_artifacts == expected_artifacts, 'checkpoint artifact inventory')
+    # Full blob/tree preimages are available for this single-file fixture. Commit
+    # preimages are absent, so SHA labels can only be reconciled across observations.
+    identities = {}
+
+    def observe(head, tree, content):
+        identity = (tree, hashlib.sha256(content).hexdigest())
+        _require(identities.setdefault(head, identity) == identity, 'conflicting commit identity')
+
     baseline = (ev / 'baseline.py').read_bytes()
+    observe(init['base'], candidate_tree(baseline), baseline)
     for i, (checkpoint, evaluation) in enumerate(zip(checkpoints, evaluations), 1):
         cp, evaluation_data = checkpoint['payload'], evaluation['payload']
         cp_binding = cp['binding']
@@ -76,6 +88,7 @@ def verify_current_evidence(ev, spec, policy, events, report):
                  'proposal content')
         verify_patch((ev / f'iteration-{i}.diff').read_bytes(), baseline, candidate)
         _require(cp['tree'] == candidate_tree(candidate), 'checkpoint tree')
+        observe(cp_binding['head'], cp['tree'], candidate)
         expected_paths = [] if candidate == baseline else [PAYMENT_PATH]
         _require(cp['paths'] == expected_paths, 'checkpoint paths')
         checks = evaluation_data['checks']
@@ -118,6 +131,32 @@ def verify_current_evidence(ev, spec, policy, events, report):
         _require(cp['binding'] == binding and cp['paths'] == inputs['paths']
                  and evaluation['checks'] == inputs['checks'], 'decision checkpoint scope or checks')
     _require(used_proposals == proposal_map.keys(), 'proposal inventory')
+    def resolve(recorded):
+        _require(valid_binding(recorded)
+                 and all(recorded[k] == binding[k] for k in binding if k != 'head')
+                 and recorded['head'] in identities, 'unresolved commit binding')
+
+    # Checkpoint verification, drift and evaluation bindings are also compared in
+    # the shared replay checks. Proposal content is resolved through its checkpoint.
+    resolve(binding)
+    for event in events:
+        payload = event['payload']
+        if event['kind'] in ('verification', 'evaluation', 'intent_drift'):
+            resolve(payload['binding'])
+        elif event['kind'] == 'approval_challenge_issued':
+            resolve(payload['challenge']['binding'])
+    for approval in inputs['approvals']:
+        resolve(approval['binding'])
+    if inputs['eval_binding'] is not None:
+        resolve(inputs['eval_binding'])
+
+    current_base = inputs['current_base']
+    _require(isinstance(current_base, str) and re.fullmatch(r'[0-9a-f]{40}', current_base),
+             'invalid current target identity')
+    if current_base != init['base']:
+        # An independently moved target has no tree artifact in this format.
+        _require(not decision['payload']['decision']['authorized']
+                 and 'stale_base' in decision['payload']['decision']['reasons'], 'stale target')
     if checkpoints:
         _require(checkpoints[-1]['payload']['binding'] == binding, 'latest candidate')
         # Stale-evaluation scenarios are recorded denials, not valid evidence.

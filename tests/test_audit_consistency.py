@@ -219,3 +219,68 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.assertTrue(verify(corpus/'bundles/happy', corpus/'signer.pub', profile=HISTORICAL_V1)['merged'])
         with self.assertRaisesRegex(ValueError, 'historical evidence profile'):
             verify(self.bundle, self.public, profile=HISTORICAL_V1)
+
+    def alias_first_checkpoint(self, head):
+        for event in self.events:
+            payload = event['payload']
+            if payload.get('iteration') == 1 and event['kind'] in (
+                    'checkpoint', 'intent_drift', 'verification', 'evaluation'):
+                payload['binding']['head'] = head
+                if event['kind'] == 'checkpoint':
+                    payload['universal']['binding']['head'] = head
+        self.report['history'][0]['head'] = head
+        write_json(self.ev/'verification.json',
+                   [e['payload'] for e in self.events if e['kind'] == 'verification'])
+        write_json(self.ev/'intent-drift.json',
+                   [e['payload'] for e in self.events if e['kind'] == 'intent_drift'])
+
+    def test_one_sha_cannot_name_two_trees(self):
+        self.alias_first_checkpoint(self.report['candidate'])
+        signed = self.signed_copy()
+        with self.assertRaisesRegex(ValueError, 'conflicting commit identity'):
+            verify(signed, self.public)
+        with self.assertRaisesRegex(ValueError, 'conflicting commit identity'):
+            self.anchored()
+        with self.assertRaisesRegex(ValueError, 'conflicting commit identity'):
+            pack(self.out, self.out.parent/'contradictory.bundle', self.private)
+
+    def test_changed_content_cannot_name_baseline_sha(self):
+        self.alias_first_checkpoint(self.report['base'])
+        with self.assertRaisesRegex(ValueError, 'conflicting commit identity'):
+            verify(self.signed_copy(), self.public)
+
+    def test_evaluation_must_reference_an_observed_identity(self):
+        from intent_merge.core import evaluate_policy
+        decision = self.payload('policy_decision')
+        inputs = decision['inputs']
+        inputs['eval_binding']['head'] = 'f'*40
+        trust = json.loads((self.out/'demo-trust.json').read_text())
+        decision['decision'] = evaluate_policy(load_config(self.ev/'spec.toml'),
+                                               load_config(self.ev/'policy.toml'),
+                                               keys=trust, **inputs)
+        result = self.payload('merge_result')
+        result.update(merged=False, main=self.report['base'])
+        self.report.update(merged=False, main=self.report['base'], decision=decision['decision'])
+        self.assert_rejected('unresolved commit binding')
+
+    def test_repeated_consistent_tree_and_refresh(self):
+        for name in ('failed-eval', 'stale-approval'):
+            with self.subTest(name=name):
+                out = self.out.parent/name
+                run(name, out, ROOT/'examples/spec.toml', ROOT/'examples/policy.toml')
+                checkpoints = json.loads((out/'evidence/checkpoints.json').read_text())
+                self.assertLess(len({event['tree'] for event in checkpoints}), len(checkpoints))
+                self.assertEqual(len({event['binding']['head'] for event in checkpoints}), len(checkpoints))
+                archive = out.with_suffix('.bundle')
+                pack(out, archive, self.private)
+                self.assertFalse(verify(archive, self.public)['merged'])
+
+    def test_repeated_observation_of_same_commit_with_matching_content(self):
+        out = self.out.parent/'same-tree'
+        run('failed-eval', out, ROOT/'examples/spec.toml', ROOT/'examples/policy.toml')
+        self.out, self.ev = out, out/'evidence'
+        self.events = [json.loads(line) for line in (self.ev/'ledger.jsonl').read_text().splitlines()]
+        self.report = json.loads((self.ev/'report.json').read_text())
+        self.alias_first_checkpoint(self.report['candidate'])
+        self.reseal()
+        self.assertFalse(self.anchored()['merged'])

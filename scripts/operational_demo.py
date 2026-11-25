@@ -8,6 +8,9 @@ from intent_merge.github import policy_from
 
 HEAD='a'*40;BASE='b'*40;APP=789;NOW=1900000000
 class Fixture:
+    installation_app_id = APP
+    installation_id = 1
+    installation_repository = 'OWNER/REPO'
     def __init__(self):
         self.posts=[];self.lose=False;self.pr={'head':{'sha':HEAD,'repo':{'full_name':'OWNER/REPO'}},'base':{'sha':BASE,'ref':'main','repo':{'full_name':'OWNER/REPO'}},'state':'open','draft':False,'changed_files':1,'user':{'id':99}}
         self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success'}]

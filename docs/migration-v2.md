@@ -41,6 +41,22 @@ approval-only profiles require their archival verifier or fresh evidence.
 - The DSSE predicate, audit result fields and archived report formats retain their
   existing wire formats. Supply stable evidence directories to offline consumers.
 
+PAY-104 v2 current evidence can reconstruct SHA-1 blob names and the complete
+tree name implied by the regular `app/payments.py` bytes and fixed file mode.
+It reconciles each observed commit label with that tree and content, including
+the baseline. Commit-object preimages, parent graphs, author/committer fields,
+timestamps and raw commit messages are absent. The auditor cannot recompute
+commit SHA values, establish ancestry, or authenticate external Git objects.
+A moved target in a stale-target denial is a ref observation without a tree
+artifact. Proposal records carry source digests and acquire a commit binding
+through their checkpoint. Archived v1 keeps its explicit replay semantics.
+
+All audit profiles require a flat evidence directory of regular files whose
+names match the manifest. Symlinks, nested directories and special files are
+rejected. Supply stable paths and directories throughout verification. These
+checks do not protect against a concurrent writer replacing checked filesystem
+entries.
+
 The journaled worker uses the signed assertion expiry by default. The strict
 worker also requires independently signed receipts and takes the earliest
 expiry. Success requires an ordered clock sample after the journal commit and
@@ -50,12 +66,32 @@ sets the evaluation time. Offline tests can inject an independent
 gate must return a supported profile with verified evidence and expiry to
 publish success. The CLI uses the wall clock for publication.
 
-A known pre-request denial records `BLOCKED_BEFORE_PUBLICATION`. An attempted
-write with an unconfirmed response records `UNCERTAIN` and preserves correlation.
-Use read-only reconciliation to resolve a unique matching response. Sweep flags
-a known-success row with an invalid stored ID as `REMOTE_STATE_UNKNOWN`. Older
-corrupt journals require operator inspection against independently verified
-remote state. Expiry or ref changes can occur after the request starts.
+A known pre-request denial records `BLOCKED_BEFORE_PUBLICATION`. Before any
+creation request, the worker saves the original App and installation IDs,
+repository, head, check name, status, conclusion and external ID in its
+publication intent. The journal upgrades its schema in place on open. Older
+published or in-flight rows lack the original identity needed for automatic
+reconciliation or revocation. They retain their correlation and report
+`RECONCILIATION_REQUIRED`. Verify these rows against independently established
+remote state. A new delivery is appropriate only after the original uncertain
+operation has been investigated. Python publication transports must declare
+`installation_app_id`, `installation_id` and `installation_repository`.
+Authenticated webhook deliveries also pin the installation used by the worker.
+
+An unconfirmed POST records `UNCERTAIN`. Sweep recovers interrupted
+`PUBLISHING` rows and checks the original publication intent for a single valid
+remote match. With `--publish` it can record that match and revoke a stale
+success on the same check ID. A missing, duplicate or contradictory observation
+leaves the operation uncertain and tells the operator to inspect it. No
+automatic creation POST occurs during recovery. A confirmed check with invalid
+remote fields is `REMOTE_STATE_UNKNOWN`. A PATCH begins with a durable
+`REVOKING` transition. Loss of its acknowledgement leaves
+`REVOCATION_UNCERTAIN` until the same check is observed as blocked or an
+idempotent PATCH receives a matching acknowledgement. Sweep reports
+`REVOKED` only for a matching PATCH acknowledgement. The CLI exits 2 for
+unresolved reconciliation or sweep results. Expiry, ref changes, and remote
+state changes can occur after request start. Publication, revocation and merge
+are separate operations.
 
 Direct `github-preflight --publish` writes the distinct diagnostic
 `ITM / PR preflight` check. The evidence-gate expiry contract applies to

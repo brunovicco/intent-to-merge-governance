@@ -12,11 +12,20 @@ from cryptography.hazmat.primitives import serialization
 from .core import canonical, digest
 from .github import positive_id, validate_check_response
 from .policy_schema import InvalidConfiguration
-from .operational import CONTROLS, NAME, require, gate
+from .operational import (
+    CONTROLS, require, gate, checked_publication, correlated_check, reconciliation_required,
+    validate_gate_policy,
+)
 from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign, OBSERVATION_ERRORS
 
 RECEIPT_DOMAIN = b'ITM-control-receipt-v1\0'
 BINDINGS = ('repository','pr','head','base','policy_digest')
+
+
+def validate_control_trust(trust):
+    require(isinstance(trust, dict) and set(trust) == CONTROLS
+            and all(isinstance(k, str) and re.fullmatch(r'[0-9a-f]{64}', k) for k in trust.values())
+            and len(set(trust.values())) == len(CONTROLS), 'independent control keys required')
 
 
 def verify_control_receipts(receipts, trust, report, now):
@@ -25,7 +34,7 @@ def verify_control_receipts(receipts, trust, report, now):
     Artifact contents are bounded structured observations supplied by trusted control
     services. The caller must pin trust outside agent-controlled storage.
     """
-    require(set(trust)==CONTROLS and all(isinstance(k,str) and re.fullmatch(r'[0-9a-f]{64}',k) for k in trust.values()) and len(set(trust.values()))==len(CONTROLS), 'independent control keys required')
+    validate_control_trust(trust)
     require(isinstance(receipts,list) and len(receipts)==len(CONTROLS),'complete control inventory required')
     seen=set(); roots={}
     for r in receipts:
@@ -34,7 +43,7 @@ def verify_control_receipts(receipts, trust, report, now):
         require(control in CONTROLS and control not in seen,'unknown or duplicate control')
         require(set(s)==set(BINDINGS)|{'control','profile','issued_at','expires_at','artifact_digest','passed'},'invalid statement fields')
         require(s['profile']=='external-control-v1' and s['passed'] is True,'control failed or synthetic profile')
-        require(all(s[k]==report[k] for k in BINDINGS),'control binding mismatch')
+        require(positive_id(s['pr']) and all(s[k]==report[k] for k in BINDINGS), 'control binding mismatch')
         require(type(s['issued_at']) is int and type(s['expires_at']) is int and s['issued_at']<=now<s['expires_at']<=s['issued_at']+900,'control expired')
         require(isinstance(artifact,dict) and 0<len(canonical(artifact))<=262144,'invalid artifact size')
         require(s['artifact_digest']==digest(artifact),'artifact digest mismatch')
@@ -68,46 +77,110 @@ def strict_gate(client,job,policy,assertion_dir,verifier_key,now=None,*,receipt_
     return report
 
 
-def sweep(journal,client,policy,assertion_dir,verifier_key,receipt_dir,control_trust,app_id,*,now=None,apply=False):
-    """Revoke stale successful checks known to the journal. PATCH is idempotent.
+BLOCKED_CONCLUSIONS = {'failure', 'action_required', 'cancelled', 'timed_out', 'stale', 'startup_failure'}
 
-    A check may be shared across PRs with the same head: never create a success here.
-    Missing or ambiguous API observations are errors, not evidence of revocation.
-    """
-    now=int(time.time() if now is None else now); results=[]
+
+def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, control_trust,
+          app_id, *, installation_id=None, now=None, apply=False):
+    """Reconcile recoverable writes and revoke stale successes by exact check ID."""
+    validate_gate_policy(policy)
+    now = int(time.time() if now is None else now)
+    results = []
     with journal.worker_lock():
+        journal.recover()
         for row in journal.list():
-            if row['state']!='DONE' or not row['report']: continue
-            old=json.loads(row['report'])
-            if old.get('decision')!='PASS' or row['repo'].lower()!=policy['repository'].lower(): continue
-            if not positive_id(row['check_id']):
-                results.append({'id':row['id'],'status':'REMOTE_STATE_UNKNOWN'})
+            state = row['state']
+            if (state not in ('DONE', 'UNCERTAIN', 'REVOCATION_UNCERTAIN')
+                    or row['repo'].lower() != policy['repository'].lower()):
                 continue
-            path=f"/repos/{row['repo']}/check-runs/{row['check_id']}"
-            expected = {'head_sha': old['head'], 'external_id': row['external_id'],
-                        'name': NAME, 'status': 'completed'}
+            job_id = row['id']
             try:
-                remote=client.request(path)
-                validate_check_response(remote, {**expected, 'conclusion': remote['conclusion']},
-                                        app_id, check_id=row['check_id'])
-                if remote['status']=='completed' and remote['conclusion'] in ('failure','action_required','cancelled','timed_out','stale'):
-                    results.append({'id':row['id'],'status':'ALREADY_BLOCKED'}); continue
-            except Exception:
-                results.append({'id':row['id'],'status':'REMOTE_STATE_UNKNOWN'}); continue
-            try:
-                current=strict_gate(client,row,policy,assertion_dir,verifier_key,now,receipt_dir=receipt_dir,control_trust=control_trust)
-                valid=remote['status']=='completed' and remote['conclusion']=='success' and old.get('profile')=='github-strict-snapshot' and now<old.get('expires_at',0) and current['decision']=='PASS' and all(old.get(k)==current.get(k) for k in (*BINDINGS,'assertion_digest','control_receipts','gates'))
-            except Exception: valid=False
-            if valid: status='CURRENT'
-            elif not apply: status='WOULD_REVOKE'
-            else:
+                intent, old = checked_publication(row, client, app_id, installation_id)
+            except (ValueError, KeyError, TypeError):
+                results.append({'id': job_id, **reconciliation_required(
+                    row, 'publication_identity_unavailable_or_mismatched')})
+                continue
+
+            expiry = old.get('expires_at')
+            timing = {'expired': now >= expiry, 'expires_at': expiry} if type(expiry) is int else {}
+            check_id = row['check_id']
+            if state == 'UNCERTAIN':
                 try:
-                    response=client.request(path,{'status':'completed','conclusion':'failure','output':{'title':'ITM evidence revoked','summary':'Evidence no longer current; fresh evaluation required.'}},method='PATCH')
-                    validate_check_response(response, {**expected, 'conclusion': 'failure'},
-                                            app_id, check_id=row['check_id'])
-                    status='REVOKED'
-                except Exception: status='REVOCATION_UNCERTAIN'
-            results.append({'id':row['id'],'status':status})
+                    check_id, matches = correlated_check(client, intent)
+                    checked_publication(row, client, app_id, installation_id)
+                except Exception:
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'remote_observation_unavailable', **timing)})
+                    continue
+                if check_id is None:
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'no_unique_matching_check', matches=matches, **timing)})
+                    continue
+                if apply:
+                    journal.transition(job_id, 'UNCERTAIN', 'DONE', check_id=check_id)
+            if intent['conclusion'] == 'failure':
+                if state == 'UNCERTAIN':
+                    results.append({'id': job_id, 'status': 'RECONCILED' if apply else 'WOULD_RECONCILE'})
+                continue
+
+            path = f"/repos/{intent['repository']}/check-runs/{check_id}"
+            try:
+                require(positive_id(check_id), 'invalid stored check ID')
+                remote = client.request(path)
+                validate_check_response(remote, intent, intent['app_id'], check_id=check_id,
+                                        conclusions=BLOCKED_CONCLUSIONS | {'success'})
+            except Exception:
+                results.append({'id': job_id, 'status': 'REMOTE_STATE_UNKNOWN',
+                                'external_id': intent['external_id'], **timing,
+                                'action': 'Inspect the correlated check before revocation.'})
+                continue
+
+            if remote['conclusion'] in BLOCKED_CONCLUSIONS:
+                if state == 'REVOCATION_UNCERTAIN' and apply:
+                    journal.transition(job_id, state, 'DONE')
+                results.append({'id': job_id, 'status': 'ALREADY_BLOCKED'})
+                continue
+
+            valid = False
+            if (state != 'REVOCATION_UNCERTAIN' and old.get('profile') == 'github-strict-snapshot'
+                    and type(old.get('expires_at')) is int and now < old['expires_at']):
+                try:
+                    current = strict_gate(client, row, policy, assertion_dir, verifier_key, now,
+                                          receipt_dir=receipt_dir, control_trust=control_trust)
+                    valid = (current['decision'] == 'PASS' and all(old.get(k) == current.get(k)
+                                     for k in (*BINDINGS, 'assertion_digest', 'control_receipts', 'gates')))
+                except (ValueError, KeyError, TypeError, OSError):
+                    pass
+            if valid:
+                status = 'WOULD_RECONCILE' if state == 'UNCERTAIN' and not apply else 'CURRENT'
+            elif not apply:
+                status = 'WOULD_REVOKE'
+            else:
+                prior = 'REVOCATION_UNCERTAIN' if state == 'REVOCATION_UNCERTAIN' else 'DONE'
+                try:
+                    checked_publication(row, client, app_id, installation_id)
+                except (ValueError, KeyError, TypeError):
+                    results.append({'id': job_id, **reconciliation_required(
+                        journal.get(job_id), 'publication_identity_unavailable_or_mismatched', **timing)})
+                    continue
+                journal.transition(job_id, prior, 'REVOKING')
+                try:
+                    response = client.request(path, {
+                        'status': 'completed', 'conclusion': 'failure',
+                        'output': {'title': 'ITM evidence revoked',
+                                   'summary': 'Evidence no longer current; fresh evaluation required.'},
+                    }, method='PATCH')
+                    validate_check_response(response, {**intent, 'conclusion': 'failure'},
+                                            intent['app_id'], check_id=check_id)
+                except Exception:
+                    journal.transition(job_id, 'REVOKING', 'REVOCATION_UNCERTAIN')
+                    results.append({'id': job_id, 'status': 'REVOCATION_UNCERTAIN',
+                                    'external_id': intent['external_id'], **timing,
+                                    'action': 'Observe the same check before confirming revocation.'})
+                    continue
+                journal.transition(job_id, 'REVOKING', 'DONE')
+                status = 'REVOKED'
+            results.append({'id': job_id, 'status': status})
     return results
 
 

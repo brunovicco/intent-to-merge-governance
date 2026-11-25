@@ -1,7 +1,8 @@
 """Read the single-file Git text diff recorded by the PAY-104 runner.
 
 All paths and modes are fixed. Reconcile hunks against bytes in memory, including
-context and omitted lines. Git object IDs are format checks for this lab.
+context and omitted lines. Blob and tree IDs derive from the recorded bytes.
+The commit object preimages are not part of the evidence format.
 """
 import hashlib
 import re

@@ -7,7 +7,7 @@ from .evidence_profile import CURRENT
 from .policy_schema import InvalidConfiguration
 from .bundle import keygen, pack, verify
 from .core import load_config, load_user_config, digest
-from .runner import run, write_json
+from .runner import run, write_json, validate_runner_configuration
 
 # Predeclared labels, independent of the recorded decision.
 CATALOG = {
@@ -119,7 +119,10 @@ def write_reports(report, out):
 
 def generate(out, spec, policy, workers=4):
     if not 1<=workers<=8: raise ValueError('workers must be between 1 and 8')
-    if (digest(load_user_config(spec)),digest(load_user_config(policy)))!=(V1_SPEC,V1_POLICY): raise InvalidConfiguration('AMGB v1 requires the catalog-bound spec and policy')
+    spec_config, policy_config = load_user_config(spec), load_user_config(policy)
+    validate_runner_configuration(spec_config, policy_config)
+    if (digest(spec_config), digest(policy_config)) != (V1_SPEC, V1_POLICY):
+        raise InvalidConfiguration('AMGB v1 requires the catalog-bound spec and policy')
     out=Path(out).resolve(); out.mkdir(parents=True,exist_ok=False); public=out/'signer.pub'
     with tempfile.TemporaryDirectory(prefix='amgb-') as tmp:
         private=Path(tmp)/'signer.pem'; keygen(private,public)

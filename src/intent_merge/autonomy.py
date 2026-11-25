@@ -24,13 +24,14 @@ def hexstr(value,n=64):
     return isinstance(value,str) and re.fullmatch('[0-9a-f]{'+str(n)+'}',value) is not None
 
 def validate_config(c):
-    require(set(c)=={'version','scope','keys','initial_level','clean_required','window','adverse_limit','max_level','risk_ceiling'},'invalid config fields')
-    require(c['version']==1 and c['initial_level'] in (0,1,2) and c['max_level'] in (1,2) and c['initial_level']<=c['max_level'],'invalid levels')
+    require(isinstance(c, dict) and set(c)=={'version','scope','keys','initial_level','clean_required','window','adverse_limit','max_level','risk_ceiling'},'invalid config fields')
+    require(all(type(c[k]) is int for k in ('version', 'initial_level', 'max_level'))
+            and c['version']==1 and c['initial_level'] in (0,1,2) and c['max_level'] in (1,2) and c['initial_level']<=c['max_level'],'invalid levels')
     require(all(type(c[k]) is int and 1<=c[k]<=1000 for k in ('clean_required','window','adverse_limit')) and c['adverse_limit']<=c['window'],'invalid thresholds')
     require(c['risk_ceiling'] in ('low','medium','high'),'invalid risk ceiling')
-    scope=c['scope']; require(set(scope)=={'repository','agent','model','harness','policy','spec','bundle_signer','profile'},'invalid scope')
+    scope=c['scope']; require(isinstance(scope, dict) and set(scope)=={'repository','agent','model','harness','policy','spec','bundle_signer','profile'},'invalid scope')
     require(all(isinstance(v,str) and v for v in scope.values()) and all(hexstr(scope[k]) for k in ('harness','policy','spec','bundle_signer')) and scope['profile']=='synthetic-demo','invalid scope values')
-    require(set(c['keys'])==set(ROLES.values()) and all(hexstr(v) for v in c['keys'].values()) and len(set(c['keys'].values()))==len(c['keys']),'distinct role keys required')
+    require(isinstance(c['keys'], dict) and set(c['keys'])==set(ROLES.values()) and all(hexstr(v) for v in c['keys'].values()) and len(set(c['keys'].values()))==len(c['keys']),'distinct role keys required')
     return c
 
 def sign_event(config, events, kind, payload, private_key):

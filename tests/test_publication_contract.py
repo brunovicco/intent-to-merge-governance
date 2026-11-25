@@ -36,6 +36,16 @@ class InstallationContractTests(unittest.TestCase):
             client = self.client({'token': 'installation-fixture'})
         self.assertEqual(client.token, 'installation-fixture')
         self.assertEqual(client.installation_app_id, 789)
+        self.assertEqual(client.installation_id, 2)
+        self.assertEqual(client.installation_repository, 'OWNER/REPO')
+
+    def test_declared_token_response_identity_must_be_exact(self):
+        for field, value in (('app_id', 789.0), ('app_id', 788), ('installation_id', True),
+                             ('installation_id', 3), ('installation_id', '2')):
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                self.client({'token': 'fixture', field: value})
+        client = self.client({'token': 'fixture', 'app_id': 789, 'installation_id': 2})
+        self.assertEqual(client.installation_id, 2)
 
     def test_explicit_invalid_token_cannot_fallback(self):
         with patch.dict(os.environ, {'ITM_GITHUB_TOKEN': 'read-token'}):

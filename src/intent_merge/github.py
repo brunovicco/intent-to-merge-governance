@@ -5,12 +5,15 @@ from .path_policy import matches, validate_patterns, SEGMENT_V2
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from .core import digest, load_user_config
+from .core import digest, load_user_config, unique_json_members
 from .policy_schema import InvalidConfiguration
 
 SHA = re.compile(r'[0-9a-f]{40}')
 REPO = re.compile(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+')
 CHECK_NAME = 'ITM / PR preflight'
+CHECK_STATUSES = {'queued', 'in_progress', 'completed', 'requested', 'waiting', 'pending'}
+CHECK_CONCLUSIONS = {'action_required', 'cancelled', 'failure', 'neutral', 'skipped',
+                     'stale', 'startup_failure', 'success', 'timed_out'}
 
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
@@ -27,33 +30,59 @@ def positive_id(value):
     return type(value) is int and value > 0
 
 
-def validate_check_response(response, expected, app_id, *, check_id=None):
-    """Return the positive ID of a matching check response."""
-    app = response.get('app') if isinstance(response, dict) else None
-    fields = ('name', 'head_sha', 'external_id', 'status', 'conclusion')
-    if (not isinstance(response, dict) or not positive_id(response.get('id'))
-            or not positive_id(app_id) or not isinstance(app, dict)
-            or not positive_id(app.get('id')) or app['id'] != app_id
+def check_observation(row):
+    """Validate the identity and lifecycle fields returned by GitHub."""
+    if not isinstance(row, dict):
+        raise ValueError('invalid check observation')
+    app, status, conclusion = row.get('app'), row.get('status'), row.get('conclusion')
+    if (not positive_id(row.get('id')) or not isinstance(app, dict) or not positive_id(app.get('id'))
+            or not isinstance(row.get('name'), str) or not row['name']
+            or not isinstance(row.get('head_sha'), str) or not SHA.fullmatch(row['head_sha'])
+            or not isinstance(status, str) or status not in CHECK_STATUSES
+            or 'conclusion' not in row
+            or (status == 'completed' and
+                (not isinstance(conclusion, str) or conclusion not in CHECK_CONCLUSIONS))
+            or (status != 'completed' and conclusion is not None)):
+        raise ValueError('invalid check observation')
+    return row['id']
+
+
+def validate_check_response(response, expected, app_id, *, check_id=None, conclusions=None):
+    """Validate an observation against trusted correlation and lifecycle expectations."""
+    observed_id = check_observation(response)
+    fields = ('name', 'head_sha', 'external_id', 'status')
+    if conclusions is None:
+        conclusions = (expected['conclusion'],)
+    if (not positive_id(app_id) or response['app']['id'] != app_id
             or any(field not in response or response[field] != expected[field] for field in fields)
-            or (check_id is not None and (not positive_id(check_id) or response['id'] != check_id))):
+            or response['conclusion'] not in conclusions
+            or (check_id is not None and (not positive_id(check_id) or observed_id != check_id))):
         raise ValueError('unexpected check response')
-    return response['id']
+    return observed_id
 
 
 class CheckPublicationUnconfirmed(ValueError):
     """A check creation POST may have taken effect."""
-    def __init__(self, repo, app_id, payload):
+    def __init__(self, repo, app_id, payload, *, installation_id=None):
         super().__init__('check publication not confirmed')
         self.correlation = {'repository': repo, 'app_id': app_id,
                             **{k: payload[k] for k in ('name', 'head_sha', 'external_id', 'conclusion')}}
+        if installation_id is not None:
+            self.correlation['installation_id'] = installation_id
 
 
 class GitHub:
-    def __init__(self, token=None, *, installation_app_id=None):
+    def __init__(self, token=None, *, installation_app_id=None, installation_id=None, repository=None):
         if installation_app_id is not None:
-            if type(installation_app_id) is not int or installation_app_id <= 0 or not valid_token(token):
+            if not positive_id(installation_app_id) or not valid_token(token):
                 raise ValueError('invalid installation credentials')
+        if installation_id is not None and (not positive_id(installation_id)
+                or not positive_id(installation_app_id) or not isinstance(repository, str)
+                or not REPO.fullmatch(repository)):
+            raise ValueError('invalid installation scope')
         self.installation_app_id = installation_app_id
+        self.installation_id = installation_id
+        self.installation_repository = repository
         self.token = os.environ.get('ITM_GITHUB_TOKEN') if token is None else token
         if not valid_token(self.token): raise ValueError('valid GitHub token required')
         self.opener = build_opener(NoRedirect())
@@ -64,7 +93,7 @@ class GitHub:
             with self.opener.open(req, timeout=30) as response:
                 raw=response.read(16*1024*1024+1)
                 if len(raw)>16*1024*1024: raise ValueError('API response too large')
-                return json.loads(raw)
+                return json.loads(raw, object_pairs_hook=unique_json_members)
         except HTTPError as e: raise ValueError(f'GitHub HTTP {e.code}') from None
         except URLError: raise ValueError('GitHub transport failure') from None
     def pages(self,path,key=None):
@@ -99,28 +128,59 @@ def validate_policy(p):
     names=set()
     for check in p['required_checks']:
         if not isinstance(check,dict) or set(check)!={'name','app_id'}: raise ValueError('invalid required check fields')
-        if not isinstance(check['name'],str) or not check['name'] or check['name']==CHECK_NAME or type(check['app_id']) is not int or check['app_id']<=0: raise ValueError('invalid required check')
+        if not isinstance(check['name'],str) or not check['name'] or check['name']==CHECK_NAME or not positive_id(check['app_id']): raise ValueError('invalid required check')
         if check['name'] in names: raise ValueError('duplicate check name')
         names.add(check['name'])
     roles=p['required_roles']
     if not isinstance(roles,dict) or not roles: raise ValueError('required roles must be nonempty')
     ids=set()
     for role, members in roles.items():
-        if not isinstance(role,str) or not role.strip() or not isinstance(members,list) or not members or any(type(m) is not int or m<=0 for m in members) or len(members) != len(set(members)) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
+        if not isinstance(role,str) or not role.strip() or not isinstance(members,list) or not members or any(not positive_id(m) for m in members) or len(members) != len(set(members)) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
         ids.update(members)
     return p
 
-def identity(pr):
-    return (pr['head']['sha'],pr['base']['sha'],pr['base']['ref'],pr['state'],pr['draft'],pr['head']['repo']['full_name'],pr['base']['repo']['full_name'],pr['changed_files'],pr['user']['id'])
+def identity(pr, number):
+    head, base = pr['head'], pr['base']
+    author, count, draft = pr['user']['id'], pr['changed_files'], pr['draft']
+    if (not positive_id(author) or type(count) is not int or type(draft) is not bool
+            or ('number' in pr and (not positive_id(pr['number']) or pr['number'] != number))
+            or pr['state'] not in ('open', 'closed')):
+        raise ValueError('invalid PR observation')
+    return (head['sha'], base['sha'], base['ref'], pr['state'], draft,
+            head['repo']['full_name'], base['repo']['full_name'], count, author)
+
+
+def latest_prerequisite(checks, rule, head):
+    matching = []
+    try:
+        for row in checks:
+            if not isinstance(row, dict):
+                raise ValueError('invalid check collection')
+            if row.get('name') == rule['name']:
+                check_observation(row)
+                if row['app']['id'] == rule['app_id'] and row['head_sha'] == head:
+                    matching.append(row)
+        if len({row['id'] for row in matching}) != len(matching):
+            raise ValueError('ambiguous prerequisite checks')
+    except ValueError:
+        return {}
+    return max(matching, key=lambda row: row['id'], default={})
 
 def preflight(client, repo, number, policy, *, publish=False):
     validate_policy(policy)
     app_id = getattr(client, 'installation_app_id', None)
-    if publish and (type(app_id) is not int or app_id <= 0):
+    if publish and not positive_id(app_id):
         raise ValueError('publication requires expected installation App identity')
-    if not REPO.fullmatch(repo) or type(number) is not int or number<=0 or policy['repository'].lower()!=repo.lower(): raise ValueError('repository/PR does not match policy')
+    if not REPO.fullmatch(repo) or not positive_id(number) or policy['repository'].lower()!=repo.lower(): raise ValueError('repository/PR does not match policy')
+    scoped_repo = getattr(client, 'installation_repository', None)
+    scoped_installation = getattr(client, 'installation_id', None)
+    if publish and scoped_installation is not None and not positive_id(scoped_installation):
+        raise ValueError('invalid publication installation identity')
+    if publish and scoped_repo is not None and (not isinstance(scoped_repo, str)
+                                               or scoped_repo.lower() != repo.lower()):
+        raise ValueError('installation repository mismatch')
     prefix='/repos/'+repo; route=prefix+f'/pulls/{number}'
-    pr=client.request(route); before=identity(pr); head,base,ref,state,draft,head_repo,base_repo,count,author=before
+    pr=client.request(route); before=identity(pr, number); head,base,ref,state,draft,head_repo,base_repo,count,author=before
     if not SHA.fullmatch(head) or not SHA.fullmatch(base): raise ValueError('invalid Git SHA')
     if base_repo.lower()!=repo.lower(): raise ValueError('base repository mismatch')
     if head_repo.lower()!=repo.lower(): raise ValueError('fork PRs unsupported in v0.5')
@@ -139,25 +199,32 @@ def preflight(client, repo, number, policy, *, publish=False):
     for path in paths:
         gate('scope:'+path,matches(path,policy['allowed_paths']) and not matches(path,policy['protected_paths']))
     for rule in policy['required_checks']:
-        matching=[c for c in checks if c['name']==rule['name'] and (c.get('app') or {}).get('id')==rule['app_id'] and c.get('head_sha')==head]
-        latest=max(matching,key=lambda c:c['id'],default={})
+        latest = latest_prerequisite(checks, rule, head)
         gate('check:'+rule['name'],latest.get('status')=='completed' and latest.get('conclusion')=='success')
+    review_ids = set()
+    for review in reviews:
+        if (not positive_id(review.get('id')) or review['id'] in review_ids
+                or not positive_id(review['user'].get('id'))
+                or review.get('state') not in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED',
+                                                'COMMENTED', 'PENDING')):
+            raise ValueError('invalid review observation')
+        review_ids.add(review['id'])
     latest_reviews={}
     for r in sorted(reviews,key=lambda x:x['id']):
         uid=r['user']['id']; status=r['state']
         if status in ('APPROVED','CHANGES_REQUESTED','DISMISSED'): latest_reviews[uid]=r
     approved={uid for uid,r in latest_reviews.items() if uid!=author and r['state']=='APPROVED' and r.get('commit_id')==head and r['user'].get('type')=='User'}
     for role, members in policy['required_roles'].items(): gate('approval:'+role,bool(approved.intersection(members)))
-    if identity(client.request(route))!=before: raise ValueError('PR changed during collection; retry')
+    if identity(client.request(route), number)!=before: raise ValueError('PR changed during collection; retry')
     report={'schema_version':'1.0','profile':'github-live-preflight','repository':repo,'pr':number,'head':head,'base':base,'base_ref':ref,'policy_digest':digest(policy),'paths':paths,'gates':gates,'reasons':reasons,'decision':'PASS' if not reasons else 'BLOCK','full_itm_authorization':False,'note':'PR preflight only; no verification of agent observations or full evidence bundle. GitHub enforces merge rules.'}
     if publish:
-        if identity(client.request(route))!=before: raise ValueError('PR changed before publication')
+        if identity(client.request(route), number)!=before: raise ValueError('PR changed before publication')
         payload={'name':CHECK_NAME,'head_sha':head,'status':'completed','conclusion':'failure' if reasons else 'success','external_id':digest(report),'output':{'title':'ITM preflight '+report['decision'],'summary':f'{sum(g["passed"] for g in gates)}/{len(gates)} gates passed. Base {base}. This is not full ITM merge authorization.'}}
         try:
             result = client.request(prefix+'/check-runs', payload)
             check_id = validate_check_response(result, payload, app_id)
         except Exception:
-            raise CheckPublicationUnconfirmed(repo, app_id, payload) from None
+            raise CheckPublicationUnconfirmed(repo, app_id, payload, installation_id=scoped_installation) from None
         report['published_check_id'] = check_id
         report['publication_confirmation'] = 'RESPONSE_MATCHED'
         report['published_external_id'] = payload['external_id']

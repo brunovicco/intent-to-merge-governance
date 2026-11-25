@@ -40,8 +40,8 @@ def order(config, *, historical=False):
     comps=config['components']; require(isinstance(comps,dict) and 1<=len(comps)<=32,'invalid components')
     keys=[config['executor_key']]
     for name,c in comps.items():
-        require(identifier(name) and set(c)=={'depends_on','allowed_paths','reviewer_key'},'invalid component')
-        deps=c['depends_on']; require(isinstance(deps,list) and len(set(deps))==len(deps) and all(d in comps and d!=name for d in deps),'invalid dependencies')
+        require(identifier(name) and isinstance(c, dict) and set(c)=={'depends_on','allowed_paths','reviewer_key'},'invalid component')
+        deps=c['depends_on']; require(isinstance(deps, list) and all(isinstance(d, str) and d in comps and d != name for d in deps) and len(set(deps)) == len(deps),'invalid dependencies')
         paths = c['allowed_paths']
         if semantics == SEGMENT_V2:
             validate_patterns(paths, nonempty=True)
@@ -340,6 +340,7 @@ def _verify_observation_events(p, events, status):
 
 
 def verify_receipt(config,receipt,expected_config_digest):
+    order(config, historical=True)
     require(digest(config)==expected_config_digest,'external config digest mismatch')
     require(set(receipt)=={'version','config_digest','plan','approvals','events','status','merge_authority','signature'},'invalid receipt fields')
     body={k:v for k,v in receipt.items() if k!='signature'}

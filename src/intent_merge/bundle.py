@@ -8,6 +8,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from .core import canonical, file_hash
+from .evidence_inventory import evidence_files, regular_file
 from .evidence_profile import CURRENT
 from .runner import audit, write_json
 
@@ -40,15 +41,11 @@ def inventory(root):
     root=Path(root)
     if root.is_symlink() or not root.is_dir(): raise ValueError('invalid bundle directory')
     if {p.name for p in root.iterdir()} != {'evidence','manifest.json','anchor.json','approval-trust.json','attestation.json'}: raise ValueError('unexpected bundle layout')
-    files=[]
-    for p in root.iterdir():
-        if p.is_symlink(): raise ValueError('symlinks not allowed')
-        if p.name=='evidence':
-            if not p.is_dir(): raise ValueError('invalid evidence directory')
-            files.extend(p.iterdir())
-        elif p.name!='attestation.json': files.append(p)
-        elif not p.is_file(): raise ValueError('invalid attestation file')
-    if any(p.is_symlink() or not p.is_file() for p in files): raise ValueError('non-regular evidence file')
+    files = list(evidence_files(root).values())
+    for name in ('manifest.json', 'anchor.json', 'approval-trust.json', 'attestation.json'):
+        path = regular_file(root / name)
+        if name != 'attestation.json':
+            files.append(path)
     return {p.relative_to(root).as_posix():file_hash(p) for p in sorted(files)}
 
 
@@ -62,12 +59,12 @@ def public_approval_trust(path):
 
 
 def pack(run, output, private_key):
-    run,output=Path(run).resolve(),Path(output).resolve()
-    if output.exists() or output.is_relative_to(run): raise ValueError('bundle output must be new and outside run')
+    run,output=Path(run),Path(output).resolve()
+    if output.exists() or output.is_relative_to(run.resolve()): raise ValueError('bundle output must be new and outside run')
     key=serialization.load_pem_private_key(Path(private_key).read_bytes(),password=None)
     if not isinstance(key,Ed25519PrivateKey): raise ValueError('Ed25519 signer required')
-    public_approval_trust(run/'demo-trust.json')
     audit(run,run/'anchor.json',run/'demo-trust.json')
+    public_approval_trust(run/'demo-trust.json')
     output.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output.parent) as tmp:
         stage=Path(tmp)/'bundle'; stage.mkdir(); (stage/'evidence').mkdir()

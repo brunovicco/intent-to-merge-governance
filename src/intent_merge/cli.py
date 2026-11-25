@@ -1,22 +1,24 @@
 import argparse, json
 from pathlib import Path
+from functools import partial
+from .core import load_user_json_config
 from .evidence_profile import CURRENT, PROFILES
 from .runner import run, SCENARIOS
 from .trust import audit_synthetic, audit_anchored
 from .checkpoints import normalize_session
 from .bundle import keygen, pack, verify
 from .replay import replay
-from .github import GitHub, policy_from, preflight
+from .github import GitHub, policy_from, preflight, positive_id
 from .operational import installation_client
 from .policy_schema import InvalidConfiguration
 from .cli_errors import emit_failure
 from .agent_import import import_agent
 from .explorer import render
 from .benchmark import generate, evaluate_corpus, write_reports
-from .autonomy import replay as replay_operations, gate as autonomy_gate
+from .autonomy import replay as replay_operations, gate as autonomy_gate, validate_config as validate_autonomy_config
 from .operations_demo import study
 from .changeset_demo import study as changeset_study
-from .changeset import verify_receipt
+from .changeset import verify_receipt, order
 
 def main():
     p = argparse.ArgumentParser(description='Intent-to-Merge Governance reference harness')
@@ -67,10 +69,10 @@ def main():
         elif args.cmd=='policy-replay': result=replay(args.bundle,args.public_key,args.policy,profile=args.profile)
         elif args.cmd=='github-preflight':
             policy = policy_from(args.policy)
-            if args.repo.lower() != policy['repository'].lower() or args.pr <= 0:
+            if args.repo.lower() != policy['repository'].lower() or not positive_id(args.pr):
                 raise ValueError('repository/PR does not match policy')
             if args.publish:
-                if not args.app_id or args.app_id <= 0 or not args.installation or args.installation <= 0 or args.app_key is None:
+                if not positive_id(args.app_id) or not positive_id(args.installation) or args.app_key is None:
                     raise ValueError('publication requires GitHub App installation credentials')
                 client = installation_client(args.app_id, args.installation, args.app_key, policy['repository'])
             else:
@@ -81,10 +83,10 @@ def main():
         elif args.cmd=='import-agent': result=import_agent(args.provider,args.input,args.agent_id,args.head)
         elif args.cmd=='explorer': result=render(args.bundle,args.public_key,args.output,pr_reports=args.pr_report,sessions=args.session,profile=args.profile)
         elif args.cmd=='changeset-demo': result=changeset_study(args.out)
-        elif args.cmd=='changeset-verify': result=verify_receipt(json.loads(args.config.read_text()),json.loads(args.receipt.read_text()),args.expected_config_digest)
+        elif args.cmd=='changeset-verify': result=verify_receipt(load_user_json_config(args.config, partial(order, historical=True)),json.loads(args.receipt.read_text()),args.expected_config_digest)
         elif args.cmd=='autonomy-demo': result=study(args.bundles,args.public_key,args.out)
-        elif args.cmd=='autonomy-replay': result=replay_operations(json.loads(args.config.read_text()),json.loads(args.events.read_text()),args.expected_root).summary()
-        elif args.cmd=='autonomy-gate': result=autonomy_gate(json.loads(args.config.read_text()),json.loads(args.events.read_text()),args.expected_root,args.bundle,args.public_key,profile=args.profile)
+        elif args.cmd=='autonomy-replay': result=replay_operations(load_user_json_config(args.config, validate_autonomy_config),json.loads(args.events.read_text()),args.expected_root).summary()
+        elif args.cmd=='autonomy-gate': result=autonomy_gate(load_user_json_config(args.config, validate_autonomy_config),json.loads(args.events.read_text()),args.expected_root,args.bundle,args.public_key,profile=args.profile)
         elif args.cmd=='benchmark': result=generate(args.out,args.spec,args.policy,args.workers)
         elif args.cmd=='benchmark-replay':
             result=evaluate_corpus(args.bundles,args.public_key,profile=args.profile); args.output.mkdir(parents=True,exist_ok=False); write_reports(result,args.output)
