@@ -87,8 +87,8 @@
       "sha256": "526034397d8c87f10e7f7b0e6a9a9ee3fd66eba56e4f3782947674f7fad86e66"
     },
     "docs/bandit-review.json": {
-      "bytes": 35007,
-      "sha256": "18af864dedf4d2d9dac5bc16f3be89211727767182530a81de19d119902bd727"
+      "bytes": 35017,
+      "sha256": "b3a41f31091c53c95163a483213531b6fba69e0a9bbe4e712828c5ebaf99cb94"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -115,8 +115,8 @@
       "sha256": "ef80b4bccb92951444b72a09c2c76e9af6286f5615b28383b9468f537c87aad5"
     },
     "docs/hardening.md": {
-      "bytes": 6506,
-      "sha256": "0d910e1c60b5831b391b0ab288263a30b0f4cfbf30e33a2ed7823429291f2ecd"
+      "bytes": 7431,
+      "sha256": "856529c7de0d3f9456866a471b37760181070bba70c9c1ef824e227feed39982"
     },
     "docs/migration-v2.md": {
       "bytes": 9473,
@@ -2695,12 +2695,12 @@
       "sha256": "bdec34b58d483f57aaa1340c43bd1bac338bfec3213d42667ebadca6c1e8a2a1"
     },
     "src/intent_merge/hardening.py": {
-      "bytes": 19151,
-      "sha256": "02f64b3fbea71f5d1da8410df343263cc611cf2616bb0c7283c9bb0c511954a4"
+      "bytes": 23275,
+      "sha256": "9e2ada52be3440ce1607135719504c721a607417d62ce706292e9b077c3cadf0"
     },
     "src/intent_merge/integrated.py": {
-      "bytes": 16841,
-      "sha256": "9502cd36cde882e4cd4f4e59a037a5ebcc4b1e902c18340f8c40112a725904e1"
+      "bytes": 17069,
+      "sha256": "322976b231496c115853159fcf1f8e777121e0dafe14d273b7ffc8f4649b4d7f"
     },
     "src/intent_merge/intent.py": {
       "bytes": 9158,
@@ -2798,6 +2798,10 @@
       "bytes": 3522,
       "sha256": "ec8c6188f4b77e0bc61a6183de6c27e0b8a0bb49eb07cada8f70a7398a338028"
     },
+    "tests/test_exact_payment_candidate.py": {
+      "bytes": 6387,
+      "sha256": "8153223bb4e38b68fd157b7297d9b250f1c25ed09bf15b9ee24d2f901365f6b8"
+    },
     "tests/test_final_release.py": {
       "bytes": 2873,
       "sha256": "fad5ca074bf7d6802247b73f8460ab1275d15d85e7ca089580f8af6c40fd259e"
@@ -2835,8 +2839,8 @@
       "sha256": "95a97784ee448df4f7fd049e3dc23d190f5f7ed075d5012d0c6b0bd84052a2d5"
     },
     "tests/test_publication_lifecycle.py": {
-      "bytes": 11015,
-      "sha256": "d9e038b744eff8d3bb03811860eb1f3b287462ce9a1ecd0fdf48a556cdff658c"
+      "bytes": 18492,
+      "sha256": "2fa8bcd3824b2d8690f16df68f8a245680ab3ea3925996f5107bb885699fdef1"
     },
     "tests/test_qualification_metadata.py": {
       "bytes": 1036,

@@ -20,12 +20,19 @@ SCENARIO=SCENARIOS['AUTH-201']
 SHA=re.compile(r'[0-9a-f]{40}')
 HEX=re.compile(r'[0-9a-f]{64}')
 
-def git(repo,*args):
+def git(repo,*args,bare=False):
     # Ignore inherited Git selectors and replace refs. Repo metadata itself
     # is still same-user writable; this is not a sandbox boundary.
     env={k:v for k,v in os.environ.items() if not k.startswith('GIT_')}
     env.update(GIT_CONFIG_NOSYSTEM='1',GIT_CONFIG_GLOBAL=os.devnull,GIT_NO_REPLACE_OBJECTS='1',GIT_TERMINAL_PROMPT='0')
-    return subprocess.check_output(['git','--no-replace-objects','-C',str(repo),'-c','core.hooksPath=/dev/null',*args],env=env,stderr=subprocess.DEVNULL,timeout=30)
+    location = ['-C', str(repo)]
+    if bare:
+        env.update(GIT_GRAFT_FILE=os.devnull, GIT_NO_LAZY_FETCH='1')
+        location = ['--git-dir', str(repo), '-c', 'core.commitGraph=false']
+    return subprocess.check_output(
+        ['git', '--no-replace-objects', *location, '-c', 'core.hooksPath=/dev/null', *args],
+        env=env, stderr=subprocess.DEVNULL, timeout=30,
+    )
 
 def text_git(repo,*args):return git(repo,*args).decode().strip()
 

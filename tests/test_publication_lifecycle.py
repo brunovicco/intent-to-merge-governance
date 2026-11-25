@@ -1,4 +1,5 @@
 """Adversarial transport observations and SQLite recovery boundaries."""
+import base64
 import copy
 import hashlib
 import hmac
@@ -8,7 +9,9 @@ import tempfile
 import unittest
 from functools import partial
 from pathlib import Path
+from unittest.mock import patch
 
+from intent_merge.core import canonical
 from intent_merge.github import CheckPublicationUnconfirmed, preflight
 from intent_merge.hardening import strict_gate, sweep
 from intent_merge.operational import Journal, delivery, reconcile, work_once
@@ -47,18 +50,22 @@ class PublicationLifecycleTests(unittest.TestCase):
             return copy.deepcopy(self.api.pr)
         if path.endswith('/check-runs'):
             self.posts.append(copy.deepcopy(payload))
-            self.remote = {**payload, 'id': 41, 'app': {'id': 77}}
+            self.remote = {**payload, 'id': 40 + len(self.posts), 'app': {'id': 77}}
             self.api.checks.append(self.remote)
             if self.creation_fault:
                 raise self.creation_fault
-        elif path.endswith('/check-runs/41'):
-            if method == 'PATCH':
-                self.patches.append(copy.deepcopy(payload))
-                self.remote.update(payload)
-                if self.revocation_fault == 'lost':
-                    raise OSError('mock response lost after PATCH')
-                if self.revocation_fault == 'malformed':
-                    return {**self.remote, 'id': 41.0}
+        elif '/check-runs/' in path:
+            check_id = int(path.rsplit('/', 1)[-1])
+            remote = next(row for row in self.api.checks if row['id'] == check_id)
+            if method != 'PATCH':
+                return copy.deepcopy(remote)
+            self.patches.append(copy.deepcopy(payload))
+            remote.update(payload)
+            if self.revocation_fault == 'lost':
+                raise OSError('mock response lost after PATCH')
+            if self.revocation_fault == 'malformed':
+                return {**remote, 'id': float(check_id)}
+            return copy.deepcopy(remote)
         else:
             raise AssertionError('unexpected request')
         return copy.deepcopy(self.remote)
@@ -73,10 +80,10 @@ class PublicationLifecycleTests(unittest.TestCase):
     def reconcile(self, app=77, installation=42):
         return reconcile(self.journal, self.api, self.job['id'], app, installation_id=installation)
 
-    def sweep(self, apply=True):
+    def sweep(self, apply=True, *, now=NOW+60):
         f = self.fixture
         return sweep(self.journal, self.api, self.policy, f.a, f.key.public_key(), f.r, f.trust,
-                     77, installation_id=42, now=NOW+60, apply=apply)[0]
+                     77, installation_id=42, now=now, apply=apply)[0]
 
     def reopen(self):
         self.journal.close()
@@ -223,3 +230,158 @@ class PublicationLifecycleTests(unittest.TestCase):
                 else:
                     with self.assertRaises(ValueError):
                         delivery(raw, signature, 'pull_request', 'hook', SECRET, self.job['repo'], 1)
+
+    def test_sweep_expires_during_check_get(self):
+        self.publish()
+        request = self.api.request
+
+        def advance(path, *args, **kwargs):
+            result = request(path, *args, **kwargs)
+            if path.endswith('/check-runs/41') and not kwargs.get('method'):
+                clock[0] = NOW+60
+            return result
+
+        clock = [NOW]
+        with patch('intent_merge.hardening.time.time', side_effect=lambda: clock[0]), patch.object(
+                self.api, 'request', side_effect=advance):
+            self.assertEqual(self.sweep(now=None)['status'], 'REVOKED')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 1))
+
+    def test_sweep_expires_during_publishing_recovery(self):
+        self.creation_fault = Interrupted()
+        with self.assertRaises(Interrupted):
+            self.publish()
+        self.assertEqual(self.journal.get(self.job['id'])['state'], 'PUBLISHING')
+        recover = self.journal.recover
+        clock = [NOW]
+
+        def recovery():
+            recover()
+            clock[0] = NOW+60
+
+        with patch('intent_merge.hardening.time.time', side_effect=lambda: clock[0]), patch.object(
+                self.journal, 'recover', side_effect=recovery):
+            self.assertEqual(self.sweep(now=None)['status'], 'REVOKED')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 1))
+
+    def test_sweep_expires_during_uncertain_reconciliation(self):
+        self.lost_post()
+        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_pages(NOW+60)):
+            self.assertEqual(self.sweep(now=None)['status'], 'REVOKED')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 1))
+
+    def advancing_clock_after_pages(self, final):
+        clock = [NOW]
+        pages = self.api.pages
+
+        def advance(*args, **kwargs):
+            yield from pages(*args, **kwargs)
+            clock[0] = final
+
+        self.addCleanup(setattr, self.api, 'pages', pages)
+        self.api.pages = advance
+        return lambda: clock[0]
+
+    def test_sweep_rejects_clock_regression_during_reconciliation(self):
+        self.lost_post()
+        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_pages(NOW-1)):
+            self.assertEqual(self.sweep(apply=False, now=None)['status'], 'WOULD_REVOKE')
+        self.assertEqual(self.journal.get(self.job['id'])['state'], 'UNCERTAIN')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 0))
+
+    def check_sweep_expiry(self, assertion, expiry):
+        self.fixture.setup_evidence(expires_at=NOW+assertion)
+        self.publish()
+        self.assertEqual(self.sweep(apply=False, now=NOW+expiry-1)['status'], 'CURRENT')
+        self.assertEqual(self.sweep(apply=True, now=NOW+expiry)['status'], 'REVOKED')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 1))
+
+    def test_sweep_receipt_expires_before_assertion(self):
+        self.check_sweep_expiry(assertion=90, expiry=60)
+
+    def test_sweep_assertion_expires_before_receipts(self):
+        self.check_sweep_expiry(assertion=45, expiry=45)
+
+    def test_sweep_refresh_boundary_and_revocation_acknowledgements(self):
+        self.publish()
+        request = self.api.request
+        for fault in ('lost', 'malformed', None):
+            with self.subTest(fault=fault):
+                self.remote['conclusion'] = 'success'
+                self.revocation_fault = fault
+                clock = [NOW]
+
+                def refresh(path, *args, **kwargs):
+                    result = request(path, *args, **kwargs)
+                    if path.endswith('/pulls/1'):
+                        clock[0] = NOW+60
+                    return result
+
+                with patch('intent_merge.hardening.time.time', side_effect=lambda: clock[0]), patch.object(
+                        self.api, 'request', side_effect=refresh):
+                    expected = 'REVOCATION_UNCERTAIN' if fault else 'REVOKED'
+                    self.assertEqual(self.sweep(now=None)['status'], expected)
+                self.assertEqual(self.sweep()['status'], 'ALREADY_BLOCKED')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 3))
+
+    def test_sweep_rejects_missing_or_malformed_authenticated_expiry(self):
+        self.publish()
+        f = self.fixture
+        for mutation in ('missing-assertion', 'bad-assertion', 'missing-receipt', 'bad-receipt'):
+            with self.subTest(mutation=mutation):
+                f.setup_evidence()
+                if mutation.endswith('assertion'):
+                    path = f.a / f.filename
+                    envelope = json.loads(path.read_text())
+                    artifact = envelope
+                    signer, domain = f.key, test_hardening.DOMAIN
+                else:
+                    path = f.r / f.filename
+                    artifact = json.loads(path.read_text())
+                    envelope = artifact[0]
+                    signer = f.keys[envelope['statement']['control']]
+                    domain = test_hardening.RECEIPT_DOMAIN
+                statement = envelope['statement']
+                if mutation.startswith('missing'):
+                    del statement['expires_at']
+                else:
+                    statement['expires_at'] = str(NOW+60)
+                envelope['signature'] = base64.b64encode(signer.sign(domain+canonical(statement))).decode()
+                path.write_text(json.dumps(artifact))
+                self.assertEqual(self.sweep(apply=False, now=NOW)['status'], 'WOULD_REVOKE')
+        self.assertFalse(self.patches)
+
+    def test_sweep_samples_each_row(self):
+        first = self.publish()
+        self.assertEqual(first['decision'], 'PASS')
+        self.journal.enqueue({**self.job, 'id': 'second'})
+        self.publish()
+        clock = [NOW]
+
+        def get_check(path, payload=None, *, method=None):
+            result = self.request(path, payload, method=method)
+            if path.endswith('/check-runs/42'):
+                clock[0] = NOW+60
+            return result
+
+        f = self.fixture
+        with patch('intent_merge.hardening.time.time', side_effect=lambda: clock[0]), patch.object(
+                self.api, 'request', side_effect=get_check):
+            results = sweep(self.journal, self.api, self.policy, f.a, f.key.public_key(),
+                            f.r, f.trust, 77, installation_id=42)
+        self.assertEqual([row['status'] for row in results], ['CURRENT', 'WOULD_REVOKE'])
+        self.assertEqual((len(self.posts), len(self.patches)), (2, 0))
+
+    def test_sweep_keeps_uncertain_when_exact_get_is_unconfirmed(self):
+        self.lost_post()
+        request = self.api.request
+
+        def unknown(path, *args, **kwargs):
+            if path.endswith('/check-runs/41'):
+                raise OSError('mock GET unavailable')
+            return request(path, *args, **kwargs)
+
+        with patch.object(self.api, 'request', side_effect=unknown):
+            self.assertEqual(self.sweep()['status'], 'REMOTE_STATE_UNKNOWN')
+        self.assertEqual(self.journal.get(self.job['id'])['state'], 'UNCERTAIN')
+        self.assertEqual((len(self.posts), len(self.patches)), (1, 0))
