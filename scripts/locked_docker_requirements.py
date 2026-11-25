@@ -17,7 +17,7 @@ def requirements(path):
     by_name = {p['name']: p for p in packages}
     if len(by_name) != len(packages) or set(by_name) != NAMES | {'intent-to-merge-governance'}:
         raise ValueError('unexpected dependency graph')
-    if by_name['intent-to-merge-governance']['version'] != '1.0.0':
+    if by_name['intent-to-merge-governance']['version'] != '2.0.0rc1':
         raise ValueError('unexpected project version')
     lines = []
     for name in sorted(NAMES):

@@ -23,12 +23,12 @@
       "sha256": "67774a002a6bbcea0d079e0b6a5963bcbee7acd229677e4d62137164e649f146"
     },
     "CHANGELOG.md": {
-      "bytes": 11076,
-      "sha256": "e782df0650d060b8c05b71e4b468144b8623348779f270b161659cc78e2b3947"
+      "bytes": 11891,
+      "sha256": "cedf9413a57020f9aae25dcf5aec0a54ad0f4d5e6384b6f557d92ba6e0f544a9"
     },
     "CITATION.cff": {
-      "bytes": 424,
-      "sha256": "97226f4769bd2e505ec14612e35f9dcad35c28c3e54e0241a2fdc02b8747d061"
+      "bytes": 427,
+      "sha256": "436aa2dabd1a662d45f5a91049cc7768b4cdbe4dce8e8a9aae2f66d67571c15b"
     },
     "CONTRIBUTING.md": {
       "bytes": 1005,
@@ -51,16 +51,16 @@
       "sha256": "a99c4c5e7bf0d3307362a8c7d83d733d1af54cf5177347d33b41be84d9832576"
     },
     "README.md": {
-      "bytes": 15212,
-      "sha256": "b9bc93eef1cddeb9ce7d6e9ecbd1f27716d601b7378fa70b370852c7793cb8bf"
+      "bytes": 16095,
+      "sha256": "ec951121f77708de6d130af3ab5d118099737c957be900efbcf62d733b7a069f"
     },
     "SECURITY.md": {
-      "bytes": 1199,
-      "sha256": "4adb51bc1d8a59b5c84432fb95d418a75f8aa1820d7ce635f7a80c777d37cea1"
+      "bytes": 1249,
+      "sha256": "0380da2ee46095aeb274f51d617526acf049c8123c7a94dd4d846594336c71f7"
     },
     "compose.control-plane.yaml": {
-      "bytes": 3348,
-      "sha256": "7255390dd5603a14f66ce6ab7b313a30129888a1dc4ce3cb074c4e7954687254"
+      "bytes": 3351,
+      "sha256": "1beaf764ce755dccdb67a82724c63900769fd78cd397acc676b1ee70f983a70c"
     },
     "docs/adaptive-autonomy.md": {
       "bytes": 5798,
@@ -118,6 +118,10 @@
       "bytes": 6506,
       "sha256": "0d910e1c60b5831b391b0ab288263a30b0f4cfbf30e33a2ed7823429291f2ecd"
     },
+    "docs/migration-v2.md": {
+      "bytes": 3866,
+      "sha256": "da1545359827cd289f9568bed293372aab033222b310320311b4f3510e8a16dd"
+    },
     "docs/multi-repository.md": {
       "bytes": 5241,
       "sha256": "90c416be9c4e98aea723d7828224357e8a2323ca58b0d6c6691fa6db830bed11"
@@ -141,6 +145,10 @@
     "docs/public-release.md": {
       "bytes": 4148,
       "sha256": "1823fbc3bb53de9dcb133702246ec2efa259463930115896fe1f73c43019cff6"
+    },
+    "docs/qualification-v2-rc1.md": {
+      "bytes": 4811,
+      "sha256": "7a155006c157f68cb8b16e75395837f8b4190f465afe2307f4c7e8581494e9d9"
     },
     "docs/rc2-runbook.md": {
       "bytes": 6117,
@@ -2495,12 +2503,12 @@
       "sha256": "03a5af9651ace74505ef3009fc2385abf0ee799afd8aa68ccfb1081a93419834"
     },
     "pyproject.toml": {
-      "bytes": 528,
-      "sha256": "b27ea14fdd6ba54e144a9d7054b74d70a50ad475dd33ea9342935c3fdf0a95f3"
+      "bytes": 531,
+      "sha256": "365e5b811701a186ba2fa0f6c353d6d9970bf43b69cac918570adcf54ee6a792"
     },
     "readme.pt-br.md": {
-      "bytes": 17060,
-      "sha256": "31ac2afc068dee80e6760a3c3948246c373bde50bc3a19731778b3df3473ed74"
+      "bytes": 18073,
+      "sha256": "342d45a952a92d89ac8a1033f59a932d6d9383c1148f43a4fe814545daf7f39e"
     },
     "scripts/adversarial_benchmark.py": {
       "bytes": 634,
@@ -2531,8 +2539,8 @@
       "sha256": "54741ade5a4d76657b835ad396090e1aee2c19179edf0cd55db2f17ec2436df7"
     },
     "scripts/locked_docker_requirements.py": {
-      "bytes": 1617,
-      "sha256": "0b8942d7cdcae714f3b0b8800adee7c029230acd53fc698a2126470c43ca349b"
+      "bytes": 1620,
+      "sha256": "bbad1f2ed3f3e8d709e20394869882c5dccef529c63d2ac6bb253187a727ec01"
     },
     "scripts/operational_demo.py": {
       "bytes": 5075,
@@ -2811,11 +2819,11 @@
       "sha256": "9cc0acc086d5ff2ef854f1bc79031f3d7cb4562f766ae1ff3956a6d6725ef3e4"
     },
     "uv.lock": {
-      "bytes": 51900,
-      "sha256": "891e8c8dd597002fd42e9da05725ba2a50502308b0f851ae875ed8a0ff1b2061"
+      "bytes": 51903,
+      "sha256": "b11e45b22e76a6f6f2ac058f62762a6d4777bb76bf835279910d735afdae7709"
     }
   },
-  "lockfile_status": "PRESENT_UV_CHECK_PASSED_MAINTAINER",
+  "lockfile_status": "PRESENT_UV_CHECK_PASSED_REVIEWER_OFFLINE",
   "merge_authority": false,
   "optional_dependencies": {
     "telemetry": [
@@ -2824,5 +2832,5 @@
   },
   "profile": "itm-release-inventory-v2",
   "publication_ready": false,
-  "release": "1.0.0"
+  "release": "2.0.0rc1"
 }

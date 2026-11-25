@@ -3,7 +3,7 @@
 **Entrega de software com agentes de IA vinculada a evidências, governada por políticas e com autonomia revogável.**
 
 [![Release v1.0.0](https://img.shields.io/badge/release-v1.0.0-2563EB?style=flat-square&logo=github)](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0)
-[![CI](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml)
+[![Main CI](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/ci.yml)
 [![Segurança](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/brunovicco/intent-to-merge-governance/actions/workflows/security.yml)
 [![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-64748B?style=flat-square)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
@@ -18,7 +18,11 @@ O ITM é uma **implementação de pesquisa e referência**, independente de forn
 
 > Agentes geram código. Evidências sustentam a confiança. Políticas concedem autoridade. A autonomia precisa ser revogável.
 
-**Status:** a v1.0.0 foi publicada em 24 de novembro de 2026. O projeto é experimental, não um serviço de autorização de merge para produção. `production_ready: false`; `merge_authority: false`.
+**Status:** candidato v2.0.0-rc.1, ainda não publicado. A [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) continua sendo a release pública de referência. `production_ready: false`; `merge_authority: false`.
+
+[Guia de migração](docs/migration-v2.md) · [Qualificação da RC](docs/qualification-v2-rc1.md) · [Changelog](CHANGELOG.md).
+
+O ITM governa alterações a partir de uma especificação e de um oráculo previamente definidos e confiáveis. Os verificadores atuais são específicos dos cenários experimentais; a neutralidade de fornecedor não implica generalidade de domínio.
 
 **Navegação**
 
@@ -48,9 +52,10 @@ O ITM é uma **implementação de pesquisa e referência**, independente de forn
 | CI / testes | A alteração passou nas verificações configuradas? |
 | Code review humano ou assistido por IA | A alteração é compreensível, adequada e contém problemas que precisam de revisão? |
 | [Entire CLI](https://entire.io/about/cli) | Qual contexto de sessão do agente está associado à mudança no Git? |
+| [Claude Ship](https://claude.com/resources/articles/introducing-claude-ship) | Como automatizar revisão, correção e aprovação de PRs segundo a política da equipe? |
 | **ITM (experimental)** | As evidências vinculadas ao candidato satisfazem a política definida, e a decisão continua vigente? |
 
-As camadas são complementares. A comparação descreve seus focos, não uma matriz exaustiva de funcionalidades. O ITM não substitui CI, revisão humana ou controles nativos de proteção de branches. Não foi qualificada integração com Entire nem realizado benchmark comparativo entre ferramentas.
+As camadas são complementares. A comparação descreve seus focos, não uma matriz exaustiva de funcionalidades. O ITM não substitui CI, revisão humana ou controles nativos de proteção de branches. Não foram qualificadas integrações com Entire ou Claude Ship nem realizados benchmarks comparativos entre ferramentas.
 
 ## Arquitetura
 
@@ -113,6 +118,8 @@ O segundo diagrama representa o caminho de reparo da fixture: passar na verifica
 
 ## Resultados experimentais
 
+A árvore anterior à preparação desta RC foi qualificada pelo mantenedor com 313 testes aprovados (instalação completa), 312 aprovados e um skip esperado (mínima), replay AMGB idêntico, 58 achados Bandit revisados e quatro achados de chaves públicas de fixture classificados. São resultados anteriores à mudança de versão; a RC exata ainda precisa de nova validação. Veja [qualificação](docs/qualification-v2-rc1.md).
+
 As [notas da release v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) registram a qualificação local final e as execuções posteriores bem-sucedidas do GitHub Actions no commit assinado da release.
 
 | Qualificação | Resultado observado | Escopo |
@@ -145,8 +152,7 @@ Os pilotos com Claude Code e Codex também produziram candidatos aprovados na pr
 Requisitos: Python 3.11+, Git e `uv` (a versão 0.12.10 foi usada na qualificação). Utilize uma versão compatível de uv previamente revisada; não resolva um novo lockfile implicitamente. Docker é necessário para os estudos opcionais com Docker e agentes reais, não para a fixture local abaixo.
 
 ```sh
-git clone --branch v1.0.0 https://github.com/brunovicco/intent-to-merge-governance.git
-cd intent-to-merge-governance
+# Use o checkout revisado da RC; não substitua pela tag v1.0.0.
 python3 scripts/release_inventory.py verify --require-lock
 uv sync --locked --extra telemetry
 uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/repair
