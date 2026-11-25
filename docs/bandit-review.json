@@ -240,7 +240,7 @@
       "rule": "B404",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "20e05599f8220e7944bfd362407828d85c2b9c927d3e10ab5e41bbe416c0aa10",
+      "source_sha256": "9a5faf5780860f9601313f57214b87d3bb81299dd6832d977a57713a728ee8ab",
       "line_sha256": "a82d0426409fda3ddbf4194a1fece92fcfe9db0aef281644aa27463dadbe5cd2",
       "disposition": "reviewed_import",
       "rationale": "Import only; assess the individual process call sites separately."
@@ -251,7 +251,7 @@
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "20e05599f8220e7944bfd362407828d85c2b9c927d3e10ab5e41bbe416c0aa10",
+      "source_sha256": "9a5faf5780860f9601313f57214b87d3bb81299dd6832d977a57713a728ee8ab",
       "line_sha256": "7daa0f9177e6bd56d59e3638868605635501889944a1aa68164d199be54405f3",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
@@ -262,7 +262,7 @@
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "20e05599f8220e7944bfd362407828d85c2b9c927d3e10ab5e41bbe416c0aa10",
+      "source_sha256": "9a5faf5780860f9601313f57214b87d3bb81299dd6832d977a57713a728ee8ab",
       "line_sha256": "7daa0f9177e6bd56d59e3638868605635501889944a1aa68164d199be54405f3",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."

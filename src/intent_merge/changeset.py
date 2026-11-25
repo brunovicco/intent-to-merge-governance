@@ -153,45 +153,190 @@ def verify_plan(config,p,approvals, *, historical=False):
     require(seen==set(config['components']),'missing component approval')
 
 
-def execute(config,p,approvals,repos,key,*,fault=None):
-    """Sequential local CAS updates. Fault hook is only for trusted test fixtures."""
-    verify_plan(config,p,approvals); repos=repos_checked(config,repos)
-    require(plan(config,repos)==p,'stale plan or candidate')
-    # Validate signer before any side effect.
-    probe={'config_digest':digest(config)}; verify_sig('probe',probe,sign('probe',probe,key),config['executor_key'])
-    expected={n:c['base'] for n,c in p['components'].items()}; completed=[]; ledger=Ledger()
-    def snapshot(): return {n:ref(repo,'refs/heads/main') for n,repo in repos.items()}
-    def record(kind,**data): ledger.add(kind,**data)
-    record('start',refs=snapshot()); failed=False
+RECOVERY_PROFILE = 'changeset-observation-v1'
+OBSERVATION_ERRORS = (ValueError, OSError, subprocess.SubprocessError)
+
+
+def execute(config, p, approvals, repos, key, *, fault=None):
+    """Local fixture executor: return a signed manual receipt on unknown refs.
+
+    The in-memory ledger covers handled I/O failures, not process death. Use
+    DurableChangeSet for write-ahead persistence across process interruptions.
+    """
+    verify_plan(config, p, approvals)
+    repos = repos_checked(config, repos)
+    require(plan(config, repos) == p, 'stale plan or candidate')
+    probe = {'config_digest': digest(config)}
+    verify_sig('probe', probe, sign('probe', probe, key), config['executor_key'])
+    expected = {n: c['base'] for n, c in p['components'].items()}
+    completed = []
+    ledger = Ledger()
+
+    def snapshot():
+        return {n: ref(repo, 'refs/heads/main') for n, repo in repos.items()}
+
+    def finish(status, refs):
+        ledger.add('finish', status=status, refs=refs)
+        body = {'version': config['version'], 'config_digest': digest(config),
+                'plan': p, 'approvals': approvals, 'events': ledger.events,
+                'status': status, 'merge_authority': False}
+        return {**body, 'signature': sign('receipt', body, key)}
+
+    def unknown(phase, component=None):
+        ledger.add('observation_unknown', phase=phase, component=component)
+        return finish('MANUAL_INTERVENTION', None)
+
+    initial = snapshot()  # No writes have occurred; preflight may reject.
+    require(initial == expected, 'ref drift before start')
+    ledger.add('start', refs=initial, recovery_profile=RECOVERY_PROFILE)
+    failed = False
     for n in p['order']:
+        c = p['components'][n]
         try:
-            if fault: fault('before_merge',n,repos)
-            before=snapshot()
-            require(before==expected,'ref drift before merge')
-            c=p['components'][n]
-            require(ref(repos[n],'refs/heads/candidate')==c['head'],'candidate drift')
-            result=git(repos[n],'update-ref','refs/heads/main',c['head'],c['base'],check=False)
-            require(result.returncode==0,'merge CAS failed')
-        except (ValueError,OSError,subprocess.SubprocessError) as exc:
-            record('merge_failed',component=n,reason=str(exc),refs=snapshot()); failed=True; break
-        completed.append(n); expected[n]=c['head']; record('merged',component=n,refs=snapshot())
-    status='COMPLETED'
-    if failed:
-        status='COMPENSATED' if completed else 'ABORTED'
-        for n in reversed(completed):
+            if fault:
+                fault('before_merge', n, repos)
+            require(snapshot() == expected, 'ref drift before merge')
+            require(ref(repos[n], 'refs/heads/candidate') == c['head'], 'candidate drift')
+        except OBSERVATION_ERRORS:
             try:
-                if fault: fault('before_compensate',n,repos)
-                require(snapshot()==expected,'ref drift before compensation')
-                c=p['components'][n]
-                require(git(repos[n],'update-ref','refs/heads/main',c['base'],c['head'],check=False).returncode==0,'compensation CAS failed')
-            except (ValueError,OSError,subprocess.SubprocessError) as exc:
-                record('compensation_failed',component=n,reason=str(exc),refs=snapshot()); status='MANUAL_INTERVENTION'; break
-            expected[n]=c['base']; record('compensated',component=n,refs=snapshot())
-    final=snapshot()
-    if final!=expected: status='MANUAL_INTERVENTION'
-    record('finish',status=status,refs=final)
-    body={'version':config['version'],'config_digest':digest(config),'plan':p,'approvals':approvals,'events':ledger.events,'status':status,'merge_authority':False}
-    return {**body,'signature':sign('receipt',body,key)}
+                observed = snapshot()
+            except OBSERVATION_ERRORS:
+                return unknown('merge_precheck', n)
+            ledger.add('merge_failed', component=n, reason='merge precheck failed', refs=observed)
+            failed = True
+            break
+        ledger.add('write_intent', component=n, direction='forward', old=c['base'], new=c['head'])
+        try:
+            result = git(repos[n], 'update-ref', 'refs/heads/main', c['head'], c['base'], check=False)
+            observed = snapshot()
+        except OBSERVATION_ERRORS:
+            return unknown('forward_write', n)
+        after = {**expected, n: c['head']}
+        if result.returncode == 0 and observed == after:
+            expected = after
+            completed.append(n)
+            ledger.add('merged', component=n, refs=observed)
+        elif result.returncode != 0 and observed == expected:
+            ledger.add('merge_failed', component=n, reason='merge CAS failed', refs=observed)
+            failed = True
+            break
+        else:
+            # A write may have happened or an external actor changed refs.
+            # Never compensate an unconfirmed write or overwrite drift.
+            return unknown('forward_write', n)
+
+    status = 'COMPLETED'
+    if failed:
+        status = 'COMPENSATED' if completed else 'ABORTED'
+        for n in reversed(completed):
+            c = p['components'][n]
+            try:
+                if fault:
+                    fault('before_compensate', n, repos)
+                observed = snapshot()
+                require(observed == expected, 'ref drift before compensation')
+            except OBSERVATION_ERRORS:
+                try:
+                    observed = snapshot()
+                except OBSERVATION_ERRORS:
+                    return unknown('compensation_precheck', n)
+                ledger.add('compensation_failed', component=n, reason='compensation precheck failed', refs=observed)
+                return finish('MANUAL_INTERVENTION', observed)
+            ledger.add('write_intent', component=n, direction='compensate', old=c['head'], new=c['base'])
+            try:
+                result = git(repos[n], 'update-ref', 'refs/heads/main', c['base'], c['head'], check=False)
+                observed = snapshot()
+            except OBSERVATION_ERRORS:
+                return unknown('compensation_write', n)
+            after = {**expected, n: c['base']}
+            if result.returncode == 0 and observed == after:
+                expected = after
+                ledger.add('compensated', component=n, refs=observed)
+            elif result.returncode != 0 and observed == expected:
+                ledger.add('compensation_failed', component=n, reason='compensation CAS failed', refs=observed)
+                return finish('MANUAL_INTERVENTION', observed)
+            else:
+                return unknown('compensation_write', n)
+    try:
+        final = snapshot()
+    except OBSERVATION_ERRORS:
+        return unknown('finish')
+    if final != expected:
+        status = 'MANUAL_INTERVENTION'
+    return finish(status, final)
+
+
+def _verify_observation_events(p, events, status):
+    """Replay write intents and observations; unknown is never success."""
+    expected = {n: c['base'] for n, c in p['components'].items()}
+    require(events[0]['payload'] == {'refs': expected, 'recovery_profile': RECOVERY_PROFILE}, 'invalid start')
+    completed = []
+    failed = conflict = unknown = False
+    pending = None
+    for e in events[1:-1]:
+        k, d = e['kind'], e['payload']
+        n = d.get('component')
+        require(not (conflict or unknown), 'event after terminal uncertainty')
+        forward = p['order'][len(completed)] if not failed and len(completed) < len(p['order']) else None
+        reverse = completed[-1] if failed and completed else None
+        if k == 'write_intent':
+            require(pending is None and n is not None and n in (forward, reverse), 'invalid write intent sequence')
+            c = p['components'][n]
+            direction = 'compensate' if failed else 'forward'
+            new = c['base'] if failed else c['head']
+            require(d == {'component': n, 'direction': direction, 'old': expected[n], 'new': new}, 'invalid write intent binding')
+            pending = d
+        elif k in ('merged', 'compensated'):
+            direction = 'forward' if k == 'merged' else 'compensate'
+            require(pending is not None and pending['component'] == n and pending['direction'] == direction, 'invalid write outcome sequence')
+            expected[n] = pending['new']
+            require(d == {'component': n, 'refs': expected}, 'write observation mismatch')
+            if k == 'merged':
+                completed.append(n)
+            else:
+                completed.pop()
+            pending = None
+        elif k in ('merge_failed', 'compensation_failed'):
+            require(n is not None and n == (forward if k == 'merge_failed' else reverse), 'invalid failure sequence')
+            require(set(d) == {'component', 'reason', 'refs'} and isinstance(d['reason'], str) and isinstance(d['refs'], dict)
+                    and set(d['refs']) == set(expected) and all(hexstr(v, 40) for v in d['refs'].values()), 'invalid failure observation')
+            if pending is not None:
+                require(pending['component'] == n and d['refs'] == expected, 'unconfirmed failed write')
+            pending = None
+            if k == 'merge_failed':
+                failed = True
+            else:
+                conflict = True
+        elif k == 'observation_unknown':
+            require(set(d) == {'phase', 'component'}, 'invalid observation event')
+            phase = d['phase']
+            if pending is not None:
+                require(n == pending['component'] and phase == ('forward_write' if pending['direction'] == 'forward' else 'compensation_write'), 'unknown write binding mismatch')
+            else:
+                require((phase == 'finish' and n is None and (failed and not completed or not failed and forward is None))
+                        or (phase == 'merge_precheck' and n is not None and n == forward)
+                        or (phase == 'compensation_precheck' and n is not None and n == reverse), 'invalid unknown observation sequence')
+            unknown = True
+        else:
+            raise ValueError('unexpected execution event')
+    final = events[-1]['payload']
+    require(set(final) == {'status', 'refs'} and final['status'] == status, 'invalid terminal event')
+    refs = final['refs']
+    if unknown:
+        require(refs is None and status == 'MANUAL_INTERVENTION', 'unknown refs require manual intervention')
+        return status
+    require(pending is None and isinstance(refs, dict) and set(refs) == set(expected)
+            and all(hexstr(v, 40) for v in refs.values()), 'invalid terminal observation')
+    if conflict or refs != expected:
+        derived = 'MANUAL_INTERVENTION'
+    elif failed:
+        require(not completed, 'incomplete compensation')
+        derived = 'COMPENSATED' if any(e['kind'] == 'compensated' for e in events) else 'ABORTED'
+    else:
+        require(completed == p['order'], 'incomplete success')
+        derived = 'COMPLETED'
+    require(status == derived, 'terminal state mismatch')
+    return status
 
 
 def verify_receipt(config,receipt,expected_config_digest):
@@ -201,6 +346,12 @@ def verify_receipt(config,receipt,expected_config_digest):
     verify_sig('receipt',body,receipt['signature'],config['executor_key'])
     require(type(receipt['version']) is int and receipt['version']==config['version'] and receipt['config_digest']==digest(config) and receipt['merge_authority'] is False,'receipt scope mismatch')
     p=receipt['plan']; verify_plan(config,p,receipt['approvals'], historical=True); events=receipt['events']; root=verify_chain(events)
+    require(events[0]['kind'] == 'start' and events[-1]['kind'] == 'finish', 'invalid receipt endpoints')
+    profile = events[0]['payload'].get('recovery_profile')
+    if profile is not None:
+        require(config['version'] == 2 and profile == RECOVERY_PROFILE, 'unknown recovery profile')
+        status = _verify_observation_events(p, events, receipt['status'])
+        return {'integrity':'verified','execution_replay':'verified','status':status,'ledger_root':root,'merge_authority':False,'profile':config['profile']}
     expected={n:c['base'] for n,c in p['components'].items()}; completed=[]; failed=False; conflict=False
     require(events[0]['kind']=='start' and events[0]['payload']=={'refs':expected},'invalid start')
     for e in events[1:-1]:

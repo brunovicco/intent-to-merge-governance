@@ -11,7 +11,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from .core import canonical, digest
 from .operational import CONTROLS, NAME, require, gate
-from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign
+from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign, OBSERVATION_ERRORS
 
 RECEIPT_DOMAIN = b'ITM-control-receipt-v1\0'
 BINDINGS = ('repository','pr','head','base','policy_digest')
@@ -143,10 +143,16 @@ class DurableChangeSet:
             def expected():return {n:heads[n] if n in s['completed'] else bases[n] for n in bases}
             def stop(reason):
                 s['status']='MANUAL_INTERVENTION';s['events'].append({'event':'manual','reason':reason});persist();return s
+            def observe():
+                try:
+                    return snapshot()
+                except OBSERVATION_ERRORS:
+                    return None
             # If the process died between CAS and its acknowledgement, check the
             # complete ref vector against the before and after states.
             if s['pending']:
-                pending=s['pending'];n=pending['component'];before=expected();after={**before,n:pending['new']};actual=snapshot()
+                pending=s['pending'];n=pending['component'];before=expected();after={**before,n:pending['new']};actual=observe()
+                if actual is None:return stop('refs unknown during recovery')
                 if actual==after:
                     if pending['direction']=='forward':s['completed'].append(n)
                     else:s['completed'].remove(n)
@@ -154,20 +160,35 @@ class DurableChangeSet:
                 elif actual==before:s['events'].append({'event':'reconciled_not_applied','component':n})
                 else:return stop('unexpected refs during recovery')
                 s['pending']=None;persist()
-            if snapshot()!=expected():return stop('unexpected refs before execution')
+            actual=observe()
+            if actual is None:return stop('refs unknown before execution')
+            if actual!=expected():return stop('unexpected refs before execution')
             if compensate:s['mode']='compensate';persist()
             for n in (list(reversed(s['completed'])) if s['mode']=='compensate' else [n for n in p['order'] if n not in s['completed']]):
-                if snapshot()!=expected():return stop('unexpected refs before CAS')
-                if s['mode']=='forward' and ref(repos[n],'refs/heads/candidate')!=heads[n]:return stop('candidate drift')
+                actual=observe()
+                if actual is None:return stop('refs unknown before CAS')
+                if actual!=expected():return stop('unexpected refs before CAS')
+                if s['mode']=='forward':
+                    try:
+                        candidate=ref(repos[n],'refs/heads/candidate')
+                    except OBSERVATION_ERRORS:
+                        return stop('candidate ref unknown')
+                    if candidate!=heads[n]:return stop('candidate drift')
                 old=expected()[n];new=bases[n] if s['mode']=='compensate' else heads[n]
                 s['pending']={'component':n,'old':old,'new':new,'direction':s['mode']};persist()
                 if fault:fault('before_cas',n,repos)
-                if git(repos[n],'update-ref','refs/heads/main',new,old,check=False).returncode:return stop('CAS failed')
+                try:
+                    result=git(repos[n],'update-ref','refs/heads/main',new,old,check=False)
+                except OBSERVATION_ERRORS:
+                    return stop('CAS outcome unknown')
+                if result.returncode:return stop('CAS failed')
                 if fault:fault('after_cas',n,repos)
+                actual=observe()
+                if actual is None:return stop('refs unknown after CAS')
+                if actual!={**expected(),n:new}:return stop('unexpected refs after CAS')
                 if s['mode']=='forward':s['completed'].append(n)
                 else:s['completed'].remove(n)
                 s['pending']=None;s['events'].append({'event':'cas_applied','component':n,'direction':s['mode']});persist()
-                if snapshot()!=expected():return stop('unexpected refs after CAS')
             s['status']='COMPENSATED' if s['mode']=='compensate' else 'COMPLETED';persist();return s
 
 
