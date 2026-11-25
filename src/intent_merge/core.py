@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Protocol
 from .path_policy import matches, SEGMENT_V2, LEGACY_V1
 from .policy_schema import invalid_configuration
+from .approvals import valid_context, valid_binding, verified_approval_actors
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 
@@ -54,6 +55,7 @@ def verify_chain(events):
 
 
 def approval(actor, binding, keys):
+    """Legacy fixture helper retained solely for historical compatibility."""
     payload = {"actor": actor, "binding": binding}
     key = keys[actor]
     if key.startswith("ed25519-private:"):
@@ -63,7 +65,8 @@ def approval(actor, binding, keys):
     return {**payload, "signature": signature}
 
 
-def verified_actors(policy, binding, approvals, keys, author, *, historical=False):
+def _legacy_verified_actors(policy, binding, approvals, keys, author, *, historical=False):
+    """Historical evidence only; never the fresh approval path."""
     seen = set()
     for a in approvals:
         actor = a.get("actor")
@@ -83,13 +86,27 @@ def verified_actors(policy, binding, approvals, keys, author, *, historical=Fals
     return seen
 
 
-def evaluate_policy(spec, policy, paths, checks, binding, approvals, keys, *, author, termination, current_head, current_base, eval_binding, _historical_semantics=None):
+def verified_actors(policy, binding, approvals, keys, author, *, approval_context=None, _historical_semantics=None):
+    if approval_context is None and _historical_semantics in (LEGACY_V1, SEGMENT_V2):
+        return _legacy_verified_actors(policy, binding, approvals, keys, author,
+                                       historical=_historical_semantics == LEGACY_V1)
+    return verified_approval_actors(policy, binding, approvals, keys, author, approval_context)
+
+
+def evaluate_policy(spec, policy, paths, checks, binding, approvals, keys, *, author, termination, current_head, current_base, eval_binding, approval_context=None, _historical_semantics=None):
     if _historical_semantics != LEGACY_V1:
         invalid = invalid_configuration(spec, policy)
         if invalid is not None:
             return invalid
-    actors = verified_actors(policy,binding,approvals,keys,author, historical=_historical_semantics == LEGACY_V1)
-    return evaluate_decision(spec,policy,paths,checks,binding,actors,termination=termination,current_head=current_head,current_base=current_base,eval_binding=eval_binding, _historical_semantics=_historical_semantics)
+    actors = verified_actors(policy, binding, approvals, keys, author, approval_context=approval_context, _historical_semantics=_historical_semantics)
+    decision = evaluate_decision(spec,policy,paths,checks,binding,actors,termination=termination,current_head=current_head,current_base=current_base,eval_binding=eval_binding, _historical_semantics=_historical_semantics)
+    if (_historical_semantics is None or approval_context is not None) and not valid_context(approval_context):
+        decision["authorized"] = False
+        decision["reasons"].append("invalid_approval_context")
+    if (_historical_semantics is None or approval_context is not None) and not valid_binding(binding):
+        decision["authorized"] = False
+        decision["reasons"].append("invalid_approval_binding")
+    return decision
 
 
 def evaluate_decision(spec, policy, paths, checks, binding, actors, *, termination, current_head, current_base, eval_binding, _historical_semantics=None):

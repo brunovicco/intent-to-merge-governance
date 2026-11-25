@@ -33,7 +33,7 @@ def replay(bundles, public_key, proposed_policy):
         spec=load_config(ev/'spec.toml'); old=load_config(ev/'policy.toml'); changed=validate_proposal(old,proposed)
         events=[json.loads(line) for line in (ev/'ledger.jsonl').read_text().splitlines()]
         decision=next(e['payload'] for e in events if e['kind']=='policy_decision'); i=decision['inputs']; actual=decision['decision']
-        actors=verified_actors(old,i['binding'],i['approvals'],json.loads((bundle/'approval-trust.json').read_text()),i['author'],historical=events[0]['payload'].get('path_semantics',LEGACY_V1)==LEGACY_V1)
+        actors=verified_actors(old,i['binding'],i['approvals'],json.loads((bundle/'approval-trust.json').read_text()),i['author'],approval_context=i.get('approval_context'),_historical_semantics=events[0]['payload'].get('path_semantics',LEGACY_V1))
         # Rebind only the policy digest in the *hypothetical* input. Preserve every
         # historical mismatch and never treat original signatures as new approvals.
         binding={**i['binding']}

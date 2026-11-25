@@ -1,9 +1,10 @@
 from __future__ import annotations
 import json, os, secrets, subprocess, sys, shutil
+import time
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, PublicFormat, NoEncryption
-from .core import Ledger, Proposal, approval, digest, file_hash, load_config, matches, evaluate_policy, verify_chain
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+from .core import Ledger, Proposal, digest, file_hash, load_config, matches, evaluate_policy, verify_chain
 from .fixtures import BASE, PARTIAL, FIXED, BROKEN, HARNESS, DRIFTED, SIGNATURE_DRIFT, IMPORT_DRIFT
 from .intent import validate_spec, drift, requirement_coverage, build_graph, graph_mermaid
 from .checkpoints import make_checkpoint
@@ -11,6 +12,7 @@ from .verification import WORKER, Executor, plan, evaluate, harness_digest, muta
 from .convergence import Governor
 from .path_policy import SEGMENT_V2, LEGACY_V1
 from .policy_schema import invalid_configuration
+from .approvals import PROFILE as APPROVAL_PROFILE, MAX_TTL, decision_context, sign_approval, valid_context
 
 SCENARIOS = ('happy', 'missing-approval', 'stale-approval', 'scope-violation', 'protected-path', 'loop', 'failed-eval', 'self-approval', 'stale-base', 'stale-eval', 'intent-drift', 'signature-drift', 'import-drift', 'property-regression', 'budget-exceeded', 'regression-loop')
 
@@ -87,14 +89,13 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     baseline_execution=executor.execute(BASE,WORKER,plan_data); write_json(ev/'baseline-observations.json',baseline_execution)
     mutations=mutation_report(plan_data,executor,WORKER,FIXED,baseline_execution); mutations_ok=all(m['killed'] for m in mutations); write_json(ev/'mutation-report.json',mutations)
     pairs = {actor:Ed25519PrivateKey.generate() for actor in set(policy['approvers']) | {'coding-agent'}}
-    keys = {actor:'ed25519-private:'+key.private_bytes(Encoding.Raw,PrivateFormat.Raw,NoEncryption()).hex() for actor,key in pairs.items()}
     public_keys = {actor:'ed25519-public:'+key.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw).hex() for actor,key in pairs.items()}
     trust = out/'demo-trust.json'; write_json(trust, public_keys)
     git(repo,'init','-b','main'); git(repo,'config','user.name','Governance Demo'); git(repo,'config','user.email','demo@example.invalid')
     (repo/'app').mkdir(); (repo/'app/payments.py').write_text(BASE)
     git(repo,'add','.'); git(repo,'commit','-m','Baseline'); base = git(repo,'rev-parse','HEAD'); git(repo,'checkout','-b','candidate')
     (ev/'baseline.py').write_text(BASE)
-    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',path_semantics=SEGMENT_V2,executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
+    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',path_semantics=SEGMENT_V2,approval_profile=APPROVAL_PROFILE,executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
     governor=Governor(policy); required=set(spec['criteria'])|set(policy['required_checks']); agent = FixtureAgent(scenario); feedback = {}; termination = 'iteration_budget'; author = 'coding-agent'; paths = []; checks = {}; binding = {}; history = []
     for i in range(1, policy['max_iterations']+1):
         p = agent.propose(i,feedback)
@@ -119,11 +120,16 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     eval_binding = binding.copy() if history else None
     ledger.add('termination', reason=termination, iterations=len(history))
     approvals = []
+    nonce = secrets.token_hex(16)
+    issued_at = int(time.time())
+    signing_context = decision_context(nonce, issued_at)
     if termination == 'passed':
         actors = list(policy['approvers'])
         if scenario == 'missing-approval': actors = [a for a in actors if policy['approvers'][a]!='security']
         if scenario == 'self-approval': actors = ['coding-agent']
-        approvals = [approval(a,binding,keys) for a in actors]
+        approvals = [sign_approval(a, policy['approvers'].get(a, 'self'), author,
+                                   binding, signing_context, pairs[a], issued_at=issued_at,
+                                   expires_at=issued_at + MAX_TTL) for a in actors]
         if scenario == 'stale-approval':
             # New commit retains identical code; old approvals/evaluations cannot authorize it.
             git(repo,'commit','--allow-empty','-m','New candidate after approval'); binding = {**binding,'head':git(repo,'rev-parse','HEAD')}
@@ -134,6 +140,7 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     ledger.add('approvals', approvals=approvals, simulated=True)
     current_head = git(repo,'rev-parse','candidate'); current_base = git(repo,'rev-parse','main')
     inputs = dict(paths=paths, checks=checks, binding=binding, approvals=approvals, author=author, termination=termination, current_head=current_head, current_base=current_base, eval_binding=eval_binding)
+    inputs["approval_context"] = decision_context(nonce, int(time.time()))
     decision = evaluate_policy(spec,policy,keys=public_keys,**inputs)
     ledger.add('policy_decision', inputs=inputs, decision=decision)
     merged = False
@@ -175,6 +182,12 @@ def audit(out, anchor_path, trust_path):
     verify_intent_evidence(ev,spec,events,semantics=semantics)
     verify_verification_evidence(ev,spec,policy,events)
     d = next(e['payload'] for e in events if e['kind']=='policy_decision'); inputs = d['inputs']
+    profile = init.get('approval_profile')
+    if profile == APPROVAL_PROFILE:
+        if semantics != SEGMENT_V2 or not valid_context(inputs.get('approval_context')):
+            raise ValueError('invalid recorded approval context')
+    elif profile is not None or 'approval_context' in inputs:
+        raise ValueError('unknown or inconsistent approval profile')
     replay = evaluate_policy(spec,policy,keys=keys,_historical_semantics=semantics,**inputs)
     if replay != d['decision']: raise ValueError('policy replay mismatch')
     result = events[-1]['payload']; report = json.loads((ev/'report.json').read_text())
