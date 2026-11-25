@@ -50,7 +50,7 @@ uv run intent-merge autonomy-demo --out results/autonomy-study
 ROOT=$(python -c 'import json; print(json.load(open("examples/autonomy-v1/anchor.json"))["root"])')
 uv run intent-merge autonomy-replay --config examples/autonomy-v1/config.json \
   --events examples/autonomy-v1/events.json --expected-root "$ROOT"
-uv run intent-merge autonomy-gate --config examples/autonomy-v1/config.json \
+uv run intent-merge autonomy-gate --profile historical-v1 --config examples/autonomy-v1/config.json \
   --events examples/autonomy-v1/events.json --expected-root "$ROOT" \
   --bundle examples/amgb-v1/bundles/safe-delayed --public-key examples/amgb-v1/signer.pub
 ```

@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 from .autonomy import ROLES, ZERO, sign_event, replay, gate, validate_case
 from .core import digest
+from .evidence_profile import HISTORICAL_V1
 from .bundle import verify
 from .verification import Executor, WORKER, expected, plan, evaluate as verify_cases
 from .fixtures import FIXED
@@ -19,7 +20,7 @@ def study(corpus, public_key, out):
     corpus,public_key,out=map(Path,(corpus,public_key,out)); out.mkdir(parents=True,exist_ok=False)
     names=['happy','safe-first','safe-refactor','safe-delayed','missing-approval']; refs={}
     for n in names:
-        b=corpus/n; v=verify(b,public_key); ev=b/'evidence'; first=json.loads((ev/'ledger.jsonl').read_text().splitlines()[0])['payload']; report=json.loads((ev/'report.json').read_text())
+        b=corpus/n; v=verify(b,public_key,profile=HISTORICAL_V1); ev=b/'evidence'; first=json.loads((ev/'ledger.jsonl').read_text().splitlines()[0])['payload']; report=json.loads((ev/'report.json').read_text())
         refs[n]={'root':v['ledger_root'],'head':v['candidate']};
         if n=='happy': scope={'repository':'demo/payments','agent':'coding-agent','model':'fixture-v1','profile':v['profile'],'bundle_signer':v['key_id'],**{k:first[k] for k in ('harness','policy','spec')}}
     keys={r:Ed25519PrivateKey.generate() for r in set(ROLES.values())}
@@ -29,7 +30,7 @@ def study(corpus, public_key, out):
     def add(kind,**p):
         events.append(sign_event(config,events,kind,p,keys[ROLES[kind]])); replay(config,events,root())
     def stage(label,n='happy'):
-        s=replay(config,events,root()); d=gate(config,events,root(),corpus/n,public_key); stages.append({'label':label,'scenario':n,'event_count':len(events),'level':s.level,'clean_streak':s.clean,'open_incidents':s.pending(),'gate':d})
+        s=replay(config,events,root()); d=gate(config,events,root(),corpus/n,public_key,profile=HISTORICAL_V1); stages.append({'label':label,'scenario':n,'event_count':len(events),'level':s.level,'clean_streak':s.clean,'open_incidents':s.pending(),'gate':d})
     stage('Initial eligibility')
     add('incident',id='INC-424242',severity='critical'); stage('Critical incident: circuit open')
     ops=[['register','edge',424242],['register','edge',424242],['register','edge',424243]]

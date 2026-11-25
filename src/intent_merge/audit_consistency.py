@@ -4,7 +4,8 @@ This checks recorded observations, not the existence of external Git objects.
 Historical v1 replay deliberately retains its original decision semantics.
 """
 from .approvals import valid_binding
-from .path_policy import matches
+from .core import digest
+from .evidence_patch import PAYMENT_PATH, candidate_tree, rejected_paths, verify_patch
 
 
 def _require(condition, detail):
@@ -49,38 +50,53 @@ def verify_current_evidence(ev, spec, policy, events, report):
     proposal_map = {e['hash']: e for e in proposals}
     _require(len(checkpoints) == len(evaluations), 'checkpoint inventory')
     history = []
+    used_proposals = set()
+    expected_artifacts = {name for i in range(1, len(checkpoints) + 1)
+                          for name in (f'candidate-{i}.py', f'iteration-{i}.diff')}
+    recorded_artifacts = {p.name for p in ev.iterdir()
+                          if p.name.startswith(('candidate-', 'iteration-'))}
+    _require(recorded_artifacts == expected_artifacts, 'checkpoint artifact inventory')
     baseline = (ev / 'baseline.py').read_bytes()
     for i, (checkpoint, evaluation) in enumerate(zip(checkpoints, evaluations), 1):
         cp, evaluation_data = checkpoint['payload'], evaluation['payload']
         cp_binding = cp['binding']
         _require(valid_binding(cp_binding) and all(cp_binding[k] == init[k] for k in
                  ('base', 'spec', 'policy', 'harness', 'path_semantics')), 'checkpoint binding')
+        prior_evaluation = evaluations[i-2]['seq'] if i > 1 else initial['seq']
         _require(cp['iteration'] == evaluation_data['iteration'] == i
-                 and checkpoint['seq'] < evaluation['seq'] < decision['seq'], 'checkpoint order')
+                 and prior_evaluation < checkpoint['seq'] < evaluation['seq'] < decision['seq'], 'checkpoint order')
         _require(cp['author'] == inputs['author'], 'candidate author')
         proposal = proposal_map.get(cp['universal']['proposal_event_hash'])
         _require(proposal is not None and proposal['seq'] < checkpoint['seq']
                  and proposal['payload']['agent'] == cp['author'], 'proposal identity')
         # PAY-104 records only this file. Do not silently certify unobserved files.
-        _require(set(proposal['payload']['files']) == {'app/payments.py'}, 'unsupported candidate inventory')
+        _require(set(proposal['payload']['files']) == {PAYMENT_PATH}, 'unsupported candidate inventory')
         candidate = (ev / f'candidate-{i}.py').read_bytes()
-        expected_paths = [] if candidate == baseline else ['app/payments.py']
+        _require(digest(candidate.decode('utf-8')) == proposal['payload']['files'][PAYMENT_PATH],
+                 'proposal content')
+        verify_patch((ev / f'iteration-{i}.diff').read_bytes(), baseline, candidate)
+        _require(cp['tree'] == candidate_tree(candidate), 'checkpoint tree')
+        expected_paths = [] if candidate == baseline else [PAYMENT_PATH]
         _require(cp['paths'] == expected_paths, 'checkpoint paths')
         checks = evaluation_data['checks']
-        scope = all(matches(p, spec['allowed_paths']) and not matches(p, policy['protected_paths'])
-                    for p in expected_paths)
+        scope = not rejected_paths(expected_paths, spec, policy)
         _require(checks.get('scope') is scope and checks.get('trusted_harness') is True,
                  'scope or harness observation')
         score = sum(v is True for v in checks.values())
         _require(evaluation_data['score'] == score, 'evaluation score')
         source = cp['universal']['source']
         if source == 'agent_proposal':
-            _require(checkpoint['seq'] < termination['seq'] and proposal['payload']['iteration'] == i,
+            _require(prior_evaluation < proposal['seq'] < checkpoint['seq'] < termination['seq'] and proposal['payload']['iteration'] == i,
                      'proposal iteration')
+            used_proposals.add(proposal['hash'])
             history.append({'iteration': i, 'passed': score, 'total': len(checks), 'head': cp_binding['head']})
         else:
             _require(source == 'harness_refresh' and i == len(checkpoints)
-                     and termination['seq'] < checkpoint['seq'] < approvals['seq'], 'refresh order')
+                     and i > 1 and termination['seq'] < checkpoint['seq'] < approvals['seq'], 'refresh order')
+            previous = checkpoints[i-2]['payload']
+            _require(previous['tree'] == cp['tree'] and previous['paths'] == cp['paths']
+                     and previous['universal']['proposal_event_hash'] == proposal['hash']
+                     and previous['binding']['head'] != cp_binding['head'], 'refresh candidate')
     _require(report['history'] == history and termination['payload']['iterations'] == len(history),
              'history')
     if inputs['termination'] == 'scope_rejected':
@@ -88,14 +104,20 @@ def verify_current_evidence(ev, spec, policy, events, report):
         _require(bool(proposals) and proposals[-1]['seq'] < rejection['seq'] < termination['seq'],
                  'rejected proposal order')
         paths = sorted(proposals[-1]['payload']['files'])
-        _require(inputs['paths'] == paths and bool(rejection['payload']['paths'])
-                 and set(rejection['payload']['paths']) <= set(paths)
+        disallowed = rejected_paths(paths, spec, policy)
+        _require(proposals[-1]['payload']['iteration'] == len(history) + 1
+                 and proposals[-1]['payload']['agent'] == inputs['author']
+                 and inputs['paths'] == paths and bool(disallowed)
+                 and sorted(rejection['payload']['paths']) == disallowed
                  and inputs['checks'] == {'scope': False, 'trusted_harness': True}, 'rejected proposal scope')
+        used_proposals.add(proposals[-1]['hash'])
     else:
+        _require(not any(e['kind'] == 'proposal_rejected' for e in events), 'unexpected scope rejection')
         _require(bool(checkpoints), 'missing candidate checkpoint')
         cp, evaluation = checkpoints[-1]['payload'], evaluations[-1]['payload']
         _require(cp['binding'] == binding and cp['paths'] == inputs['paths']
                  and evaluation['checks'] == inputs['checks'], 'decision checkpoint scope or checks')
+    _require(used_proposals == proposal_map.keys(), 'proposal inventory')
     if checkpoints:
         _require(checkpoints[-1]['payload']['binding'] == binding, 'latest candidate')
         # Stale-evaluation scenarios are recorded denials, not valid evidence.

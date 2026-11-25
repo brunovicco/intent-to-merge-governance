@@ -1,13 +1,14 @@
 """Static, offline Governance Explorer; verifies bundles before displaying them."""
 from html import escape
 import json
+from .evidence_profile import CURRENT
 from .bundle import verify
 
-def render(bundles, public_key, output, *, pr_reports=(), sessions=()):
+def render(bundles, public_key, output, *, pr_reports=(), sessions=(), profile=CURRENT):
     def e(v): return escape(str(v),quote=True)
     cards=[]
     for b in bundles:
-        result=verify(b,public_key)
+        result=verify(b,public_key,profile=profile)
         report=json.loads((b/'evidence/report.json').read_text())
         coverage=report.get('requirement_coverage',[])
         decision=report.get('decision',{})

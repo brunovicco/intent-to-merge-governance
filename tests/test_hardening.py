@@ -40,7 +40,7 @@ class HardeningTests(unittest.TestCase):
         s={**self.bind,'schema_version':1,'profile':'live-external-verifier','issued_at':NOW-1,'expires_at':NOW+60,'controls':dict.fromkeys(CONTROLS,True),'evidence_digest':root,**kwargs}
         (self.a/self.filename).write_text(json.dumps({'statement':s,'signature':base64.b64encode(self.key.sign(DOMAIN+canonical(s))).decode()}));(self.r/self.filename).write_text(json.dumps(receipts))
     def gate(self,now=NOW):return strict_gate(self.api,self.job,self.policy,self.a,self.key.public_key(),now,receipt_dir=self.r,control_trust=self.trust)
-    def publish(self):return work_once(self.j,self.api,self.policy,self.a,self.key.public_key(),app_id=APP,now=NOW,publish=True,gate_fn=partial(strict_gate,receipt_dir=self.r,control_trust=self.trust))
+    def publish(self):return work_once(self.j,self.api,self.policy,self.a,self.key.public_key(),app_id=APP,now=NOW,publication_clock=lambda: NOW,publish=True,gate_fn=partial(strict_gate,receipt_dir=self.r,control_trust=self.trust))
     def sweep(self,now=NOW,apply=False):return sweep(self.j,self.api,self.policy,self.a,self.key.public_key(),self.r,self.trust,APP,now=now,apply=apply)
     def test_complete_signed_receipts(self):self.setup_evidence();self.assertEqual(self.publish()['decision'],'PASS');self.assertEqual(self.sweep()[0]['status'],'CURRENT')
     def publish_with_clock(self, clock, *, after_refresh=None, after_journal=None):
@@ -92,6 +92,21 @@ class HardeningTests(unittest.TestCase):
         self.assertEqual(result['decision'], 'BLOCK')
         self.assertIn('evidence_clock_invalid_before_publication', result['reasons'])
         self.assertFalse(self.api.posts)
+
+    def test_control_receipt_expiry_is_publication_boundary(self):
+        self.setup_evidence(expires_at=NOW+90)
+        result = self.publish_with_clock([NOW], after_journal=NOW+60)
+        self.assertEqual(result['decision'], 'BLOCK')
+        self.assertFalse(self.api.posts)
+        self.assertEqual(self.j.get('d1')['state'], 'BLOCKED_BEFORE_PUBLICATION')
+
+    def test_sweep_flags_preexisting_corrupt_id(self):
+        self.setup_evidence()
+        self.publish()
+        with self.j.db:
+            self.j.db.execute("UPDATE jobs SET check_id=0 WHERE id='d1'")
+        self.assertEqual(self.sweep(apply=True)[0]['status'], 'REMOTE_STATE_UNKNOWN')
+        self.assertEqual(self.api.checks[-1]['conclusion'], 'success')
 
     def test_missing_receipt(self):self.setup_evidence(self.receipts()[:-1]);self.assertEqual(self.gate()['decision'],'BLOCK')
     def test_tampered_artifact(self):r=self.receipts();r[0]['artifact']['observations']=['tamper'];self.setup_evidence(r);self.assertEqual(self.gate()['decision'],'BLOCK')

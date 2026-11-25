@@ -15,6 +15,58 @@ Unpublished experimental candidate. Python package version: `2.0.0rc1` (PEP 440)
 
 Retain the signed v1.0.0 tag, source archive, lock, and exact trust anchors. Do not change the historical AMGB reports or keys. Reproduce them with the documented historical verifier. Do not treat the new package version as a new schema version for every evidence profile.
 
+## RC1 remediation compatibility
+
+Fresh PAY-104 evidence uses the default `current` verification profile. It requires
+the segment-v2 path contract, the v2 approval envelope and a complete challenge
+issue and claim. Each checkpoint records a regular-file Git text diff from the
+baseline to `app/payments.py`. The auditor reconciles the patch and tree with
+the recorded source and proposal. A refresh can retain a tree under a new
+commit. A rejected proposal records its attempted paths before execution.
+
+Choose `historical-v1` only when trust context independently identifies an
+archived v1 corpus or run. This selects the archived fnmatch and pre-v2 approval
+contract. Evidence metadata must agree with the selected profile. Intermediate
+approval-only profiles require their archival verifier or fresh evidence.
+
+- Pass `--profile historical-v1` with archived inputs to `audit`, `verify-bundle`,
+  `policy-replay`, `explorer`, `benchmark-replay` or `autonomy-gate`.
+- In Python, pass `profile=HISTORICAL_V1` from `intent_merge.evidence_profile` to
+  `runner.audit`, `trust.audit_synthetic`, `bundle.verify`, `replay.replay`,
+  `explorer.render`, `benchmark.evaluate_corpus` or `autonomy.gate`.
+- `audit-anchored`, `trust.audit_anchored` and new bundle packing use the current
+  contract. `autonomy-demo` is a study of the archived v1 corpus and fixes its
+  verification profile in the study code. Fresh benchmark generation uses current
+  verification.
+- The DSSE predicate, audit result fields and archived report formats retain their
+  existing wire formats. Supply stable evidence directories to offline consumers.
+
+The journaled worker uses the signed assertion expiry by default. The strict
+worker also requires independently signed receipts and takes the earliest
+expiry. Success requires an ordered clock sample after the journal commit and
+before the request, with time strictly earlier than expiry. In Python, `now`
+sets the evaluation time. Offline tests can inject an independent
+`publication_clock` callable returning integer epoch seconds. A trusted custom
+gate must return a supported profile with verified evidence and expiry to
+publish success. The CLI uses the wall clock for publication.
+
+A known pre-request denial records `BLOCKED_BEFORE_PUBLICATION`. An attempted
+write with an unconfirmed response records `UNCERTAIN` and preserves correlation.
+Use read-only reconciliation to resolve a unique matching response. Sweep flags
+a known-success row with an invalid stored ID as `REMOTE_STATE_UNKNOWN`. Older
+corrupt journals require operator inspection against independently verified
+remote state. Expiry or ref changes can occur after the request starts.
+
+Direct `github-preflight --publish` writes the distinct diagnostic
+`ITM / PR preflight` check. The evidence-gate expiry contract applies to
+`ITM / evidence gate` produced by the journaled worker. Keep diagnostic and
+lab transport checks out of required merge controls.
+
+Invalid user TOML and local spec or policy validation return structured
+`INVALID_CONFIGURATION`, with `authorized` and `merged` false, and exit 2.
+`demo` writes its configuration rejection event when the output directory can
+be created. Valid policy blocks exit 0. Unexpected operational failures exit 1.
+
 ## Steps
 
 1. Review the candidate on a separate branch and verify its exact inventory. Back up trusted evidence and registry state through an independently administered process.

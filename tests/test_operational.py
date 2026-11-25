@@ -12,7 +12,7 @@ class API(FixtureAPI):
     def __init__(self):super().__init__();self.lost=False
     def request(self,path,payload=None):
         if payload is None:return super().request(path)
-        self.posts.append((path,payload)); result={**payload,'id':44,'app':{'id':APP}};self.checks.append(result)
+        self.posts.append((path,payload)); result={**payload,'id':43+len(self.posts),'app':{'id':APP}};self.checks.append(result)
         if self.lost:raise ValueError('simulated response loss')
         return result
 class OpsTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class OpsTests(unittest.TestCase):
         self.body={'schema_version':1,'profile':'live-external-verifier','repository':'OWNER/REPO','pr':1,'head':HEAD,'base':BASE,'policy_digest':digest(self.policy),'issued_at':NOW-10,'expires_at':NOW+60,'controls':dict.fromkeys(CONTROLS,True),'evidence_digest':'c'*64}
     def assertion(self,**kw):
         body={**self.body,**kw};env={'statement':body,'signature':base64.b64encode(self.key.sign(DOMAIN+canonical(body))).decode()};(self.root/f'1-{HEAD}.json').write_text(json.dumps(env));return env
-    def work(self,**kw):return work_once(self.j,self.api,self.policy,self.root,self.key.public_key(),app_id=APP,now=NOW,**kw)
+    def work(self,**kw):return work_once(self.j,self.api,self.policy,self.root,self.key.public_key(),app_id=APP,now=NOW,publication_clock=lambda: NOW,**kw)
     def check(self):return gate(self.api,self.job,self.policy,self.root,self.key.public_key(),NOW)
     def test_valid_snapshot(self):
         self.assertion();r=self.work(publish=True);self.assertEqual(r['decision'],'PASS');self.assertFalse(r['merge_authority']);self.assertEqual(self.j.get('d1')['state'],'DONE');self.assertEqual(self.api.posts[0][1]['conclusion'],'success')
@@ -92,3 +92,122 @@ class OpsTests(unittest.TestCase):
     def test_self_required_gate(self):
         self.policy['required_checks'].append({'name':NAME,'app_id':APP});self.assertion()
         with self.assertRaisesRegex(ValueError,'itself'):self.check()
+
+    def test_installation_identity_mismatch_never_posts(self):
+        self.api.installation_app_id = APP + 1
+        self.assertion()
+        with self.assertRaisesRegex(ValueError, 'App identity mismatch'):
+            self.work(publish=True)
+        self.assertEqual(self.j.get('d1')['state'], 'QUEUED')
+        self.assertFalse(self.api.posts)
+
+    def test_malformed_acknowledgement_after_remote_creation(self):
+        from unittest.mock import patch
+        self.assertion()
+        request = self.api.request
+        for n, fields in enumerate(({'id': -1}, {'id': 0}, {'id': True}, {'id': 44.0},
+                                    {'app': {'id': 789.0}}, {'app': None}, {'head_sha': 'f'*40},
+                                    {'name': 'incorrect'}, {'status': 'queued'},
+                                    {'conclusion': 'failure'}, {'external_id': 'incorrect'},
+                                    {'app': {'id': -1}}, {'app': {'id': True}},
+                                    {'app': {'id': 0}}, {'app': {}})):
+            with self.subTest(fields=fields):
+                job_id = self.job['id'] if n == 0 else f'd{n+1}'
+                self.j.enqueue({**self.job, 'id': job_id})
+                def create(path, payload=None):
+                    result = request(path, payload)
+                    return {**result, **fields} if payload else result
+                with patch.object(self.api, 'request', side_effect=create), self.assertRaises(ValueError):
+                    self.work(publish=True)
+                job = self.j.get(job_id)
+                self.assertEqual(job['state'], 'UNCERTAIN')
+                self.assertIsNotNone(job['external_id'])
+                self.assertIsNone(job['check_id'])
+                self.assertEqual(reconcile(self.j, self.api, job_id, APP)['state'], 'DONE')
+                self.assertEqual(len(self.api.posts), n+1)
+
+    def test_reconcile_malformed_or_duplicate_correlated_acknowledgement(self):
+        from unittest.mock import patch
+        self.assertion()
+        self.api.lost = True
+        with self.assertRaises(ValueError):
+            self.work(publish=True)
+        good = self.api.checks[-1]
+        missing = {k: v for k, v in good.items() if k != 'id'}
+        for rows in ([missing], [{**good, 'id': -1}], [good, missing],
+                     [good, {**good, 'head_sha': 'f'*40}], [good, good],
+                     [good, None], [good, {}], [good, {**good, 'external_id': 'other'}],
+                     [good, {**good, 'app': {'id': 789.0}}]):
+            with self.subTest(rows=len(rows)), patch.object(self.api, 'pages', return_value=rows):
+                result = reconcile(self.j, self.api, 'd1', APP)
+                self.assertEqual(result['state'], 'UNCERTAIN')
+                self.assertEqual(self.j.get('d1')['external_id'], good['external_id'])
+        with patch.object(self.api, 'pages', return_value=[{**good, 'id': 99, 'external_id': 'other'}, good]):
+            self.assertEqual(reconcile(self.j, self.api, 'd1', APP)['state'], 'DONE')
+        self.assertEqual(len(self.api.posts), 1)
+
+    def test_default_gate_expiry_after_publishing_commit(self):
+        from unittest.mock import patch
+        self.assertion(expires_at=NOW+1)
+        clock = [NOW]
+        transition = self.j.transition
+        def commit(*args, **kwargs):
+            transition(*args, **kwargs)
+            if args[2] == 'PUBLISHING':
+                clock[0] = NOW+1
+        with patch('intent_merge.operational.time.time', side_effect=lambda: clock[0]), \
+                patch.object(self.j, 'transition', side_effect=commit):
+            report = work_once(self.j, self.api, self.policy, self.root, self.key.public_key(),
+                               app_id=APP, now=NOW, publish=True)
+        self.assertEqual(report['decision'], 'BLOCK')
+        self.assertEqual(self.j.get('d1')['state'], 'BLOCKED_BEFORE_PUBLICATION')
+        self.assertFalse(self.api.posts)
+
+    def test_default_gate_last_valid_second_and_clock_regression(self):
+        self.assertion(expires_at=NOW+2)
+        def run(clock):
+            return work_once(self.j, self.api, self.policy, self.root, self.key.public_key(),
+                             app_id=APP, now=NOW, publish=True, publication_clock=lambda: clock)
+        self.assertEqual(run(NOW-1)['decision'], 'BLOCK')
+        self.assertEqual(self.j.get('d1')['state'], 'BLOCKED_BEFORE_PUBLICATION')
+        self.assertFalse(self.api.posts)
+        self.j.enqueue({**self.job, 'id': 'last-second'})
+        self.assertEqual(run(NOW+1)['decision'], 'PASS')
+        self.assertEqual(self.j.get('last-second')['state'], 'DONE')
+        self.assertEqual(len(self.api.posts), 1)
+
+    def test_success_returned_without_valid_verified_expiry(self):
+        self.assertion()
+        for i, invalid in enumerate((None, True, float(NOW+60), 'unknown', 0)):
+            with self.subTest(invalid=invalid):
+                job_id = 'd1' if not i else 'invalid-' + str(i)
+                self.j.enqueue({**self.job, 'id': job_id})
+                def invalid_gate(*args):
+                    report = gate(*args)
+                    return {**report, 'expires_at': invalid}
+                report = self.work(publish=True, gate_fn=invalid_gate)
+                self.assertEqual(report['decision'], 'BLOCK')
+                self.assertEqual(self.j.get(job_id)['state'], 'BLOCKED_BEFORE_PUBLICATION')
+                self.assertIsNone(self.j.get(job_id)['external_id'])
+        self.assertFalse(self.api.posts)
+
+    def test_acknowledgement_missing_identifier_or_invalid_object(self):
+        from unittest.mock import patch
+        self.assertion()
+        request = self.api.request
+        for i, field in enumerate(('id', 'app', None)):
+            with self.subTest(field=field):
+                job_id = 'd1' if not i else 'missing-' + str(i)
+                self.j.enqueue({**self.job, 'id': job_id})
+                def create(path, payload=None):
+                    result = request(path, payload)
+                    if not payload:
+                        return result
+                    if field is None:
+                        return []
+                    return {k: v for k, v in result.items() if k != field}
+                with patch.object(self.api, 'request', side_effect=create), self.assertRaises(ValueError):
+                    self.work(publish=True)
+                self.assertEqual(self.j.get(job_id)['state'], 'UNCERTAIN')
+                self.assertEqual(reconcile(self.j, self.api, job_id, APP)['state'], 'DONE')
+        self.assertEqual(len(self.api.posts), 3)

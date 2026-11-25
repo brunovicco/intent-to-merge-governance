@@ -8,6 +8,7 @@ from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from .core import canonical, file_hash
+from .evidence_profile import CURRENT
 from .runner import audit, write_json
 
 PAYLOAD_TYPE = 'application/vnd.in-toto+json'
@@ -87,7 +88,7 @@ def pack(run, output, private_key):
     return {'bundle':str(output),'key_id':key_id(key.public_key()),'subjects':len(statement['subject']),'candidate':report['candidate']}
 
 
-def verify(bundle, public_key):
+def verify(bundle, public_key, *, profile=CURRENT):
     bundle=Path(bundle); files=inventory(bundle)
     key=serialization.load_pem_public_key(Path(public_key).read_bytes())
     if not isinstance(key,Ed25519PublicKey): raise ValueError('Ed25519 public key required')
@@ -107,5 +108,5 @@ def verify(bundle, public_key):
     expected_pred={'candidate':report['candidate'],'base':report['base'],'ledger_root':report['ledger_root'],'merged':report['merged'],'profile':'synthetic-demo','approval_trust':'signer-endorsed public keys','evidence_version':'0.4'}
     if pred!=expected_pred: raise ValueError('attestation predicate mismatch')
     public_approval_trust(bundle/'approval-trust.json')
-    result=audit(bundle,bundle/'anchor.json',bundle/'approval-trust.json')
+    result=audit(bundle,bundle/'anchor.json',bundle/'approval-trust.json',profile=profile)
     return {**result,'signature':'verified','key_id':key_id(key),'subjects':len(files),'candidate':report['candidate'],'profile':pred['profile']}

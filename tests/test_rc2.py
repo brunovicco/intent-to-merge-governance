@@ -9,7 +9,7 @@ spec=importlib.util.spec_from_file_location('github_lab',ROOT/'scripts/github_la
 APP=5897543
 class LabAPI(FixtureAPI):
     def __init__(self):
-        super().__init__();self.pr['head']['repo']['full_name']=lab.LAB;self.pr['base']['repo']['full_name']=lab.LAB;self.reviews=[];self.remote={};self.required=False;self.lost=False
+        super().__init__();self.installation_app_id=APP;self.pr['head']['repo']['full_name']=lab.LAB;self.pr['base']['repo']['full_name']=lab.LAB;self.reviews=[];self.remote={};self.required=False;self.lost=False
     def pages(self,path,key=None):
         if path.endswith('/rulesets'):return iter([{'id':1}])
         return super().pages(path,key)

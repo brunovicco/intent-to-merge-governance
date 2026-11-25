@@ -4,7 +4,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Protocol
 from .path_policy import matches, SEGMENT_V2, LEGACY_V1
-from .policy_schema import invalid_configuration
+from .policy_schema import InvalidConfiguration, invalid_configuration
 from .approvals import valid_context, valid_binding, verified_approval_actors
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
@@ -19,8 +19,25 @@ def digest(x):
 def file_hash(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
+def unique_json_members(pairs):
+    result = {}
+    for name, value in pairs:
+        if name in result:
+            raise ValueError('duplicate JSON member')
+        result[name] = value
+    return result
+
+
 def load_config(path):
     with open(path, 'rb') as f: return tomllib.load(f)
+
+
+def load_user_config(path):
+    """Parse user TOML. Filesystem errors remain operational failures."""
+    try:
+        return load_config(path)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError):
+        raise InvalidConfiguration('invalid_toml') from None
 
 
 @dataclass(frozen=True)

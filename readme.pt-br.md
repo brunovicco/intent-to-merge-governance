@@ -174,7 +174,7 @@ Execute em um checkout com dependências travadas após a configuração do iní
 
 | Estudo | Comando | Escopo |
 | --- | --- | --- |
-| AMGB histórico | `uv run --locked intent-merge benchmark-replay --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 traces selecionados e assinados |
+| AMGB histórico | `uv run --locked intent-merge benchmark-replay --profile historical-v1 --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 traces selecionados e assinados |
 | Ablação adversarial | `uv run --locked python scripts/adversarial_benchmark.py --out results/adversarial` | 25 candidatos selecionados |
 | Plano de controle distribuído | `uv run --locked python scripts/control_plane.py demo --out results/control-plane` | Seis controles sintéticos; 15 casos |
 | Runtime integrado | `uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/runtime` | Reparo com fixture AUTH-201 |

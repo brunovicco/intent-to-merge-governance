@@ -1,5 +1,6 @@
 import copy, json, tempfile, unittest
 from pathlib import Path
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge.github import preflight, policy_from, CHECK_NAME
 from intent_merge.agent_import import import_agent
 from intent_merge.explorer import render
@@ -67,5 +68,5 @@ class AgentExplorerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'one successfully'): import_agent('codex',p)
     def test_explorer_verified(self):
         with tempfile.TemporaryDirectory() as tmp:
-            p=Path(tmp)/'explorer.html'; s=ROOT/'examples/sample-evidence'; r=render([s/'signed-demo-bundle'],s/'demo-signer.pub',p)
+            p=Path(tmp)/'explorer.html'; s=ROOT/'examples/sample-evidence'; r=render([s/'signed-demo-bundle'],s/'demo-signer.pub',p,profile=HISTORICAL_V1)
             self.assertEqual(r['verified_bundles'],1); self.assertIn('synthetic-demo',p.read_text()); self.assertIn('not production authorization',p.read_text())

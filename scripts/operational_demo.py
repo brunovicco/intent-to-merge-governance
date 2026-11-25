@@ -30,7 +30,7 @@ def study(out):
             path.unlink(missing_ok=True);api=Fixture();db=root/(scenario+'.sqlite');j=Journal(db);j.enqueue({'id':scenario,'repo':'OWNER/REPO','pr':1,'body_sha256':digest(scenario)})
             if scenario!='missing-assertion':write({**body,**({'expires_at':NOW} if scenario=='expired-assertion' else {'profile':'synthetic-demo'} if scenario=='synthetic-profile' else {})})
             if scenario in ('lost-response','unresolved-publication'):api.lose=True
-            try:work_once(j,api,policy,assertions,key.public_key(),app_id=APP,publish=True,now=NOW)
+            try:work_once(j,api,policy,assertions,key.public_key(),app_id=APP,publish=True,now=NOW,publication_clock=lambda: NOW)
             except ValueError:
                 if not api.lose:raise
             initial=j.get(scenario)['state'];j.close();j=Journal(db)

@@ -9,6 +9,7 @@ from functools import partial
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge import runner, bundle, autonomy, benchmark, changeset
 from intent_merge.core import canonical, digest, load_config
 from intent_merge.github import policy_from
@@ -121,7 +122,7 @@ def simulate_gate(temp, local_report, verified, exact, operational, mode):
     try:
         j.enqueue(job); j.enqueue(job); require(len(j.list())==1,'dedup failed')
         try:
-            result=work_once(j,api,policy,a,agg.public_key(),app_id=APP,now=NOW,publish=True,gate_fn=gate)
+            result=work_once(j,api,policy,a,agg.public_key(),app_id=APP,now=NOW,publication_clock=lambda: NOW,publish=True,gate_fn=gate)
         except ValueError:
             require(mode=='lost-response' and j.get(job['id'])['state']=='UNCERTAIN','unexpected publication failure')
             j.close(); j=Journal(temp/'jobs.sqlite')
@@ -171,7 +172,7 @@ def local(out):
                 e=autonomy.sign_event(cfg,[],'incident',{'id':'RC-INC','severity':'critical'},keys[autonomy.ROLES['incident']]); blocked=autonomy.gate(cfg,[e],e['hash'],b,pub)
                 require(blocked['status']=='BLOCKED','incident did not block')
                 ops.append({'scenario':name,**simulate_gate(tmp/'incident-gate',report,v,exact,blocked,'incident')})
-    corpus=benchmark.evaluate_corpus(ROOT/'examples/amgb-v1/bundles',ROOT/'examples/amgb-v1/signer.pub')
+    corpus=benchmark.evaluate_corpus(ROOT/'examples/amgb-v1/bundles',ROOT/'examples/amgb-v1/signer.pub', profile=HISTORICAL_V1)
     require(corpus==read(ROOT/'examples/amgb-v1/report.json'),'AMGB replay diverged')
     cfg=read(ROOT/'examples/changeset-v1/config.json'); anchor=read(ROOT/'examples/changeset-v1/anchor.json')
     receipts=[]

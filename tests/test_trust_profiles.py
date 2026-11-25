@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge.runner import run
 from intent_merge.trust import ANCHORED, SYNTHETIC, audit_anchored, audit_synthetic
 
@@ -121,7 +122,7 @@ class TrustProfilesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'current lab profiles'):
             audit_anchored(legacy, anchor, trust, expected_anchor_sha256=sha(anchor),
                            expected_trust_sha256=sha(trust))
-        self.assertTrue(audit_synthetic(legacy, anchor, trust)['merged'])
+        self.assertTrue(audit_synthetic(legacy, anchor, trust, profile=HISTORICAL_V1)['merged'])
 
     def test_snapshot_not_original_passed_to_audit(self):
         from intent_merge.runner import audit

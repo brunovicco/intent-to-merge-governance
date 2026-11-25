@@ -9,6 +9,7 @@ from pathlib import Path
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from .core import canonical, digest
+from .evidence_profile import CURRENT
 from .bundle import verify
 from .verification import expected
 
@@ -116,11 +117,11 @@ def replay(config, events, expected_root):
     require(previous==expected_root,'external root mismatch (stale, truncated or altered stream)')
     return s
 
-def gate(config, events, expected_root, bundle, public_key):
+def gate(config, events, expected_root, bundle, public_key, *, profile=CURRENT):
     """Evaluate extra gate against a verified *historical synthetic* change.
     Never grants authority, relaxes a base approval, or writes a GitHub check.
     """
-    s=replay(config,events,expected_root); b=Path(bundle); v=verify(b,public_key)
+    s=replay(config,events,expected_root); b=Path(bundle); v=verify(b,public_key,profile=profile)
     ev=b/'evidence'; report=json.loads((ev/'report.json').read_text()); first=json.loads((ev/'ledger.jsonl').read_text().splitlines()[0])['payload']; scope=config['scope']
     require(v['key_id']==scope['bundle_signer'] and v['profile']==scope['profile'] and all(first[k]==scope[k] for k in ('harness','policy','spec')),'bundle does not match scope pins')
     r=(v['ledger_root'],v['candidate']); reasons=[]

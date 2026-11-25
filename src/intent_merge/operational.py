@@ -1,6 +1,7 @@
 """Durable single-worker GitHub App gate. No remote merge authority."""
 from __future__ import annotations
 import base64, hashlib, hmac, json, os, re, sqlite3, time, fcntl
+from collections import Counter
 from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from urllib.request import Request, build_opener
@@ -9,7 +10,10 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa, ed25519
 from cryptography.exceptions import InvalidSignature
 from .core import canonical, digest
-from .github import GitHub, NoRedirect, REPO, SHA, preflight, valid_token
+from .github import (
+    CheckPublicationUnconfirmed, GitHub, NoRedirect, REPO, preflight, valid_token,
+    positive_id, validate_check_response,
+)
 
 NAME='ITM / evidence gate'
 CONTROLS={'intent','provenance','verification','convergence','authorization','operational_autonomy'}
@@ -91,6 +95,8 @@ class Journal:
             return self.get(r['id'])
     def transition(self,id,old,new,**fields):
         require(set(fields)<= {'report','external_id','check_id'},'invalid journal field')
+        if 'check_id' in fields:
+            require(positive_id(fields['check_id']), 'invalid journal check ID')
         with self.db:
             result=self.db.execute('UPDATE jobs SET state=?'+''.join(', '+k+'=?' for k in fields)+' WHERE id=? AND state=?',(new,*fields.values(),id,old))
             require(result.rowcount==1,'invalid job transition')
@@ -115,17 +121,51 @@ def gate(client,job,policy,assertion_dir,verifier_key,now=None):
     require(all(c['name']!=NAME for c in policy['required_checks']),'gate cannot require itself')
     p=preflight(client,job['repo'],job['pr'],policy)
     now=int(time.time() if now is None else now)
-    reasons=list(p['reasons']); assertion_digest=None
+    reasons=list(p['reasons']); assertion_digest=None; expires_at=None
     try:
         path=Path(assertion_dir)/(str(job['pr'])+'-'+p['head']+'.json')
         require(not path.is_symlink() and path.is_file() and path.stat().st_size<=65536,'missing or invalid verifier assertion')
-        assertion_digest=verify_assertion(json.loads(path.read_text()),verifier_key,p,now)
+        assertion = json.loads(path.read_text())
+        assertion_digest = verify_assertion(assertion, verifier_key, p, now)
+        expires_at = assertion['statement']['expires_at']
     except (ValueError,KeyError,TypeError,OSError): reasons.append('trusted_live_assertion_missing_or_invalid')
-    return {**p,'profile':'github-app-snapshot','decision':'PASS' if not reasons else 'BLOCK','reasons':reasons,'assertion_digest':assertion_digest,'evaluated_at':now,'merge_authority':False,'note':'Snapshot only; external verifier is trusted. Not full live ITM execution or merge permission.'}
+    return {**p,'profile':'github-app-snapshot','decision':'PASS' if not reasons else 'BLOCK','reasons':reasons,'assertion_digest':assertion_digest,'expires_at':expires_at,'evaluated_at':now,'merge_authority':False,'note':'Snapshot only; external verifier is trusted. Not full live ITM execution or merge permission.'}
 
 def span(tracer,name): return tracer.start_as_current_span(name) if tracer else nullcontext(None)
 
-def work_once(journal,client,policy,assertion_dir,verifier_key,*,app_id,tracer=None,now=None,publish=False,gate_fn=gate):
+def publication_block(report, latest, checked_at):
+    first = report.get('evaluated_at')
+    refreshed = latest.get('evaluated_at')
+    expiry = latest.get('expires_at')
+    if (any(type(t) is not int for t in (first, refreshed, checked_at))
+            or not 0 <= first <= refreshed <= checked_at):
+        return 'evidence_clock_invalid_before_publication'
+    profile = latest.get('profile')
+    assertion = latest.get('assertion_digest')
+    receipts = latest.get('control_receipts')
+    if (profile not in ('github-app-snapshot', 'github-strict-snapshot')
+            or not isinstance(assertion, str) or not re.fullmatch(r'[0-9a-f]{64}', assertion)
+            or type(expiry) is not int or expiry <= 0
+            or (profile == 'github-strict-snapshot'
+                and (not isinstance(receipts, dict) or type(receipts.get('expires_at')) is not int
+                     or expiry > receipts['expires_at']))):
+        return 'verified_evidence_expiry_missing_or_invalid'
+    if checked_at >= expiry:
+        return 'evidence_expired_before_publication'
+    return None
+
+
+def work_once(journal,client,policy,assertion_dir,verifier_key,*,app_id,tracer=None,now=None,publish=False,gate_fn=gate,publication_clock=None):
+    """Process a delivery. Gate and clock injection are trusted caller inputs.
+
+    The evaluation override now only affects evaluation. The publication clock
+    returns epoch seconds and defaults to a new sample after the durable transition.
+    """
+    require(not publish or positive_id(app_id), 'invalid publication App ID')
+    installation_app_id = getattr(client, 'installation_app_id', None)
+    if publish and installation_app_id is not None:
+        require(positive_id(installation_app_id) and installation_app_id == app_id,
+                'publication App identity mismatch')
     with journal.worker_lock(),span(tracer,'itm.worker') as s:
         journal.recover(); job=journal.claim()
         if not job:return None
@@ -138,31 +178,24 @@ def work_once(journal,client,policy,assertion_dir,verifier_key,*,app_id,tracer=N
                 journal.transition(id,'RUNNING','DRY_RUN',report=json.dumps(report)); return report
             # Refresh all preflight inputs before publication, not only the head SHA.
             latest=gate_fn(client,job,policy,assertion_dir,verifier_key,now)
-            for k in ('head','base','policy_digest','decision','gates','reasons','assertion_digest','control_receipts','expires_at'):
+            for k in ('profile','head','base','policy_digest','decision','gates','reasons','assertion_digest','control_receipts','expires_at'):
                 require(latest.get(k)==report.get(k),'PR evidence changed; retry with fresh delivery')
         except Exception:
             journal.transition(id,'RUNNING','QUEUED'); raise
         external=digest({'delivery':id,'report':latest,'app_id':app_id})
-        journal.transition(id,'RUNNING','PUBLISHING',report=json.dumps(latest),external_id=external)
         payload={'name':NAME,'head_sha':latest['head'],'external_id':external,'status':'completed','conclusion':'success' if latest['decision']=='PASS' else 'failure','output':{'title':'ITM '+latest['decision'],'summary':'Snapshot gate; no merge authority. '+', '.join(latest['reasons'])[:1000]}}
+        journal.transition(id,'RUNNING','PUBLISHING',report=json.dumps(latest),external_id=external)
+        attempted = False
         try:
             with span(tracer,'itm.publish'):
-                # The strict gate may have sampled its clock before slow API
-                # collection. Check again after the write-ahead journal commit,
-                # immediately before starting a success request. The explicit
-                # now override is only for trusted deterministic lab callers.
-                if latest.get('profile') == 'github-strict-snapshot' and latest['decision'] == 'PASS':
-                    checked_at = int(time.time() if now is None else now)
-                    expiry = latest.get('expires_at')
-                    evaluated_at = latest.get('evaluated_at')
-                    first_evaluated_at = report.get('evaluated_at')
-                    if (type(evaluated_at) is not int or type(first_evaluated_at) is not int
-                            or not 0 <= first_evaluated_at <= evaluated_at <= checked_at):
-                        reason = 'evidence_clock_invalid_before_publication'
-                    elif type(expiry) is not int or checked_at >= expiry:
-                        reason = 'evidence_expired_before_publication'
-                    else:
-                        reason = None
+                if latest['decision'] == 'PASS':
+                    try:
+                        checked_at = int(time.time()) if publication_clock is None else publication_clock()
+                    except (OSError, ValueError, TypeError, OverflowError):
+                        checked_at = None
+                    if type(checked_at) is not int:
+                        checked_at = None
+                    reason = publication_block(report, latest, checked_at)
                     if reason is not None:
                         blocked = {**latest, 'decision': 'BLOCK',
                                    'reasons': [*latest['reasons'], reason],
@@ -171,18 +204,55 @@ def work_once(journal,client,policy,assertion_dir,verifier_key,*,app_id,tracer=N
                         journal.transition(id, 'PUBLISHING', 'BLOCKED_BEFORE_PUBLICATION',
                                            report=json.dumps(blocked), external_id=None)
                         return blocked
+                attempted = True
                 result=client.request('/repos/'+job['repo']+'/check-runs',payload)
-            require(result.get('external_id')==external and result.get('head_sha')==latest['head'] and (result.get('app') or {}).get('id')==app_id and result.get('name')==NAME and result.get('status')=='completed' and result.get('conclusion')==payload['conclusion'] and type(result.get('id')) is int,'unexpected check response')
-            journal.transition(id,'PUBLISHING','DONE',check_id=result['id'])
+            check_id = validate_check_response(result, payload, app_id)
+            journal.transition(id,'PUBLISHING','DONE',check_id=check_id)
         except Exception:
-            journal.transition(id,'PUBLISHING','UNCERTAIN'); raise
+            if attempted:
+                journal.transition(id, 'PUBLISHING', 'UNCERTAIN')
+                raise CheckPublicationUnconfirmed(job['repo'], app_id, payload) from None
+            if journal.get(id)['state'] == 'PUBLISHING':
+                blocked = {**latest, 'decision': 'BLOCK',
+                           'reasons': [*latest['reasons'], 'publication_preparation_failed'],
+                           'publication_attempted': False}
+                journal.transition(id, 'PUBLISHING', 'BLOCKED_BEFORE_PUBLICATION',
+                                   report=json.dumps(blocked), external_id=None)
+            raise
         return latest
 
 def reconcile(journal,client,id,app_id):
     with journal.worker_lock():
         journal.recover(); job=journal.get(id); require(job and job['state']=='UNCERTAIN','job not uncertain')
-        r=json.loads(job['report']); expected='success' if r['decision']=='PASS' else 'failure'
-        rows=client.pages('/repos/'+job['repo']+'/commits/'+r['head']+'/check-runs?filter=all','check_runs')
-        matches=[c for c in rows if c.get('external_id')==job['external_id'] and c.get('name')==NAME and c.get('head_sha')==r['head'] and (c.get('app') or {}).get('id')==app_id and c.get('status')=='completed' and c.get('conclusion')==expected]
-        if len(matches)!=1:return {'state':'UNCERTAIN','matches':len(matches),'note':'No automatic retry; inspect remote state.'}
-        journal.transition(id,'UNCERTAIN','DONE',check_id=matches[0]['id']); return {'state':'DONE','check_id':matches[0]['id']}
+        r = json.loads(job['report'])
+        expected = {'external_id': job['external_id'], 'name': NAME, 'head_sha': r['head'],
+                    'status': 'completed', 'conclusion': 'success' if r['decision'] == 'PASS' else 'failure'}
+        require(isinstance(job['external_id'], str) and bool(job['external_id'])
+                and positive_id(app_id), 'invalid publication correlation')
+        route = '/repos/' + job['repo'] + '/commits/' + r['head'] + '/check-runs?filter=all'
+        matches = []
+        check_ids = Counter()
+        ambiguous = False
+        for row in client.pages(route, 'check_runs'):
+            if not isinstance(row, dict):
+                ambiguous = True
+                continue
+            if positive_id(row.get('id')):
+                check_ids[row['id']] += 1
+            external = row.get('external_id')
+            if external == expected['external_id']:
+                matches.append(row)
+            elif ((not isinstance(external, str) or not external)
+                  and (not isinstance(row.get('name'), str) or not row['name'] or row['name'] == NAME)):
+                ambiguous = True
+        if len(matches) == 1 and not ambiguous:
+            try:
+                check_id = validate_check_response(matches[0], expected, app_id)
+            except ValueError:
+                pass
+            else:
+                if check_ids[check_id] == 1 and check_id <= 2**63 - 1:
+                    journal.transition(id, 'UNCERTAIN', 'DONE', check_id=check_id)
+                    return {'state': 'DONE', 'check_id': check_id}
+        return {'state': 'UNCERTAIN', 'matches': len(matches),
+                'note': 'No automatic retry; inspect remote state.'}

@@ -11,9 +11,8 @@ import re
 import tempfile
 from pathlib import Path
 
-from .approval_registry import PROFILE as REGISTRY_PROFILE
-from .approvals import PROFILE as APPROVAL_PROFILE
-from .path_policy import SEGMENT_V2
+from .core import unique_json_members
+from .evidence_profile import CURRENT
 from .runner import audit
 
 SYNTHETIC = "synthetic-historical-v1"
@@ -46,16 +45,8 @@ def _read(path, limit):
     return data
 
 
-def _unique_pairs(pairs):
-    result = {}
-    for key, value in pairs:
-        _require(key not in result, "duplicate JSON member")
-        result[key] = value
-    return result
-
-
 def _decode(data):
-    return json.loads(data.decode("utf-8"), object_pairs_hook=_unique_pairs)
+    return json.loads(data.decode("utf-8"), object_pairs_hook=unique_json_members)
 
 
 def _pinned(path, expected):
@@ -83,9 +74,9 @@ def _historical_result(result, profile):
             "production_ready": False}
 
 
-def audit_synthetic(out, anchor_path, trust_path):
+def audit_synthetic(out, anchor_path, trust_path, *, profile=CURRENT):
     """Compatibility mode; trust is not independently established."""
-    return _historical_result(audit(out, anchor_path, trust_path), SYNTHETIC)
+    return _historical_result(audit(out, anchor_path, trust_path, profile=profile), SYNTHETIC)
 
 
 def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
@@ -137,11 +128,6 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
         first = _decode(ledger[0])
         _require(isinstance(first, dict) and first.get("kind") == "intent_registered"
                  and isinstance(first.get("payload"), dict), "invalid initial ledger event")
-        init = first["payload"]
-        _require(init.get("path_semantics") == SEGMENT_V2
-                 and init.get("approval_profile") == APPROVAL_PROFILE
-                 and init.get("challenge_profile") == REGISTRY_PROFILE,
-                 "anchored audit requires current lab profiles")
         result = audit(stage, stage / "anchor.json", stage / "approval-trust.json")
     return {**_historical_result(result, ANCHORED), "pins_verified": True,
             "anchor_sha256": expected_anchor_sha256,

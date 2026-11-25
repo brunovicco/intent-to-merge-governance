@@ -112,6 +112,11 @@ def _public_key(value):
     return Ed25519PublicKey.from_public_bytes(bytes.fromhex(raw))
 
 
+def current_envelope(envelope):
+    return (isinstance(envelope, dict) and set(envelope) == _BODY_FIELDS | {"signature"}
+            and envelope["profile"] == PROFILE and envelope["audience"] == AUDIENCE)
+
+
 def verified_approval_actors(policy, binding, approvals, keys, author, context):
     """Verify only v2 envelopes, against caller-supplied context, never envelope time."""
     if not (valid_context(context) and valid_binding(binding) and _name(author)
@@ -125,7 +130,7 @@ def verified_approval_actors(policy, binding, approvals, keys, author, context):
     counts = Counter(ids.values())
     verified = set()
     for envelope in approvals:
-        if not isinstance(envelope, dict) or set(envelope) != _BODY_FIELDS | {"signature"}:
+        if not current_envelope(envelope):
             continue
         actor = envelope["actor"]
         if not _name(actor) or actor == author or actor not in policy["approvers"]:
@@ -133,8 +138,7 @@ def verified_approval_actors(policy, binding, approvals, keys, author, context):
         if actor not in ids or counts[ids[actor]] != 1:
             continue
         if not (
-            envelope["profile"] == PROFILE and envelope["audience"] == AUDIENCE
-            and envelope["nonce"] == context["nonce"] and envelope["author"] == author
+            envelope["nonce"] == context["nonce"] and envelope["author"] == author
             and envelope["role"] == policy["approvers"][actor]
             and envelope["key_id"] == ids[actor] and envelope["binding"] == binding
             and _valid_lifetime(envelope["issued_at"], envelope["expires_at"])

@@ -33,7 +33,7 @@ jobs:
           python scripts/operational_demo.py --out results/operational-study
           cmp examples/operational-v1/report.json results/operational-study/report.json
       - run: |
-          intent-merge benchmark-replay --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay
+          intent-merge benchmark-replay --profile historical-v1 --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay
           cmp examples/amgb-v1/report.json results/amgb-replay/report.json
       - run: |
           intent-merge changeset-demo --out results/changeset-study

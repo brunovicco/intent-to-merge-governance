@@ -47,10 +47,19 @@ class SemanticEvidenceTests(unittest.TestCase):
 
     def reseal(self):
         prev = '0'*64
+        proposal_hashes = {}
         for i, event in enumerate(self.events):
+            if event['kind'] == 'checkpoint':
+                cp = event['payload']['universal']
+                cp['proposal_event_hash'] = proposal_hashes[cp['proposal_event_hash']]
+            old_hash = event['hash']
             event.update(seq=i, prev=prev)
             event.pop('hash', None)
             event['hash'] = prev = digest(event)
+            if event['kind'] == 'proposal':
+                proposal_hashes[old_hash] = prev
+        write_json(self.ev/'checkpoints.json',
+                   [e['payload']['universal'] for e in self.events if e['kind'] == 'checkpoint'])
         (self.ev/'ledger.jsonl').write_text(''.join(json.dumps(e, sort_keys=True)+'\n' for e in self.events))
         self.report['ledger_root'] = prev
         spec = load_config(self.ev/'spec.toml')
@@ -106,10 +115,9 @@ class SemanticEvidenceTests(unittest.TestCase):
         self.report['history'][0]['head'] = 'f'*40
         self.assert_rejected('semantic evidence mismatch: history')
 
-    def test_signed_inconsistent_predicate_and_report(self):
-        self.report['candidate'] = 'f'*40
+    def signed_copy(self):
         self.reseal()
-        b = self.out.parent/'signed'
+        b = Path(tempfile.mkdtemp(dir=self.out.parent))/'signed'
         shutil.copytree(self.bundle, b)
         shutil.copyfile(self.out/'manifest.json', b/'manifest.json')
         shutil.copyfile(self.out/'anchor.json', b/'anchor.json')
@@ -118,6 +126,7 @@ class SemanticEvidenceTests(unittest.TestCase):
         envelope = json.loads((b/'attestation.json').read_text())
         statement = json.loads(base64.b64decode(envelope['payload']))
         statement['predicate']['candidate'] = self.report['candidate']
+        statement['predicate']['ledger_root'] = self.report['ledger_root']
         statement['subject'] = [{'name':name, 'digest':{'sha256':sha}} for name,sha in inventory(b).items()]
         key = serialization.load_pem_private_key(self.private.read_bytes(), password=None)
         payload = canonical(statement)
@@ -125,5 +134,88 @@ class SemanticEvidenceTests(unittest.TestCase):
         envelope['signatures'] = [{'keyid':key_id(key.public_key()),
                                    'sig':base64.b64encode(key.sign(pae(PAYLOAD_TYPE,payload))).decode()}]
         write_json(b/'attestation.json', envelope)
+        return b
+
+    def test_signed_inconsistent_predicate_and_report(self):
+        self.report['candidate'] = 'f'*40
         with self.assertRaisesRegex(ValueError, 'semantic evidence mismatch: terminal candidate'):
-            verify(b, self.public)
+            verify(self.signed_copy(), self.public)
+
+    def replace_patch(self, transform):
+        path = self.ev/'iteration-1.diff'
+        original = path.read_bytes()
+        changed = transform(original)
+        self.assertNotEqual(original, changed)
+        path.write_bytes(changed)
+        cp = self.payload('checkpoint')
+        cp['diff_hash'] = file_hash(path)
+        cp['universal']['diff_sha256'] = cp['diff_hash']
+        self.payload('convergence')['diff_bytes'] = len(changed)
+        write_json(self.ev/'convergence.json',
+                   [e['payload'] for e in self.events if e['kind'] == 'convergence'])
+        write_json(self.ev/'checkpoints.json',
+                   [e['payload']['universal'] for e in self.events if e['kind'] == 'checkpoint'])
+
+    def test_signed_patch_path(self):
+        self.replace_patch(lambda p: p.replace(b'app/payments.py', b'app/shadowed.py'))
+        with self.assertRaisesRegex(ValueError, 'patch'):
+            verify(self.signed_copy(), self.public)
+
+    def test_signed_patch_content(self):
+        self.replace_patch(lambda p: p.replace(b'raise ValueError', b'raise TypeError', 1))
+        with self.assertRaisesRegex(ValueError, 'patch'):
+            verify(self.signed_copy(), self.public)
+
+    def test_signed_extra_patch_path(self):
+        self.replace_patch(lambda p: p + p.replace(b'app/payments.py', b'app/shadowed.py'))
+        with self.assertRaisesRegex(ValueError, 'patch'):
+            verify(self.signed_copy(), self.public)
+
+    def test_signed_missing_challenge_profile(self):
+        self.payload('intent_registered').pop('challenge_profile')
+        self.events = [e for e in self.events if not e['kind'].startswith('approval_challenge_')]
+        with self.assertRaises(ValueError):
+            verify(self.signed_copy(), self.public)
+
+
+    def test_signed_unsupported_patch_structures(self):
+        original = (self.ev/'iteration-1.diff').read_bytes()
+        for suffix in (b'rename from app/payments.py\n', b'copy to app/other.py\n', b'@@ -1 +1 @@\n'):
+            with self.subTest(suffix=suffix):
+                self.replace_patch(lambda _: original + suffix)
+                with self.assertRaisesRegex(ValueError, 'patch'):
+                    verify(self.signed_copy(), self.public)
+
+    def test_signed_current_profile_marker_mismatch(self):
+        for field in ('schema_version', 'path_semantics', 'approval_profile', 'challenge_profile'):
+            with self.subTest(field=field):
+                init = self.payload('intent_registered')
+                old = init[field]
+                init[field] = 'unsupported'
+                bundle = self.signed_copy()
+                init[field] = old
+                with self.assertRaisesRegex(ValueError, 'current lab profiles'):
+                    verify(bundle, self.public)
+
+    def test_signed_incomplete_challenge_events(self):
+        self.events = [e for e in self.events if e['kind'] != 'approval_challenge_claimed']
+        with self.assertRaisesRegex(ValueError, 'challenge evidence'):
+            verify(self.signed_copy(), self.public)
+
+    def test_signed_mixed_approval_envelopes(self):
+        old = ROOT/'examples/amgb-v1/bundles/happy/evidence/ledger.jsonl'
+        legacy = next(e['payload']['approvals'][0] for e in map(json.loads, old.read_text().splitlines())
+                      if e['kind'] == 'approvals')
+        self.payload('approvals')['approvals'].append(legacy)
+        self.payload('policy_decision')['inputs']['approvals'].append(legacy)
+        with self.assertRaisesRegex(ValueError, 'approval profile'):
+            verify(self.signed_copy(), self.public)
+
+    def test_historical_verification_is_explicit(self):
+        from intent_merge.evidence_profile import HISTORICAL_V1
+        corpus = ROOT/'examples/amgb-v1'
+        with self.assertRaisesRegex(ValueError, 'current lab profiles'):
+            verify(corpus/'bundles/happy', corpus/'signer.pub')
+        self.assertTrue(verify(corpus/'bundles/happy', corpus/'signer.pub', profile=HISTORICAL_V1)['merged'])
+        with self.assertRaisesRegex(ValueError, 'historical evidence profile'):
+            verify(self.bundle, self.public, profile=HISTORICAL_V1)

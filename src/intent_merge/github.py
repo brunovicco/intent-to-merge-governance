@@ -1,11 +1,12 @@
 """Live GitHub preflight. Separate from synthetic evidence and merge authority."""
 from __future__ import annotations
-import json, os, re, tomllib
+import json, os, re
 from .path_policy import matches, validate_patterns, SEGMENT_V2
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from .core import digest
+from .core import digest, load_user_config
+from .policy_schema import InvalidConfiguration
 
 SHA = re.compile(r'[0-9a-f]{40}')
 REPO = re.compile(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+')
@@ -22,8 +23,25 @@ def valid_token(token):
     )
 
 
+def positive_id(value):
+    return type(value) is int and value > 0
+
+
+def validate_check_response(response, expected, app_id, *, check_id=None):
+    """Return the positive ID of a matching check response."""
+    app = response.get('app') if isinstance(response, dict) else None
+    fields = ('name', 'head_sha', 'external_id', 'status', 'conclusion')
+    if (not isinstance(response, dict) or not positive_id(response.get('id'))
+            or not positive_id(app_id) or not isinstance(app, dict)
+            or not positive_id(app.get('id')) or app['id'] != app_id
+            or any(field not in response or response[field] != expected[field] for field in fields)
+            or (check_id is not None and (not positive_id(check_id) or response['id'] != check_id))):
+        raise ValueError('unexpected check response')
+    return response['id']
+
+
 class CheckPublicationUnconfirmed(ValueError):
-    """A diagnostic POST may have taken effect; never retry it blindly."""
+    """A check creation POST may have taken effect."""
     def __init__(self, repo, app_id, payload):
         super().__init__('check publication not confirmed')
         self.correlation = {'repository': repo, 'app_id': app_id,
@@ -59,10 +77,13 @@ class GitHub:
         raise ValueError('pagination limit reached; refusing incomplete evidence')
 
 def policy_from(path):
-    p=tomllib.loads(path.read_text())
+    p = load_user_config(path)
     if 'path_semantics' not in p:
         p['path_semantics'] = SEGMENT_V2
-    return validate_policy(p)
+    try:
+        return validate_policy(p)
+    except ValueError as exc:
+        raise InvalidConfiguration(str(exc)) from None
 
 def validate_policy(p):
     if not isinstance(p,dict) or type(p.get('version')) is not int or p.get('version')!=1: raise ValueError('unsupported PR policy')
@@ -85,7 +106,7 @@ def validate_policy(p):
     if not isinstance(roles,dict) or not roles: raise ValueError('required roles must be nonempty')
     ids=set()
     for role, members in roles.items():
-        if not isinstance(role,str) or not role.strip() or not isinstance(members,list) or not members or any(type(m) is not int or m<=0 for m in members) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
+        if not isinstance(role,str) or not role.strip() or not isinstance(members,list) or not members or any(type(m) is not int or m<=0 for m in members) or len(members) != len(set(members)) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
         ids.update(members)
     return p
 
@@ -134,14 +155,10 @@ def preflight(client, repo, number, policy, *, publish=False):
         payload={'name':CHECK_NAME,'head_sha':head,'status':'completed','conclusion':'failure' if reasons else 'success','external_id':digest(report),'output':{'title':'ITM preflight '+report['decision'],'summary':f'{sum(g["passed"] for g in gates)}/{len(gates)} gates passed. Base {base}. This is not full ITM merge authorization.'}}
         try:
             result = client.request(prefix+'/check-runs', payload)
-            if (not isinstance(result, dict) or type(result.get('id')) is not int or result['id'] <= 0
-                    or not isinstance(result.get('app'), dict)
-                    or type(result['app'].get('id')) is not int or result['app']['id'] != app_id
-                    or any(result.get(k) != payload[k] for k in ('name', 'head_sha', 'status', 'conclusion', 'external_id'))):
-                raise ValueError('unexpected check response')
+            check_id = validate_check_response(result, payload, app_id)
         except Exception:
             raise CheckPublicationUnconfirmed(repo, app_id, payload) from None
-        report['published_check_id'] = result['id']
+        report['published_check_id'] = check_id
         report['publication_confirmation'] = 'RESPONSE_MATCHED'
         report['published_external_id'] = payload['external_id']
     return report

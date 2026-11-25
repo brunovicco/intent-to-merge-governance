@@ -10,6 +10,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from .core import canonical, digest
+from .github import positive_id, validate_check_response
+from .policy_schema import InvalidConfiguration
 from .operational import CONTROLS, NAME, require, gate
 from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign, OBSERVATION_ERRORS
 
@@ -58,7 +60,7 @@ def strict_gate(client,job,policy,assertion_dir,verifier_key,now=None,*,receipt_
         require(digest(assertion)==report['assertion_digest'],'assertion changed')
         require(assertion['statement']['evidence_digest']==result['evidence_digest'],'aggregate evidence binding mismatch')
         report['control_receipts']=result
-        report['expires_at']=min(result['expires_at'],assertion['statement']['expires_at'])
+        report['expires_at']=min(result['expires_at'],report['expires_at'])
     except (ValueError,KeyError,TypeError,OSError,AttributeError):
         report['reasons'].append('independent_control_evidence_missing_or_invalid')
     report['decision']='PASS' if not report['reasons'] else 'BLOCK'
@@ -75,13 +77,19 @@ def sweep(journal,client,policy,assertion_dir,verifier_key,receipt_dir,control_t
     now=int(time.time() if now is None else now); results=[]
     with journal.worker_lock():
         for row in journal.list():
-            if row['state']!='DONE' or not row['check_id'] or not row['report']: continue
+            if row['state']!='DONE' or not row['report']: continue
             old=json.loads(row['report'])
             if old.get('decision')!='PASS' or row['repo'].lower()!=policy['repository'].lower(): continue
+            if not positive_id(row['check_id']):
+                results.append({'id':row['id'],'status':'REMOTE_STATE_UNKNOWN'})
+                continue
             path=f"/repos/{row['repo']}/check-runs/{row['check_id']}"
+            expected = {'head_sha': old['head'], 'external_id': row['external_id'],
+                        'name': NAME, 'status': 'completed'}
             try:
                 remote=client.request(path)
-                require(remote['id']==row['check_id'] and remote['head_sha']==old['head'] and remote['external_id']==row['external_id'] and remote['name']==NAME and remote['app']['id']==app_id,'check identity mismatch')
+                validate_check_response(remote, {**expected, 'conclusion': remote['conclusion']},
+                                        app_id, check_id=row['check_id'])
                 if remote['status']=='completed' and remote['conclusion'] in ('failure','action_required','cancelled','timed_out','stale'):
                     results.append({'id':row['id'],'status':'ALREADY_BLOCKED'}); continue
             except Exception:
@@ -95,7 +103,8 @@ def sweep(journal,client,policy,assertion_dir,verifier_key,receipt_dir,control_t
             else:
                 try:
                     response=client.request(path,{'status':'completed','conclusion':'failure','output':{'title':'ITM evidence revoked','summary':'Evidence no longer current; fresh evaluation required.'}},method='PATCH')
-                    require(response['id']==row['check_id'] and response['head_sha']==old['head'] and response['app']['id']==app_id and response['name']==NAME and response['external_id']==row['external_id'] and response['conclusion']=='failure','revocation not confirmed')
+                    validate_check_response(response, {**expected, 'conclusion': 'failure'},
+                                            app_id, check_id=row['check_id'])
                     status='REVOKED'
                 except Exception: status='REVOCATION_UNCERTAIN'
             results.append({'id':row['id'],'status':status})
@@ -205,7 +214,12 @@ def verify_payment_candidate(repo,base,head,spec,*,backend='docker',trusted_fixt
     from .intent import validate_spec, drift, requirement_coverage
     require(hexstr(base,40) and hexstr(head,40) and base!=head,'invalid commit binding')
     require(backend=='docker' or (backend=='local' and trusted_fixture),'local execution restricted to trusted fixtures')
-    validate_spec(spec);require(spec['id']=='PAY-104' and spec['allowed_paths']==['app/payments.py'],'unsupported demo spec')
+    try:
+        validate_spec(spec)
+    except ValueError:
+        raise InvalidConfiguration('invalid_spec') from None
+    if spec['id'] != 'PAY-104' or spec['allowed_paths'] != ['app/payments.py']:
+        raise InvalidConfiguration('unsupported_demo_spec')
     repo=Path(repo).resolve(strict=True)
     require(git(repo,'rev-parse','--is-bare-repository').stdout.strip()==b'true','trusted bare Git clone required')
     require(git(repo,'merge-base','--is-ancestor',base,head,check=False).returncode==0,'candidate not descended from base')

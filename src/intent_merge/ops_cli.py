@@ -6,9 +6,10 @@ from cryptography.hazmat.primitives import serialization
 from .github import policy_from,REPO
 from .operational import Journal,delivery,installation_client,work_once,reconcile,MAX_BODY
 from .capture import run_agent,hook
-from .core import digest, load_config
+from .core import digest, load_user_config
 from .hardening import strict_gate, sweep, DurableChangeSet, verify_payment_candidate
 from functools import partial
+from .policy_schema import InvalidConfiguration
 from .cli_errors import emit_failure, telemetry_provider
 
 def serve(db,repo,installation,secret,port):
@@ -53,7 +54,7 @@ def main():
     args=p.parse_args()
     try:
         if args.cmd=='serve':return serve(args.db,args.repo,args.installation,os.environ['ITM_WEBHOOK_SECRET'].encode(),args.port)
-        if args.cmd=='verify-candidate':result=verify_payment_candidate(args.repo,args.base,args.head,load_config(args.spec),backend=args.backend,trusted_fixture=args.trusted_fixture,image=args.image)
+        if args.cmd=='verify-candidate':result=verify_payment_candidate(args.repo,args.base,args.head,load_user_config(args.spec),backend=args.backend,trusted_fixture=args.trusted_fixture,image=args.image)
         elif args.cmd=='changeset-recover':
             d=DurableChangeSet(args.db)
             try:result=d.run(json.loads(args.config.read_text()),json.loads(args.plan.read_text()),json.loads(args.approvals.read_text()),json.loads(args.repos.read_text()),serialization.load_pem_private_key(args.executor_key.read_bytes(),password=None),compensate=args.compensate)
@@ -93,5 +94,5 @@ def main():
         if args.cmd=='changeset-recover' and result['status']=='MANUAL_INTERVENTION':p.exit(2)
     except Exception as exc:
         emit_failure(args.cmd, exc, remote_write_possible=getattr(args, 'publish', False))
-        p.exit(1)
+        p.exit(2 if isinstance(exc, InvalidConfiguration) else 1)
 if __name__=='__main__':main()

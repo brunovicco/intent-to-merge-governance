@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 from .github import CheckPublicationUnconfirmed
+from .policy_schema import InvalidConfiguration
 
 
 class TelemetryUnavailable(ValueError):
@@ -29,7 +30,9 @@ def telemetry_provider(stream):
 
 
 def failure(command, exc, *, remote_write_possible=False):
-    if isinstance(exc, TelemetryUnavailable):
+    if isinstance(exc, InvalidConfiguration):
+        code = 'INVALID_CONFIGURATION'
+    elif isinstance(exc, TelemetryUnavailable):
         code = 'OPTIONAL_TELEMETRY_UNAVAILABLE'
     elif isinstance(exc, (sqlite3.Error, OSError, subprocess.SubprocessError)):
         code = 'OPERATIONAL_ERROR'
@@ -40,9 +43,10 @@ def failure(command, exc, *, remote_write_possible=False):
     # Raw exception messages may contain paths, tokens or inputs.
     result = {
         'command': command,
-        'status': 'ERROR',
+        'status': 'INVALID_CONFIGURATION' if code == 'INVALID_CONFIGURATION' else 'ERROR',
         'decision': 'BLOCK',
         'authorized': False,
+        'merged': False,
         'merge_authority': False,
         'production_ready': False,
         'reason': code,

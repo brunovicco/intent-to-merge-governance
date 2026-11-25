@@ -83,3 +83,45 @@ class FailureContractTests(unittest.TestCase):
             result = self.invoke(ops_cli.main, ['itm-ops','journal','--db','results/not-run.sqlite'])
         self.assertEqual(result['reason'], 'OPERATIONAL_ERROR')
         self.assertNotIn('private', json.dumps(result))
+
+    def test_demo_configuration_rejection_is_structured(self):
+        from tempfile import TemporaryDirectory
+        spec = (ROOT/'examples/spec.toml').read_text()
+        policy = (ROOT/'examples/policy.toml').read_text()
+        for name, spec_text, policy_text in (
+                ('malformed', spec, 'secret = "sentinel'),
+                ('duplicate', spec.replace('id = "R02"', 'id = "R01"'), policy),
+                ('invalid-schema', spec, 'version = 42'),
+                ('invalid-shape', spec.replace('[[requirements]]', '[[unused]]'), policy)):
+            with self.subTest(name=name), TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root/'spec').write_text(spec_text)
+                (root/'policy').write_text(policy_text)
+                args = ['intent-merge', 'demo', '--out', str(root/'run'),
+                        '--spec', str(root/'spec'), '--policy', str(root/'policy')]
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with patch('sys.argv', args), contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as exc:
+                    cli.main()
+                self.assertEqual(exc.exception.code, 2)
+                result = json.loads(stdout.getvalue())
+                self.assertEqual(result['decision']['status'], 'INVALID_CONFIGURATION')
+                self.assertFalse(result['decision']['authorized'])
+                self.assertFalse(result['merged'])
+                self.assertNotIn('sentinel', stdout.getvalue()+stderr.getvalue())
+
+    def test_missing_approval_block_is_a_successful_evaluation(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as tmp:
+            args = ['intent-merge', 'demo', '--scenario', 'missing-approval', '--out', str(Path(tmp)/'run')]
+            stdout = io.StringIO()
+            with patch('sys.argv', args), contextlib.redirect_stdout(stdout):
+                self.assertIsNone(cli.main())
+            result = json.loads(stdout.getvalue())
+            self.assertFalse(result['decision']['authorized'])
+            self.assertFalse(result['merged'])
+
+    def test_unavailable_config_file_is_operational(self):
+        result = self.invoke(cli.main, ['intent-merge', 'demo', '--spec', 'missing-file.toml',
+                                       '--out', 'results/not-run'])
+        self.assertEqual(result['reason'], 'OPERATIONAL_ERROR')
+        self.assertFalse(result['merged'])
