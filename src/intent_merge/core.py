@@ -1,8 +1,10 @@
 from __future__ import annotations
-import hashlib, hmac, json, fnmatch, tomllib
+import hashlib, hmac, json, tomllib
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Protocol
+from .path_policy import matches, SEGMENT_V2, LEGACY_V1
+from .policy_schema import invalid_configuration
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 
@@ -19,8 +21,6 @@ def file_hash(p):
 def load_config(path):
     with open(path, 'rb') as f: return tomllib.load(f)
 
-def matches(path, patterns):
-    return any(fnmatch.fnmatchcase(path, pattern) for pattern in patterns)
 
 @dataclass(frozen=True)
 class Proposal:
@@ -63,7 +63,7 @@ def approval(actor, binding, keys):
     return {**payload, "signature": signature}
 
 
-def verified_actors(policy, binding, approvals, keys, author):
+def verified_actors(policy, binding, approvals, keys, author, *, historical=False):
     seen = set()
     for a in approvals:
         actor = a.get("actor")
@@ -73,26 +73,41 @@ def verified_actors(policy, binding, approvals, keys, author):
         try:
             if key.startswith("ed25519-public:"):
                 Ed25519PublicKey.from_public_bytes(bytes.fromhex(key.split(":",1)[1])).verify(bytes.fromhex(a["signature"]), canonical({"actor":actor,"binding":binding}))
-            else:
+            elif historical and not key.startswith("ed25519-"):
                 if not hmac.compare_digest(approval(actor,binding,keys)["signature"],str(a.get("signature",""))): continue
+            else:
+                continue
         except (InvalidSignature, ValueError, KeyError, TypeError):
             continue
         seen.add(actor)
     return seen
 
 
-def evaluate_policy(spec, policy, paths, checks, binding, approvals, keys, *, author, termination, current_head, current_base, eval_binding):
-    actors = verified_actors(policy,binding,approvals,keys,author)
-    return evaluate_decision(spec,policy,paths,checks,binding,actors,termination=termination,current_head=current_head,current_base=current_base,eval_binding=eval_binding)
+def evaluate_policy(spec, policy, paths, checks, binding, approvals, keys, *, author, termination, current_head, current_base, eval_binding, _historical_semantics=None):
+    if _historical_semantics != LEGACY_V1:
+        invalid = invalid_configuration(spec, policy)
+        if invalid is not None:
+            return invalid
+    actors = verified_actors(policy,binding,approvals,keys,author, historical=_historical_semantics == LEGACY_V1)
+    return evaluate_decision(spec,policy,paths,checks,binding,actors,termination=termination,current_head=current_head,current_base=current_base,eval_binding=eval_binding, _historical_semantics=_historical_semantics)
 
 
-def evaluate_decision(spec, policy, paths, checks, binding, actors, *, termination, current_head, current_base, eval_binding):
+def evaluate_decision(spec, policy, paths, checks, binding, actors, *, termination, current_head, current_base, eval_binding, _historical_semantics=None):
     """Pure deterministic decision; unknown paths/rules/checks fail closed."""
+    semantics = _historical_semantics or SEGMENT_V2
+    if semantics not in (LEGACY_V1, SEGMENT_V2):
+        raise ValueError("unknown path semantics")
+    if semantics != LEGACY_V1:
+        invalid = invalid_configuration(spec, policy)
+        if invalid is not None:
+            return invalid
     reasons = []
+    if binding.get("path_semantics", LEGACY_V1) != semantics:
+        reasons.append("path_semantics_mismatch")
     if termination != "passed": reasons.append("not_converged")
     if not paths: reasons.append("empty_change")
-    if any(not matches(p, spec["allowed_paths"]) for p in paths): reasons.append("outside_spec")
-    if any(matches(p, policy["protected_paths"]) for p in paths): reasons.append("protected_path")
+    if any(not matches(p, spec["allowed_paths"], semantics=semantics) for p in paths): reasons.append("outside_spec")
+    if any(matches(p, policy["protected_paths"], semantics=semantics) for p in paths): reasons.append("protected_path")
     if current_head != binding["head"]: reasons.append("stale_head")
     if current_base != binding["base"]: reasons.append("stale_base")
     if eval_binding != binding: reasons.append("stale_evaluation")
@@ -103,7 +118,7 @@ def evaluate_decision(spec, policy, paths, checks, binding, actors, *, terminati
         if checks.get(check) is not True: reasons.append("check_failed:"+check)
     roles = set(); rank = {"low":0,"medium":1,"high":2}; risk = "low"
     for p in paths:
-        rules = [r for r in policy["risk_rules"] if matches(p, [r["path"]])]
+        rules = [r for r in policy["risk_rules"] if matches(p, [r["path"]], semantics=semantics)]
         if not rules: reasons.append("unclassified_path:"+p)
         for rule in rules:
             roles.update(rule["required_roles"])
