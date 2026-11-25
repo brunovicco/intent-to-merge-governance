@@ -6,6 +6,8 @@ from .checkpoints import normalize_session
 from .bundle import keygen, pack, verify
 from .replay import replay
 from .github import GitHub, policy_from, preflight
+from .operational import installation_client
+from .cli_errors import emit_failure
 from .agent_import import import_agent
 from .explorer import render
 from .benchmark import generate, evaluate_corpus, write_reports
@@ -32,6 +34,9 @@ def main():
     v=sub.add_parser('verify-bundle',help='Verify offline with externally trusted signer'); v.add_argument('--bundle',type=Path,required=True); v.add_argument('--public-key',type=Path,required=True)
     r=sub.add_parser('policy-replay',help='Counterfactual decision-only replay'); r.add_argument('--bundle',type=Path,action='append',required=True); r.add_argument('--public-key',type=Path,required=True); r.add_argument('--policy',type=Path,required=True)
     gh=sub.add_parser('github-preflight',help='Inspect a live PR and optionally publish a preflight check'); gh.add_argument('--repo',required=True); gh.add_argument('--pr',type=int,required=True); gh.add_argument('--policy',type=Path,required=True); gh.add_argument('--publish',action='store_true')
+    gh.add_argument('--app-id', type=int)
+    gh.add_argument('--installation', type=int)
+    gh.add_argument('--app-key', type=Path)
     ag=sub.add_parser('import-agent',help='Normalize native agent JSONL stream'); ag.add_argument('--provider',choices=['claude','codex'],required=True); ag.add_argument('--input',type=Path,required=True); ag.add_argument('--head'); ag.add_argument('--agent-id',default='coding-agent')
     ex=sub.add_parser('explorer',help='Export a verified offline HTML dashboard'); ex.add_argument('--bundle',type=Path,action='append',required=True); ex.add_argument('--public-key',type=Path,required=True); ex.add_argument('--output',type=Path,required=True); ex.add_argument('--pr-report',type=Path,action='append',default=[]); ex.add_argument('--session',type=Path,action='append',default=[])
     bm=sub.add_parser('benchmark',help='Generate signed synthetic AMGB traces and a paired ablation report'); bm.add_argument('--out',type=Path,required=True); bm.add_argument('--spec',type=Path,default=Path('examples/spec.toml')); bm.add_argument('--policy',type=Path,default=Path('examples/policy.toml')); bm.add_argument('--workers',type=int,default=4)
@@ -54,7 +59,19 @@ def main():
         elif args.cmd=='bundle': result=pack(args.out,args.bundle,args.private_key)
         elif args.cmd=='verify-bundle': result=verify(args.bundle,args.public_key)
         elif args.cmd=='policy-replay': result=replay(args.bundle,args.public_key,args.policy)
-        elif args.cmd=='github-preflight': result=preflight(GitHub(),args.repo,args.pr,policy_from(args.policy),publish=args.publish)
+        elif args.cmd=='github-preflight':
+            policy = policy_from(args.policy)
+            if args.repo.lower() != policy['repository'].lower() or args.pr <= 0:
+                raise ValueError('repository/PR does not match policy')
+            if args.publish:
+                if not args.app_id or args.app_id <= 0 or not args.installation or args.installation <= 0 or args.app_key is None:
+                    raise ValueError('publication requires GitHub App installation credentials')
+                client = installation_client(args.app_id, args.installation, args.app_key, policy['repository'])
+            else:
+                if any(x is not None for x in (args.app_id, args.installation, args.app_key)):
+                    raise ValueError('App credentials are only accepted with --publish')
+                client = GitHub()
+            result = preflight(client, args.repo, args.pr, policy, publish=args.publish)
         elif args.cmd=='import-agent': result=import_agent(args.provider,args.input,args.agent_id,args.head)
         elif args.cmd=='explorer': result=render(args.bundle,args.public_key,args.output,pr_reports=args.pr_report,sessions=args.session)
         elif args.cmd=='changeset-demo': result=changeset_study(args.out)
@@ -72,5 +89,7 @@ def main():
                 if not coverage: raise ValueError('unknown requirement')
             result={'verified_requirements':coverage,'drift':json.loads((ev/'intent-drift.json').read_text()),'decision':report['decision'],'note':'Recorded evidence; run audit for integrity verification.'}
         print(json.dumps(result,indent=2))
-    except (ValueError, OSError, KeyError, TypeError) as e: p.exit(1,f'error: {e}\n')
+    except Exception as exc:
+        emit_failure(args.cmd, exc, remote_write_possible=getattr(args, 'publish', False))
+        p.exit(1)
 if __name__ == '__main__': main()
