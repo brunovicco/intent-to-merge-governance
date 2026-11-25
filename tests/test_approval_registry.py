@@ -3,6 +3,7 @@ import sqlite3
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
 from threading import Barrier
 
@@ -131,7 +132,7 @@ class ApprovalRegistryTests(unittest.TestCase):
         self.assertFalse(self.path.exists())
 
     def test_unknown_schema_rejected(self):
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db, db:
             db.execute("PRAGMA user_version=2")
         with self.assertRaisesRegex(ValueError, "unsupported approval registry schema"):
             ApprovalRegistry(self.path)

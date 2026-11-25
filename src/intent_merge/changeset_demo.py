@@ -16,7 +16,7 @@ def public(key):
 
 def config_keys():
     keys={n:Ed25519PrivateKey.generate() for n in ('payments','checkout','portal','executor')}
-    config={'version':1,'profile':'local-synthetic','intent_id':'payment-contract-v2','executor_key':public(keys['executor']),'components':{n:{'depends_on':d,'allowed_paths':['contract.json','app.txt'],'reviewer_key':public(keys[n])} for n,d in [('payments',[]),('checkout',['payments']),('portal',['checkout'])]}}
+    config={'version':2,'path_semantics':'segment-v2','profile':'local-synthetic','intent_id':'payment-contract-v2','executor_key':public(keys['executor']),'components':{n:{'depends_on':d,'allowed_paths':['contract.json','app.txt'],'reviewer_key':public(keys[n])} for n,d in [('payments',[]),('checkout',['payments']),('portal',['checkout'])]}}
     return config,keys
 
 

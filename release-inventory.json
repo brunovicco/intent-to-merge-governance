@@ -87,8 +87,8 @@
       "sha256": "526034397d8c87f10e7f7b0e6a9a9ee3fd66eba56e4f3782947674f7fad86e66"
     },
     "docs/bandit-review.json": {
-      "bytes": 34103,
-      "sha256": "e05c083203fe2f414e5777c724e04efff2b9a5601301bacb1da2ac81f3c9fb2c"
+      "bytes": 34121,
+      "sha256": "5b7b1c0e37a5906bb21f7c87af1692f854470a7b0941aa11bf1d40c314c02d24"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -97,6 +97,10 @@
     "docs/benchmark.md": {
       "bytes": 4763,
       "sha256": "6c4ad81c7c2576b7119eb134314a4503b9cc802a688210d8de116ef3114834d8"
+    },
+    "docs/changeset-path-policy-v2-draft.md": {
+      "bytes": 1790,
+      "sha256": "6501ecd4174b66a3e66a9b4bb7362682c42b9d0b944e51ba82a6aacc34ea007b"
     },
     "docs/changeset-results.svg": {
       "bytes": 2096,
@@ -2599,12 +2603,12 @@
       "sha256": "bfe4512a53fce906c925e809cd03111973bb9a6cd5303ad3a935395385ad1016"
     },
     "src/intent_merge/changeset.py": {
-      "bytes": 12698,
-      "sha256": "d9667a687564dc30eac1325650fbe73ef46884e19a88bbb37d40f51d8beb7a5e"
+      "bytes": 13865,
+      "sha256": "20e05599f8220e7944bfd362407828d85c2b9c927d3e10ab5e41bbe416c0aa10"
     },
     "src/intent_merge/changeset_demo.py": {
-      "bytes": 6754,
-      "sha256": "22b804a281c715deb5b928d160ae6254598afb9cb63e0859853e65f6a4d59f5e"
+      "bytes": 6784,
+      "sha256": "b52470023291821a25a4a025dae77d72d64d1e15f3e8915bda26a64eb864c037"
     },
     "src/intent_merge/checkpoints.py": {
       "bytes": 1880,
@@ -2695,8 +2699,8 @@
       "sha256": "74c96cca7a8ee1a209451ce0ee5a25d2226233a099d36cd66d582030170da4e1"
     },
     "tests/test_approval_registry.py": {
-      "bytes": 7432,
-      "sha256": "74be121d5fa73cb4fa0e3f29755a2f240c244d1f3d3eca5082832bf970068169"
+      "bytes": 7476,
+      "sha256": "e4eed44b2876fef39ef1013677c55ad96252bf8be529102be72be544e9f9cddc"
     },
     "tests/test_approval_v2.py": {
       "bytes": 6645,
@@ -2717,6 +2721,10 @@
     "tests/test_changeset.py": {
       "bytes": 6168,
       "sha256": "eccb7f74fb49b473947522428b8cf2192d63a838cdc85d77bf91323f8703b2b2"
+    },
+    "tests/test_changeset_path_policy.py": {
+      "bytes": 5468,
+      "sha256": "dac7a3ea22bf1367e9d8394a725f3b8e36104178efbc16da61a9bb61ccb072d8"
     },
     "tests/test_final_release.py": {
       "bytes": 2873,
