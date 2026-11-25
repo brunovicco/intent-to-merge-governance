@@ -1,6 +1,6 @@
 {
   "profile": "itm-bandit-review-v1",
-  "scope": "Bandit 1.8.6 on Python 3.11; historical review, unchanged call sites and import-only findings re-pinned after policy, approval, challenge and changeset scope hardening; fresh scan required; residual risks limited to research lab",
+  "scope": "Bandit 1.8.6 on Python 3.11; historical review, unchanged call sites and import-only findings re-pinned after policy, approval, challenge and changeset scope hardening; fresh scan required; residual risks limited to research lab; increment-6 B404 exception-class import reviewed against maintainer-provided summary; source_report_sha256 remains the historical raw report pin, not a digest of the new scan",
   "source_report_sha256": "162fe306a70555dfb32c7a954b3243930ceeedc798ae28cb5b1802ee8230b7bf",
   "findings": [
     {
@@ -299,6 +299,17 @@
       "line_sha256": "d31f41da306ac33fdf11b4335f68a72da15243a7612f36b4a5b2b3e80d8975a2",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
+    },
+    {
+      "file": "src/intent_merge/cli_errors.py",
+      "line": 4,
+      "rule": "B404",
+      "severity": "LOW",
+      "confidence": "HIGH",
+      "source_sha256": "ab31482e8aee41aa73b21b9b55aa85235496f17a43d462c1898351f31773cd74",
+      "line_sha256": "7d8752c4c7ea34c2c6d04a15aa31a1f25f62848f8c3c82528fd62439c01a225b",
+      "disposition": "reviewed_import",
+      "rationale": "Import only. The sole subprocess attribute reference is SubprocessError in an isinstance check for redacted operational error classification; this module does not start a subprocess. Reviewed against the exact increment-6 source and maintainer-provided Bandit review output. Fresh raw scanner run remains required."
     },
     {
       "file": "src/intent_merge/integrated.py",

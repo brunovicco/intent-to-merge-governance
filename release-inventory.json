@@ -87,8 +87,8 @@
       "sha256": "526034397d8c87f10e7f7b0e6a9a9ee3fd66eba56e4f3782947674f7fad86e66"
     },
     "docs/bandit-review.json": {
-      "bytes": 34121,
-      "sha256": "5b7b1c0e37a5906bb21f7c87af1692f854470a7b0941aa11bf1d40c314c02d24"
+      "bytes": 35006,
+      "sha256": "761c24091315aec40bec00d9b0ec84636dad0e11f4a85d1768b89b9f2d2c7dac"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -123,8 +123,8 @@
       "sha256": "90c416be9c4e98aea723d7828224357e8a2323ca58b0d6c6691fa6db830bed11"
     },
     "docs/operational-hardening-draft.md": {
-      "bytes": 1860,
-      "sha256": "3cab67e14c1a9bcbb7e170876f332792d48f816c458de99c9a47f458340976cc"
+      "bytes": 2751,
+      "sha256": "67dba421b8aa8af69a15be4fb82838847d0e6abfa827472fb4e1e04cda12c659"
     },
     "docs/operational-integration.md": {
       "bytes": 9134,
@@ -2748,7 +2748,7 @@
     },
     "tests/test_final_release.py": {
       "bytes": 2873,
-      "sha256": "f07d5cdcc1125fd7b0631bfd7200a9c3fa863cbcf0e8050d665f45bc66d295e9"
+      "sha256": "fad5ca074bf7d6802247b73f8460ab1275d15d85e7ca089580f8af6c40fd259e"
     },
     "tests/test_governance.py": {
       "bytes": 4615,
