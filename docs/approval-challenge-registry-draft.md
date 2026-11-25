@@ -1,0 +1,11 @@
+# Approval challenge registry — development increment 3
+
+Synthetic PAY-104 lab profile; not production authorization. The published v1.0.0 archive remains unchanged.
+
+A trusted local caller explicitly creates a SQLite registry, issues a random challenge bound to the exact candidate, author, public trust mapping digest and a maximum 300-second lifetime. `BEGIN IMMEDIATE` serializes claims against the same database. An issued challenge is consumed before policy evaluation, even if the policy subsequently denies the change or the process crashes. Expired, mismatched and revoked challenges cannot be reused; no reset is performed on open. A durable clock watermark rejects observed wall-clock regression. The caller must use a trusted clock; this is not a secure time source.
+
+The fixture runner uses the registry and records issuance and claim in its ledger. The database stays outside the exported evidence directory. Historical audit recomputes the recorded claim outcome, not the present state of the registry; counterfactual replay retains recorded challenge denials. Earlier evidence profiles retain their semantics. The pure `evaluate_policy` and `evaluate_decision` helpers are not single-use authorization APIs; all new decision callers requiring single-use semantics must use the registry gate. Only trusted decision callers may claim or revoke; arbitrary caller access would permit denial of service.
+
+The registry is per run in the fixture. Reopening the same database preserves state, but a different database, restored snapshot, same-user tampering, deletion, forked trust state, hostile code and an untrusted clock are outside this guarantee. Registry consumption is not an atomic Git merge, nor a durable authorization grant; no post-consumption revocation or external enforcement is established. Database errors abort without merging; an incomplete run may lack a final ledger. Local demo keys and trust remain synthetic. `production_ready: false`; `merge_authority: false` for remote actions.
+
+Run the locked suite and compare the historical AMGB report byte for byte. Existing unchanged Bandit call sites and an import-only finding (removed unused secrets import) were re-pinned, not newly qualified. Fresh scans are required. No dependency or package version change.

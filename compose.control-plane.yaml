@@ -1,5 +1,5 @@
 x-common: &common
-  image: itm-control-plane:1.0.0-locked
+  image: itm-control-plane:2.0.0rc1-locked
   build:
     context: .
     dockerfile: Dockerfile.control-plane

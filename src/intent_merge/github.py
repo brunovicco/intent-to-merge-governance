@@ -1,7 +1,7 @@
 """Live GitHub preflight. Separate from synthetic evidence and merge authority."""
 from __future__ import annotations
 import json, os, re, tomllib
-from fnmatch import fnmatchcase
+from .path_policy import matches, validate_patterns, SEGMENT_V2
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -41,17 +41,24 @@ class GitHub:
 
 def policy_from(path):
     p=tomllib.loads(path.read_text())
-    if not isinstance(p,dict) or p.get('version')!=1: raise ValueError('unsupported PR policy')
+    if 'path_semantics' not in p:
+        p['path_semantics'] = SEGMENT_V2
+    return validate_policy(p)
+
+def validate_policy(p):
+    if not isinstance(p,dict) or type(p.get('version')) is not int or p.get('version')!=1: raise ValueError('unsupported PR policy')
     for k in ('repository','base_ref','allowed_paths','protected_paths','required_checks','required_roles'):
         if k not in p: raise ValueError('missing policy field: '+k)
-    if not REPO.fullmatch(p['repository']): raise ValueError('invalid repository')
+    if set(p) != {'version','path_semantics','repository','base_ref','allowed_paths','protected_paths','required_checks','required_roles'} or p.get('path_semantics') != SEGMENT_V2: raise ValueError('invalid policy fields or path semantics')
+    if not isinstance(p['repository'],str) or not REPO.fullmatch(p['repository']): raise ValueError('invalid repository')
     if not isinstance(p['base_ref'],str) or not p['base_ref']: raise ValueError('invalid base ref')
     for k in ('allowed_paths','protected_paths'):
-        if not isinstance(p[k],list) or not all(isinstance(x,str) and x for x in p[k]): raise ValueError('invalid path rules')
+        validate_patterns(p[k], nonempty=k=='allowed_paths')
     if not p['allowed_paths']: raise ValueError('empty allowlist')
     if not isinstance(p['required_checks'],list) or not p['required_checks']: raise ValueError('required checks must be nonempty')
     names=set()
     for check in p['required_checks']:
+        if not isinstance(check,dict) or set(check)!={'name','app_id'}: raise ValueError('invalid required check fields')
         if not isinstance(check['name'],str) or not check['name'] or check['name']==CHECK_NAME or type(check['app_id']) is not int or check['app_id']<=0: raise ValueError('invalid required check')
         if check['name'] in names: raise ValueError('duplicate check name')
         names.add(check['name'])
@@ -59,7 +66,7 @@ def policy_from(path):
     if not isinstance(roles,dict) or not roles: raise ValueError('required roles must be nonempty')
     ids=set()
     for role, members in roles.items():
-        if not isinstance(members,list) or not members or any(type(m) is not int or m<=0 for m in members) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
+        if not isinstance(role,str) or not role.strip() or not isinstance(members,list) or not members or any(type(m) is not int or m<=0 for m in members) or ids.intersection(members): raise ValueError('invalid or overlapping approver IDs')
         ids.update(members)
     return p
 
@@ -67,6 +74,7 @@ def identity(pr):
     return (pr['head']['sha'],pr['base']['sha'],pr['base']['ref'],pr['state'],pr['draft'],pr['head']['repo']['full_name'],pr['base']['repo']['full_name'],pr['changed_files'],pr['user']['id'])
 
 def preflight(client, repo, number, policy, *, publish=False):
+    validate_policy(policy)
     if not REPO.fullmatch(repo) or type(number) is not int or number<=0 or policy['repository'].lower()!=repo.lower(): raise ValueError('repository/PR does not match policy')
     prefix='/repos/'+repo; route=prefix+f'/pulls/{number}'
     pr=client.request(route); before=identity(pr); head,base,ref,state,draft,head_repo,base_repo,count,author=before
@@ -75,7 +83,7 @@ def preflight(client, repo, number, policy, *, publish=False):
     if head_repo.lower()!=repo.lower(): raise ValueError('fork PRs unsupported in v0.5')
     if count<=0 or count>=3000: raise ValueError('unsupported file count')
     files=list(client.pages(route+'/files'))
-    if len(files)!=count or len({f['filename'] for f in files})!=count: raise ValueError('incomplete file inventory')
+    if len(files)!=count or any(not isinstance(f.get('filename'),str) or not f['filename'] for f in files) or len({f['filename'] for f in files})!=count: raise ValueError('incomplete file inventory')
     paths=sorted({p for f in files for p in [f['filename'],f.get('previous_filename')] if p})
     if any(f['status']=='renamed' and not f.get('previous_filename') for f in files): raise ValueError('rename missing source path')
     reviews=list(client.pages(route+'/reviews'))
@@ -86,7 +94,7 @@ def preflight(client, repo, number, policy, *, publish=False):
         if not passed: reasons.append(name)
     gate('open_non_draft_target',state=='open' and not draft and ref==policy['base_ref'])
     for path in paths:
-        gate('scope:'+path,any(fnmatchcase(path,x) for x in policy['allowed_paths']) and not any(fnmatchcase(path,x) for x in policy['protected_paths']))
+        gate('scope:'+path,matches(path,policy['allowed_paths']) and not matches(path,policy['protected_paths']))
     for rule in policy['required_checks']:
         matching=[c for c in checks if c['name']==rule['name'] and (c.get('app') or {}).get('id')==rule['app_id'] and c.get('head_sha')==head]
         latest=max(matching,key=lambda c:c['id'],default={})

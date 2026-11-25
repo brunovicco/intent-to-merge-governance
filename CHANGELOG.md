@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.0-rc.1 — Security hardening (candidate, unpublished)
+
+- Versioned segment-based paths and configuration validation in the local policy engine, GitHub preflight and new changesets.
+- Domain-separated, time-bound Ed25519 approval envelopes and a single-use local SQLite challenge registry.
+- Explicit historical versus externally pinned historical trust profiles; no current organizational authorization.
+- Redacted CLI execution errors, explicit GitHub App credentials for CLI check publication, minimal and telemetry-enabled test jobs.
+- Preserve signed v1 artifacts and historical replay; new decisions require the new contracts. See [migration](docs/migration-v2.md).
+- Pre-version-change qualification is recorded separately; exact RC scans, test runs, Docker and publication approval remain required.
+
 ## 1.0.0 — security remediation candidate (unpublished)
 
 - Raise cryptography dependency floor to 50.0.0, pending resolution and fresh audit.

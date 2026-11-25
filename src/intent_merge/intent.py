@@ -5,9 +5,10 @@ AST checks are narrow structural invariants, not proof of semantic equivalence.
 from __future__ import annotations
 import ast
 from .core import digest, matches
+from .path_policy import SEGMENT_V2
 
 
-def validate_spec(spec):
+def validate_spec(spec, *, semantics=SEGMENT_V2):
     criteria = spec['criteria']
     if not criteria or len(criteria) != len(set(criteria)):
         raise ValueError('criteria must be nonempty and unique')
@@ -17,7 +18,7 @@ def validate_spec(spec):
     if not ids or len(ids) != len(set(ids)) or set(mapped) != set(criteria):
         raise ValueError('requirements must uniquely identify and cover all acceptance criteria')
     for r in requirements:
-        if not r['criteria'] or not r['paths'] or any(not matches(p, spec['allowed_paths']) for p in r['paths']):
+        if not r['criteria'] or not r['paths'] or any(not matches(p, spec['allowed_paths'], semantics=semantics) for p in r['paths']):
             raise ValueError('requirement needs criteria and authorized paths')
     rules = spec.get('non_goals', [])
     if not rules or len({r['id'] for r in rules}) != len(rules):
@@ -25,7 +26,7 @@ def validate_spec(spec):
     for r in rules:
         if r['kind'] not in {'preserve_symbol', 'preserve_signature', 'no_new_imports'}:
             raise ValueError('unsupported non-goal: '+r['kind'])
-        if not matches(r['path'], spec['allowed_paths']):
+        if not matches(r['path'], spec['allowed_paths'], semantics=semantics):
             raise ValueError('non-goal must target authorized path')
         if r['kind'] != 'no_new_imports' and not r.get('symbol'):
             raise ValueError('non-goal requires symbol')
@@ -42,7 +43,7 @@ def _imports(tree):
     return {ast.dump(n, include_attributes=False) for n in ast.walk(tree) if isinstance(n, (ast.Import, ast.ImportFrom))}
 
 
-def drift(spec, baseline, candidate, paths):
+def drift(spec, baseline, candidate, paths, *, semantics=SEGMENT_V2):
     findings = []
     for rule in spec['non_goals']:
         path, kind = rule['path'], rule['kind']
@@ -64,13 +65,13 @@ def drift(spec, baseline, candidate, paths):
             passed, detail = False, str(exc)
         findings.append({'id':rule['id'], 'kind':kind, 'path':path, 'passed':passed, 'detail':detail})
     for path in sorted(paths):
-        if not any(matches(path, r['paths']) for r in spec['requirements']):
+        if not any(matches(path, r['paths'], semantics=semantics) for r in spec['requirements']):
             findings.append({'id':'unmapped:'+path,'kind':'unmapped_path','path':path,'passed':False,'detail':'no requirement maps to path'})
     return {'passed':all(f['passed'] for f in findings),'findings':findings,'method':'python_ast_structural_v1'}
 
 
-def requirement_coverage(spec, checks, paths):
-    return [{'id':r['id'], 'description':r['description'], 'criteria':{c:checks.get(c) is True for c in r['criteria']}, 'changed_paths':sorted(p for p in paths if matches(p,r['paths'])), 'verified':all(checks.get(c) is True for c in r['criteria'])} for r in spec['requirements']]
+def requirement_coverage(spec, checks, paths, *, semantics=SEGMENT_V2):
+    return [{'id':r['id'], 'description':r['description'], 'criteria':{c:checks.get(c) is True for c in r['criteria']}, 'changed_paths':sorted(p for p in paths if matches(p,r['paths'], semantics=semantics)), 'verified':all(checks.get(c) is True for c in r['criteria'])} for r in spec['requirements']]
 
 
 def build_graph(spec, events):

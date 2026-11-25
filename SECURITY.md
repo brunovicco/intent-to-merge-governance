@@ -6,4 +6,4 @@ Report suspected vulnerabilities privately to the repository maintainer using a 
 
 See [security review and threat model](docs/rc6-security-review.md) for the scoped controls, residual risks and production qualification gates.
 
-For the 1.0.0 public source candidate, the maintainer must enable and verify a private vulnerability-reporting channel before publication. The package does not configure one automatically. No security response SLA is promised.
+Before publishing any new release candidate, the maintainer must verify that the private vulnerability-reporting channel is available. See [RC qualification](docs/qualification-v2-rc1.md). The package does not configure one automatically. No security response SLA is promised.

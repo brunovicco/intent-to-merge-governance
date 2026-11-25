@@ -2,11 +2,12 @@
 No remote merge authority. Contracts are explicit declarations, not behavioral proofs.
 """
 from __future__ import annotations
-import json, re, subprocess, fnmatch
+import json, re, subprocess
 from pathlib import Path
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from .core import canonical, digest, Ledger, verify_chain
+from .path_policy import LEGACY_V1, SEGMENT_V2, matches, validate_patterns
 
 
 def require(ok, message):
@@ -21,15 +22,31 @@ def hexstr(value, size):
     return isinstance(value,str) and re.fullmatch(r'[0-9a-f]{'+str(size)+'}',value) is not None
 
 
-def order(config):
-    require(set(config)=={'version','profile','intent_id','components','executor_key'},'invalid config fields')
-    require(config['version']==1 and config['profile']=='local-synthetic' and identifier(config['intent_id']),'invalid configuration')
+def _semantics(config, *, historical=False):
+    require(isinstance(config, dict) and type(config.get('version')) is int, 'invalid config version')
+    fields = {'version', 'profile', 'intent_id', 'components', 'executor_key'}
+    if config['version'] == 1 and historical:
+        require(set(config) == fields, 'invalid historical config fields')
+        return LEGACY_V1
+    require(config['version'] == 2, 'changeset v1 is historical replay only')
+    require(set(config) == fields | {'path_semantics'}, 'invalid config fields')
+    require(config['path_semantics'] == SEGMENT_V2, 'invalid changeset path semantics')
+    return SEGMENT_V2
+
+
+def order(config, *, historical=False):
+    semantics = _semantics(config, historical=historical)
+    require(config['profile']=='local-synthetic' and identifier(config['intent_id']),'invalid configuration')
     comps=config['components']; require(isinstance(comps,dict) and 1<=len(comps)<=32,'invalid components')
     keys=[config['executor_key']]
     for name,c in comps.items():
         require(identifier(name) and set(c)=={'depends_on','allowed_paths','reviewer_key'},'invalid component')
         deps=c['depends_on']; require(isinstance(deps,list) and len(set(deps))==len(deps) and all(d in comps and d!=name for d in deps),'invalid dependencies')
-        paths=c['allowed_paths']; require(isinstance(paths,list) and bool(paths) and all(isinstance(p,str) and p and not p.startswith('/') and '..' not in p.split('/') for p in paths),'invalid path policy')
+        paths = c['allowed_paths']
+        if semantics == SEGMENT_V2:
+            validate_patterns(paths, nonempty=True)
+        else:
+            require(isinstance(paths,list) and bool(paths) and all(isinstance(p,str) and p and not p.startswith('/') and '..' not in p.split('/') for p in paths),'invalid historical path policy')
         keys.append(c['reviewer_key'])
     require(all(hexstr(k,64) for k in keys) and len(set(keys))==len(keys),'independent role keys required')
     pending=set(comps); result=[]
@@ -76,8 +93,9 @@ def compatibility(state):
     return [f'{name}:requires:{provider}:{version}' for name,c in sorted(state.items()) for provider,version in sorted(c['requires'].items()) if version not in state[provider]['provides']]
 
 
-def derive(config, components):
-    sequence=order(config); require(set(components)==set(sequence),'component inventory mismatch')
+def derive(config, components, *, historical=False):
+    semantics = _semantics(config, historical=historical)
+    sequence=order(config, historical=historical); require(set(components)==set(sequence),'component inventory mismatch')
     issues=[]; state={}
     for n in sequence:
         c=components[n]; policy=config['components'][n]
@@ -89,13 +107,13 @@ def derive(config, components):
         if not c['fast_forward']: issues.append(n+':not_fast_forward')
         if not c['paths']: issues.append(n+':empty_change')
         for p in c['paths']:
-            if not any(fnmatch.fnmatchcase(p,g) for g in policy['allowed_paths']): issues.append(n+':out_of_scope:'+p)
+            if not matches(p, policy['allowed_paths'], semantics=semantics): issues.append(n+':out_of_scope:'+p)
     stages=[{'after':None,'violations':compatibility(state)}]
     for n in sequence:
         state[n]=components[n]['head_contract']; stages.append({'after':n,'violations':compatibility(state)})
     for stage in stages:
         issues.extend(f'prefix:{stage["after"] or "base"}:{v}' for v in stage['violations'])
-    return {'version':1,'config_digest':digest(config),'intent_id':config['intent_id'],'components':components,'order':sequence,'stages':stages,'issues':issues,'eligible':not issues,'merge_authority':False}
+    return {'version':config['version'],'config_digest':digest(config),'intent_id':config['intent_id'],'components':components,'order':sequence,'stages':stages,'issues':issues,'eligible':not issues,'merge_authority':False}
 
 
 def plan(config,repos):
@@ -117,12 +135,14 @@ def verify_sig(kind,body,sig,key):
 
 
 def approve(config,p,component,key):
+    order(config)
+    require(p.get('version') == config['version'] and p.get('config_digest') == digest(config), 'approval plan profile mismatch')
     body={'component':component,'plan_digest':digest(p),'config_digest':digest(config)}
     return {**body,'signature':sign('approval',body,key)}
 
 
-def verify_plan(config,p,approvals):
-    require(p==derive(config,p['components']),'plan derivation mismatch')
+def verify_plan(config,p,approvals, *, historical=False):
+    require(p==derive(config,p['components'], historical=historical),'plan derivation mismatch')
     require(p['eligible'],'change set blocked by plan')
     seen=set()
     for a in approvals:
@@ -170,7 +190,7 @@ def execute(config,p,approvals,repos,key,*,fault=None):
     final=snapshot()
     if final!=expected: status='MANUAL_INTERVENTION'
     record('finish',status=status,refs=final)
-    body={'version':1,'config_digest':digest(config),'plan':p,'approvals':approvals,'events':ledger.events,'status':status,'merge_authority':False}
+    body={'version':config['version'],'config_digest':digest(config),'plan':p,'approvals':approvals,'events':ledger.events,'status':status,'merge_authority':False}
     return {**body,'signature':sign('receipt',body,key)}
 
 
@@ -179,8 +199,8 @@ def verify_receipt(config,receipt,expected_config_digest):
     require(set(receipt)=={'version','config_digest','plan','approvals','events','status','merge_authority','signature'},'invalid receipt fields')
     body={k:v for k,v in receipt.items() if k!='signature'}
     verify_sig('receipt',body,receipt['signature'],config['executor_key'])
-    require(receipt['version']==1 and receipt['config_digest']==digest(config) and receipt['merge_authority'] is False,'receipt scope mismatch')
-    p=receipt['plan']; verify_plan(config,p,receipt['approvals']); events=receipt['events']; root=verify_chain(events)
+    require(type(receipt['version']) is int and receipt['version']==config['version'] and receipt['config_digest']==digest(config) and receipt['merge_authority'] is False,'receipt scope mismatch')
+    p=receipt['plan']; verify_plan(config,p,receipt['approvals'], historical=True); events=receipt['events']; root=verify_chain(events)
     expected={n:c['base'] for n,c in p['components'].items()}; completed=[]; failed=False; conflict=False
     require(events[0]['kind']=='start' and events[0]['payload']=={'refs':expected},'invalid start')
     for e in events[1:-1]:

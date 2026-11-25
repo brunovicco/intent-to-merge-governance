@@ -9,6 +9,7 @@ from .capture import run_agent,hook
 from .core import digest, load_config
 from .hardening import strict_gate, sweep, DurableChangeSet, verify_payment_candidate
 from functools import partial
+from .cli_errors import emit_failure, telemetry_provider
 
 def serve(db,repo,installation,secret,port):
     if len(secret)<32 or not REPO.fullmatch(repo) or installation<=0:raise ValueError('invalid ingress configuration')
@@ -80,9 +81,8 @@ def main():
                     else:
                         provider=None;tracer=None
                         if args.trace_console:
-                            from opentelemetry.sdk.trace import TracerProvider
-                            from opentelemetry.sdk.trace.export import SimpleSpanProcessor,ConsoleSpanExporter
-                            provider=TracerProvider();provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter(out=sys.stderr)));tracer=provider.get_tracer('intent-merge.operational')
+                            provider = telemetry_provider(sys.stderr)
+                            tracer = provider.get_tracer('intent-merge.operational')
                         try:result=work_once(j,client,policy,args.assertions,serialization.load_pem_public_key(args.verifier_key.read_bytes()),app_id=args.app_id,tracer=tracer,publish=args.publish,gate_fn=partial(strict_gate,receipt_dir=args.receipts,control_trust=json.loads(args.control_trust.read_text())))
                         finally:
                             if provider:provider.shutdown()
@@ -91,5 +91,7 @@ def main():
         if args.cmd=='sweep' and any(r['status'] in ('REMOTE_STATE_UNKNOWN','REVOCATION_UNCERTAIN') for r in result):p.exit(2)
         if args.cmd=='verify-candidate' and not result['passed']:p.exit(2)
         if args.cmd=='changeset-recover' and result['status']=='MANUAL_INTERVENTION':p.exit(2)
-    except (ValueError,OSError,KeyError,TypeError) as e:p.exit(1,f'error: {e}\n')
+    except Exception as exc:
+        emit_failure(args.cmd, exc, remote_write_possible=getattr(args, 'publish', False))
+        p.exit(1)
 if __name__=='__main__':main()

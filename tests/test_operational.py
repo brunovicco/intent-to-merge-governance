@@ -70,9 +70,14 @@ class OpsTests(unittest.TestCase):
         with self.assertRaises(ValueError):self.work(publish=True)
         self.assertFalse(self.api.posts);self.assertEqual(self.j.get('d1')['state'],'QUEUED')
     def test_telemetry(self):
-        from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-        from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+        try:
+            from opentelemetry.sdk.trace import TracerProvider
+            from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+            from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
+        except ModuleNotFoundError as exc:
+            if os.environ.get('ITM_REQUIRE_TELEMETRY') == '1' or not (exc.name or '').startswith('opentelemetry'):
+                raise
+            self.skipTest('optional telemetry extra is not installed')
         provider=TracerProvider();exp=InMemorySpanExporter();provider.add_span_processor(SimpleSpanProcessor(exp));self.assertion();self.work(tracer=provider.get_tracer('test'),publish=True);self.assertEqual({s.name for s in exp.get_finished_spans()},{'itm.worker','itm.evaluate','itm.publish'});provider.shutdown()
     def test_local_runner_fixture(self):
         from unittest.mock import patch

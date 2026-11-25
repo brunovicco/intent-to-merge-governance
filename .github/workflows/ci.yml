@@ -17,9 +17,11 @@ jobs:
           version: '0.12.10'
           enable-cache: false
       - run: python scripts/release_inventory.py verify --require-lock
+      - run: uv sync --locked
+      - run: uv run --locked python -m unittest discover -s tests -v
       - run: uv sync --locked --extra telemetry
       - run: echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
-      - run: python -m unittest discover -s tests -v
+      - run: ITM_REQUIRE_TELEMETRY=1 python -m unittest discover -s tests -v
       - run: python scripts/rc1_validate.py --out results/rc1-local
       - run: python scripts/rc1_external.py --self-test
       - run: python scripts/live_benchmark.py --fixture --out results/rc2-fixtures

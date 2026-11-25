@@ -23,7 +23,7 @@ class FinalReleaseTests(unittest.TestCase):
     def test_exact_baseline(self):
         r = self.mod.classify(ROOT, self.report, self.baseline)
         self.assertEqual(r['status'], 'REVIEWED_LAB_BASELINE')
-        self.assertEqual(len(r['reviewed']), 57)
+        self.assertEqual(len(r['reviewed']), 58)
         self.assertFalse(r['publication_ready'])
 
     def test_new_duplicate_and_missing_findings(self):

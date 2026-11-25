@@ -1,14 +1,18 @@
 from __future__ import annotations
-import json, os, secrets, subprocess, sys, shutil
+import json, os, subprocess, sys, shutil
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
-from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, PublicFormat, NoEncryption
-from .core import Ledger, Proposal, approval, digest, file_hash, load_config, matches, evaluate_policy, verify_chain
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+from .core import Ledger, Proposal, digest, file_hash, load_config, matches, evaluate_policy, verify_chain
 from .fixtures import BASE, PARTIAL, FIXED, BROKEN, HARNESS, DRIFTED, SIGNATURE_DRIFT, IMPORT_DRIFT
 from .intent import validate_spec, drift, requirement_coverage, build_graph, graph_mermaid
 from .checkpoints import make_checkpoint
 from .verification import WORKER, Executor, plan, evaluate, harness_digest, mutation_report, mutation_sources
 from .convergence import Governor
+from .path_policy import SEGMENT_V2, LEGACY_V1
+from .policy_schema import invalid_configuration
+from .approvals import PROFILE as APPROVAL_PROFILE, decision_context, sign_approval, valid_context
+from .approval_registry import ApprovalRegistry, PROFILE as REGISTRY_PROFILE, gate_decision, verify_recorded_claim
 
 SCENARIOS = ('happy', 'missing-approval', 'stale-approval', 'scope-violation', 'protected-path', 'loop', 'failed-eval', 'self-approval', 'stale-base', 'stale-eval', 'intent-drift', 'signature-drift', 'import-drift', 'property-regression', 'budget-exceeded', 'regression-loop')
 
@@ -67,25 +71,31 @@ def record_candidate(repo,ev,ledger,spec,policy,harness,trusted_hash,paths,bindi
 
 def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.11-slim"):
     if scenario not in SCENARIOS + BENCHMARK_SAFE_SCENARIOS: raise ValueError('unknown scenario')
+    spec = load_config(spec_path); policy = load_config(policy_path)
+    invalid = invalid_configuration(spec, policy)
+    if invalid is not None:
+        # A configuration rejection is not a completed candidate run or bundle.
+        out = Path(out).resolve(); out.mkdir(parents=True, exist_ok=False)
+        ledger = Ledger(); ledger.add('configuration_rejected', decision=invalid)
+        ledger.write(out/'configuration-rejection.jsonl')
+        return {'decision': invalid, 'merged': False, 'merge_authority': False}
+    validate_spec(spec)
     executor=Executor(backend,image)
     out = Path(out).resolve(); out.mkdir(parents=True, exist_ok=False)
     ev = out/'evidence'; ev.mkdir(); repo = out/'repo'; repo.mkdir()
-    spec = load_config(spec_path); policy = load_config(policy_path)
-    validate_spec(spec)
     if not {'intent_drift','requirement_coverage','checkpoint_binding','property_invariants','differential_compatibility','contract_flow','mutation_adequacy'} <= set(policy['required_checks']): raise ValueError('v0.3 policy must include intent, provenance and verification gates')
     shutil.copyfile(spec_path,ev/'spec.toml'); shutil.copyfile(policy_path,ev/'policy.toml')
     harness = ev/'acceptance.py'; harness.write_text(WORKER); plan_data=plan(); write_json(ev/'verification-plan.json',plan_data); trusted_hash=harness_digest(harness,ev/'verification-plan.json')
     baseline_execution=executor.execute(BASE,WORKER,plan_data); write_json(ev/'baseline-observations.json',baseline_execution)
     mutations=mutation_report(plan_data,executor,WORKER,FIXED,baseline_execution); mutations_ok=all(m['killed'] for m in mutations); write_json(ev/'mutation-report.json',mutations)
     pairs = {actor:Ed25519PrivateKey.generate() for actor in set(policy['approvers']) | {'coding-agent'}}
-    keys = {actor:'ed25519-private:'+key.private_bytes(Encoding.Raw,PrivateFormat.Raw,NoEncryption()).hex() for actor,key in pairs.items()}
     public_keys = {actor:'ed25519-public:'+key.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw).hex() for actor,key in pairs.items()}
     trust = out/'demo-trust.json'; write_json(trust, public_keys)
     git(repo,'init','-b','main'); git(repo,'config','user.name','Governance Demo'); git(repo,'config','user.email','demo@example.invalid')
     (repo/'app').mkdir(); (repo/'app/payments.py').write_text(BASE)
     git(repo,'add','.'); git(repo,'commit','-m','Baseline'); base = git(repo,'rev-parse','HEAD'); git(repo,'checkout','-b','candidate')
     (ev/'baseline.py').write_text(BASE)
-    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
+    ledger = Ledger(); ledger.add('intent_registered', spec=digest(spec), policy=digest(policy), base=base, harness=trusted_hash, scenario=scenario, baseline_hash=file_hash(ev/'baseline.py'), schema_version='0.4',path_semantics=SEGMENT_V2,approval_profile=APPROVAL_PROFILE,challenge_profile=REGISTRY_PROFILE,executor=executor.metadata(),mutation_report=digest(mutations),baseline_observations=digest(baseline_execution))
     governor=Governor(policy); required=set(spec['criteria'])|set(policy['required_checks']); agent = FixtureAgent(scenario); feedback = {}; termination = 'iteration_budget'; author = 'coding-agent'; paths = []; checks = {}; binding = {}; history = []
     for i in range(1, policy['max_iterations']+1):
         p = agent.propose(i,feedback)
@@ -99,22 +109,29 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
             target = repo/name; target.parent.mkdir(parents=True,exist_ok=True); target.write_text(content)
         git(repo,'add','--',*p.files); git(repo,'commit','--allow-empty','-m',f'Agent iteration {i}')
         head = git(repo,'rev-parse','HEAD'); tree = git(repo,'rev-parse','HEAD^{tree}'); paths = snapshot(repo,base)
-        binding = {'head':head,'base':base,'spec':digest(spec),'policy':digest(policy),'harness':trusted_hash}
+        binding = {'head':head,'base':base,'spec':digest(spec),'policy':digest(policy),'harness':trusted_hash,'path_semantics':SEGMENT_V2}
         checks,execution = record_candidate(repo,ev,ledger,spec,policy,harness,trusted_hash,paths,binding,i,session,proposal_hash,executor,plan_data,mutations_ok,baseline_execution)
         feedback = checks.copy()
         score = sum(v is True for v in checks.values()); history.append({'iteration':i,'passed':score,'total':len(checks),'head':head})
         control=governor.observe(iteration=i,tree=tree,checks=checks,required=required,paths=paths,case_count=len(plan_data['cases']),diff_bytes=(ev/f'iteration-{i}.diff').stat().st_size,execution_ok=execution['status']=='ok')
         ledger.add('convergence',**control)
         if control['action']!='continue': termination=control['action']; break
-    if not binding: binding = {'head':git(repo,'rev-parse','HEAD'),'base':base,'spec':digest(spec),'policy':digest(policy),'harness':trusted_hash}
+    if not binding: binding = {'head':git(repo,'rev-parse','HEAD'),'base':base,'spec':digest(spec),'policy':digest(policy),'harness':trusted_hash,'path_semantics':SEGMENT_V2}
     eval_binding = binding.copy() if history else None
     ledger.add('termination', reason=termination, iterations=len(history))
     approvals = []
+    registry = ApprovalRegistry(out / "approval-challenges.sqlite", create=True)
+    challenge = registry.issue(binding, author, public_keys)
+    nonce, issued_at = challenge["nonce"], challenge["issued_at"]
+    ledger.add("approval_challenge_issued", challenge=challenge)
+    signing_context = decision_context(nonce, issued_at)
     if termination == 'passed':
         actors = list(policy['approvers'])
         if scenario == 'missing-approval': actors = [a for a in actors if policy['approvers'][a]!='security']
         if scenario == 'self-approval': actors = ['coding-agent']
-        approvals = [approval(a,binding,keys) for a in actors]
+        approvals = [sign_approval(a, policy['approvers'].get(a, 'self'), author,
+                                   binding, signing_context, pairs[a], issued_at=issued_at,
+                                   expires_at=challenge["expires_at"]) for a in actors]
         if scenario == 'stale-approval':
             # New commit retains identical code; old approvals/evaluations cannot authorize it.
             git(repo,'commit','--allow-empty','-m','New candidate after approval'); binding = {**binding,'head':git(repo,'rev-parse','HEAD')}
@@ -125,7 +142,10 @@ def run(scenario, out, spec_path, policy_path, backend="local", image="python:3.
     ledger.add('approvals', approvals=approvals, simulated=True)
     current_head = git(repo,'rev-parse','candidate'); current_base = git(repo,'rev-parse','main')
     inputs = dict(paths=paths, checks=checks, binding=binding, approvals=approvals, author=author, termination=termination, current_head=current_head, current_base=current_base, eval_binding=eval_binding)
-    decision = evaluate_policy(spec,policy,keys=public_keys,**inputs)
+    claim = registry.claim(nonce, binding, author, public_keys)
+    ledger.add("approval_challenge_claimed", receipt=claim)
+    inputs["approval_context"] = claim["context"]
+    decision = gate_decision(evaluate_policy(spec,policy,keys=public_keys,**inputs), claim["reason"])
     ledger.add('policy_decision', inputs=inputs, decision=decision)
     merged = False
     if decision['authorized']:
@@ -159,11 +179,25 @@ def audit(out, anchor_path, trust_path):
     if root != anchor['ledger_root']: raise ValueError('ledger anchor mismatch')
     spec = load_config(ev/'spec.toml'); policy = load_config(ev/'policy.toml'); init = events[0]['payload']
     if init['spec'] != digest(spec) or init['policy'] != digest(policy) or init['harness'] != harness_digest(ev/'acceptance.py',ev/'verification-plan.json'): raise ValueError('configuration provenance mismatch')
-    validate_spec(spec)
-    verify_intent_evidence(ev,spec,events)
+    semantics = init.get('path_semantics', LEGACY_V1)
+    if semantics not in (LEGACY_V1, SEGMENT_V2):
+        raise ValueError('unknown historical path semantics')
+    validate_spec(spec, semantics=semantics)
+    verify_intent_evidence(ev,spec,events,semantics=semantics)
     verify_verification_evidence(ev,spec,policy,events)
     d = next(e['payload'] for e in events if e['kind']=='policy_decision'); inputs = d['inputs']
-    replay = evaluate_policy(spec,policy,keys=keys,**inputs)
+    profile = init.get('approval_profile')
+    if profile == APPROVAL_PROFILE:
+        if semantics != SEGMENT_V2 or not valid_context(inputs.get('approval_context')):
+            raise ValueError('invalid recorded approval context')
+    elif profile is not None or 'approval_context' in inputs:
+        raise ValueError('unknown or inconsistent approval profile')
+    replay = evaluate_policy(spec,policy,keys=keys,_historical_semantics=semantics,**inputs)
+    challenge_profile = init.get("challenge_profile")
+    if challenge_profile == REGISTRY_PROFILE and profile == APPROVAL_PROFILE:
+        replay = gate_decision(replay, verify_recorded_claim(events, inputs, keys))
+    elif challenge_profile is not None or any(e["kind"].startswith("approval_challenge_") for e in events):
+        raise ValueError("unknown or inconsistent challenge profile")
     if replay != d['decision']: raise ValueError('policy replay mismatch')
     result = events[-1]['payload']; report = json.loads((ev/'report.json').read_text())
     if report['ledger_root'] != root or report['decision'] != replay or report['merged'] != result['merged'] or report['main'] != result['main']: raise ValueError('report mismatch')
@@ -171,7 +205,7 @@ def audit(out, anchor_path, trust_path):
     return {'integrity':'verified','policy_replay':'verified','intent_graph':'verified','checkpoint_contract':'verified','structural_drift_replay':'verified','verification_replay':'verified','convergence_replay':'verified','merged':result['merged'],'ledger_root':root,'limitations':'Does not re-execute tests or attest an external Git server.'}
 
 
-def verify_intent_evidence(ev,spec,events):
+def verify_intent_evidence(ev,spec,events,*,semantics=SEGMENT_V2):
     init=events[0]['payload']
     if init['baseline_hash'] != file_hash(ev/'baseline.py'): raise ValueError('baseline provenance mismatch')
     proposals={e['hash']:e['payload'] for e in events if e['kind']=='proposal'}
@@ -185,15 +219,15 @@ def verify_intent_evidence(ev,spec,events):
         if digest((ev/f'candidate-{i}.py').read_text()) != proposal['files'].get('app/payments.py'): raise ValueError('proposal content mismatch')
         expected=make_checkpoint(spec['id'],proposal['session'],binding,cp['tree'],cp['paths'],cp['diff_hash'],uni['proposal_event_hash'],source=uni['source'])
         if uni!=expected or binding!=dr['binding'] or binding!=evl['binding'] or i!=dr['iteration'] or i!=evl['iteration']: raise ValueError('checkpoint binding mismatch')
-        observed=drift(spec,{'app/payments.py':(ev/'baseline.py').read_text()},{'app/payments.py':(ev/f'candidate-{i}.py').read_text()},cp['paths'])
-        coverage=requirement_coverage(spec,evl['checks'],cp['paths'])
+        observed=drift(spec,{'app/payments.py':(ev/'baseline.py').read_text()},{'app/payments.py':(ev/f'candidate-{i}.py').read_text()},cp['paths'],semantics=semantics)
+        coverage=requirement_coverage(spec,evl['checks'],cp['paths'],semantics=semantics)
         if observed!=dr['result'] or evl['checks']['intent_drift']!=observed['passed'] or evl['checks']['requirement_coverage']!=all(r['verified'] for r in coverage) or evl['checks']['checkpoint_binding'] is not True: raise ValueError('intent evaluation mismatch')
     read=lambda name:json.loads((ev/name).read_text())
     graph=build_graph(spec,events)
     if read('intent-graph.json')!=graph or (ev/'intent-graph.mmd').read_text()!=graph_mermaid(graph): raise ValueError('intent graph mismatch')
     if read('checkpoints.json')!=[cp['universal'] for cp in cp_events] or read('intent-drift.json')!=drift_events: raise ValueError('derived checkpoint or drift mismatch')
     d=next(e['payload'] for e in events if e['kind']=='policy_decision')['inputs']
-    coverage=requirement_coverage(spec,d['checks'],d['paths'])
+    coverage=requirement_coverage(spec,d['checks'],d['paths'],semantics=semantics)
     if read('requirement-coverage.json')!=coverage: raise ValueError('requirement coverage mismatch')
     if d['termination']=='passed' and not any(e['binding']==d['binding'] and e['checks']==d['checks'] for e in eval_events): raise ValueError('missing decision-bound evaluation')
     report=read('report.json')
