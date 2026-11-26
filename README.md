@@ -18,7 +18,7 @@ ITM is a vendor-neutral **research and reference implementation** that explores 
 
 > Agents generate code. Evidence supports trust. Policy grants authority. Autonomy must remain revocable.
 
-**Status:** v2.0.0-rc.1 candidate, not yet published. [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) remains the public reference release. `production_ready: false`; `merge_authority: false`.
+**Status** — The signed v2.0.0-rc.1 implementation completed independent AI-assisted review and local operational qualification. Publication remains on hold. [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) remains the stable public release. `publication_ready: false`, `production_ready: false`, `merge_authority: false`.
 
 [Migration guide](docs/migration-v2.md) · [RC qualification](docs/qualification-v2-rc1.md) · [Changelog](CHANGELOG.md).
 

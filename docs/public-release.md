@@ -1,5 +1,7 @@
 # Public research release qualification (1.0.0)
 
+For v2.0.0-rc.1, see the [final implementation qualification and publication gates](qualification-v2-rc1.md#final-implementation-and-operational-qualification). The runbook below records the earlier 1.0.0 qualification candidate.
+
 This final source qualification candidate includes the previously audited lockfile, scoped synthetic HTTP transport, and exact-source SAST review. See [final qualification](final-qualification.md). It is not a published or signed release. Apache-2.0 is a proposed license: the rights holder must confirm it, attribution, repository-specific lab identifiers, and distribution rights before publication. The bundled historical lab references are retained for reproducibility; review them before making the repository public. No automatic upload, signing, tag or publication is performed.
 
 ## 1. Verify the exact package before installing anything

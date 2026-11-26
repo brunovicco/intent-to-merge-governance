@@ -18,7 +18,7 @@ O ITM é uma **implementação de pesquisa e referência**, independente de forn
 
 > Agentes geram código. Evidências sustentam a confiança. Políticas concedem autoridade. A autonomia precisa ser revogável.
 
-**Status:** candidato v2.0.0-rc.1, ainda não publicado. A [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) continua sendo a release pública de referência. `production_ready: false`; `merge_authority: false`.
+**Status** — A implementação assinada da v2.0.0-rc.1 passou por revisão independente assistida por IA e concluiu a qualificação operacional local. A publicação continua pendente. A [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) continua sendo a versão pública estável. `publication_ready: false`, `production_ready: false`, `merge_authority: false`.
 
 [Guia de migração](docs/migration-v2.md) · [Qualificação da RC](docs/qualification-v2-rc1.md) · [Changelog](CHANGELOG.md).
 

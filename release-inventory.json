@@ -23,8 +23,8 @@
       "sha256": "67774a002a6bbcea0d079e0b6a5963bcbee7acd229677e4d62137164e649f146"
     },
     "CHANGELOG.md": {
-      "bytes": 11891,
-      "sha256": "cedf9413a57020f9aae25dcf5aec0a54ad0f4d5e6384b6f557d92ba6e0f544a9"
+      "bytes": 12554,
+      "sha256": "9c0ab826ace22731a2e26a297e5becd47e5155690148f7fe9ada45c51e0f608c"
     },
     "CITATION.cff": {
       "bytes": 427,
@@ -51,8 +51,8 @@
       "sha256": "a99c4c5e7bf0d3307362a8c7d83d733d1af54cf5177347d33b41be84d9832576"
     },
     "README.md": {
-      "bytes": 16119,
-      "sha256": "7520bf4e54d36f87944312146f190b76d2307759bc1de97fbcd121a34690e82e"
+      "bytes": 16250,
+      "sha256": "b5d53371e08326c9df99dd0061c0eb79dc387f1b1098b91eec2fd155f30259b7"
     },
     "SECURITY.md": {
       "bytes": 1249,
@@ -119,8 +119,8 @@
       "sha256": "856529c7de0d3f9456866a471b37760181070bba70c9c1ef824e227feed39982"
     },
     "docs/migration-v2.md": {
-      "bytes": 9473,
-      "sha256": "ec3550ca5e61dae9983d3d506d61d1f35bac7dc250d59798d030730346dcdac2"
+      "bytes": 9976,
+      "sha256": "a260fba7175d00fe2423d3d5a0c8550983ddc78e01e9ee50bb9e15368fecdea1"
     },
     "docs/multi-repository.md": {
       "bytes": 5241,
@@ -143,12 +143,12 @@
       "sha256": "ab8166f163b5c0e58fa9c9a8a0e66acbd00f7ee3fce63a3594325ef36a86324a"
     },
     "docs/public-release.md": {
-      "bytes": 4148,
-      "sha256": "1823fbc3bb53de9dcb133702246ec2efa259463930115896fe1f73c43019cff6"
+      "bytes": 4379,
+      "sha256": "e8d55ffad429e51294d0727eb930410a6bf61c523780915e5cbd5d132ae43d62"
     },
     "docs/qualification-v2-rc1.md": {
-      "bytes": 4811,
-      "sha256": "7a155006c157f68cb8b16e75395837f8b4190f465afe2307f4c7e8581494e9d9"
+      "bytes": 13358,
+      "sha256": "795a2e7734d6d0238ae7ba3089f479f09763b824544ca817c30f793057589e56"
     },
     "docs/rc1-changeset-recovery-review.md": {
       "bytes": 2100,
@@ -2523,8 +2523,8 @@
       "sha256": "365e5b811701a186ba2fa0f6c353d6d9970bf43b69cac918570adcf54ee6a792"
     },
     "readme.pt-br.md": {
-      "bytes": 18097,
-      "sha256": "27be5d7ff186d46a276937c7af78df73f9a81eacf7f61429b1fcf30c939aa0b8"
+      "bytes": 18250,
+      "sha256": "ac8094351314c20f64ad2e776941cc0f581698165aaa4bb4963168f42fdcdc90"
     },
     "scripts/adversarial_benchmark.py": {
       "bytes": 634,

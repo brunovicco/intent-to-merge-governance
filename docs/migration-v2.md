@@ -93,6 +93,12 @@ unresolved reconciliation or sweep results. Expiry, ref changes, and remote
 state changes can occur after request start. Publication, revocation and merge
 are separate operations.
 
+Check-run consumers require a complete counted collection of the runs exposed
+by GitHub and reject duplicate or invalid run identities before filtering.
+Incomplete observations are recoverable errors. Reconciliation retains the
+original publication identity for a later observation. See the
+[check collection limits](operational-integration.md#github-check-collection-limits).
+
 Direct `github-preflight --publish` writes the distinct diagnostic
 `ITM / PR preflight` check. The evidence-gate expiry contract applies to
 `ITM / evidence gate` produced by the journaled worker. Keep diagnostic and
@@ -107,8 +113,8 @@ be created. Valid policy blocks exit 0. Unexpected operational failures exit 1.
 
 1. Review the candidate on a separate branch and verify its exact inventory. Back up trusted evidence and registry state through an independently administered process.
 2. Review patterns and migrate configurations; use fresh output directories and newly issued approvals. Do not import secrets into the candidate workspace.
-3. Run both locked installation profiles, replay AMGB and the operational study, and qualify integration, Docker and scans as described in [RC qualification](qualification-v2-rc1.md).
-4. Obtain an independent review and explicit maintainer publication decision. A passing scan or test is evidence, not publication approval.
+3. Run both locked installation profiles and replay AMGB and the operational study when validating a migrated environment. See the [signed implementation qualification](qualification-v2-rc1.md#final-implementation-and-operational-qualification) for the completed local fixture, Docker and scanner results.
+4. Use the [publication gates](qualification-v2-rc1.md#publication-gates) to track exact-tree validation and maintainer release authorization.
 
 ## Detailed contracts
 
