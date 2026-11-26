@@ -13,15 +13,19 @@ class FixtureAPI:
         self.pr={'head':{'sha':HEAD,'repo':{'full_name':'OWNER/REPO'}},'base':{'sha':BASE,'ref':'main','repo':{'full_name':'OWNER/REPO'}},'state':'open','draft':False,'changed_files':1,'user':{'id':99}}
         self.files=[{'filename':'app/payments.py','status':'modified'}]
         self.reviews=[{'id':i,'user':{'id':uid,'type':'User'},'state':'APPROVED','commit_id':HEAD} for i,uid in [(1,10001),(2,10002)]]
-        self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success'}]
+        self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success','external_id':None}]
         self.posts=[]; self.reads=0; self.move=False; self.installation_app_id=789
     def request(self,path,payload=None):
         if payload is not None: self.posts.append((path,payload)); return {**payload, 'id':44, 'app':{'id':self.installation_app_id}}
+        if '/check-suites?' in path:
+            return {'total_count': 1, 'check_suites': [{'id': 1}]}
+        if '/check-runs?' in path:
+            return {'total_count': len(self.checks), 'check_runs': copy.deepcopy(self.checks)}
         self.reads+=1; obj=copy.deepcopy(self.pr)
         if self.move and self.reads>1: obj['head']['sha']='c'*40
         return obj
     def pages(self,path,key=None):
-        return iter(self.files if path.endswith('/files') else self.reviews if path.endswith('/reviews') else self.checks)
+        return iter(self.files if path.endswith('/files') else self.reviews)
 class GitHubTests(unittest.TestCase):
     def setUp(self): self.api=FixtureAPI(); self.policy=policy_from(ROOT/'examples/github-policy.toml')
     def run_gate(self,publish=False): return preflight(self.api,'OWNER/REPO',1,self.policy,publish=publish)

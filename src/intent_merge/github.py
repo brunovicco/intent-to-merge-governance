@@ -14,6 +14,9 @@ REPO = re.compile(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+')
 CHECK_NAME = 'ITM / PR preflight'
 FILE_STATUSES = ('added', 'removed', 'modified', 'renamed', 'copied', 'changed', 'unchanged')
 CHECK_STATUSES = {'queued', 'in_progress', 'completed', 'requested', 'waiting', 'pending'}
+PAGE_SIZE = 100
+PAGE_LIMIT = 30
+CHECK_SUITE_LIMIT = 1000
 CHECK_CONCLUSIONS = {'action_required', 'cancelled', 'failure', 'neutral', 'skipped',
                      'stale', 'startup_failure', 'success', 'timed_out'}
 
@@ -36,12 +39,17 @@ class GitHubObservationError(ValueError):
     """An unavailable or invalid GitHub observation with a redacted message."""
 
 
-def check_observation(row):
+def check_observation(row, *, allow_null_app=False):
     """Validate the identity and lifecycle fields returned by GitHub."""
     if not isinstance(row, dict):
         raise GitHubObservationError('invalid check observation')
     app, status, conclusion = row.get('app'), row.get('status'), row.get('conclusion')
-    if (not positive_id(row.get('id')) or not isinstance(app, dict) or not positive_id(app.get('id'))
+    has_app = isinstance(app, dict) and positive_id(app.get('id'))
+    null_app = allow_null_app and 'app' in row and app is None
+    external_id = row.get('external_id')
+    if (not positive_id(row.get('id')) or not (has_app or null_app)
+            or 'external_id' not in row
+            or (external_id is not None and not isinstance(external_id, str))
             or not isinstance(row.get('name'), str) or not row['name']
             or not isinstance(row.get('head_sha'), str) or not SHA.fullmatch(row['head_sha'])
             or not isinstance(status, str) or status not in CHECK_STATUSES
@@ -109,17 +117,60 @@ class GitHub:
         except (ValueError, RecursionError):
             raise GitHubObservationError('invalid GitHub response JSON') from None
 
-    def pages(self,path,key=None):
-        for page in range(1,31):
-            data=self.request(path+('&' if '?' in path else '?')+f'per_page=100&page={page}')
-            if key is not None and not isinstance(data, dict):
-                raise GitHubObservationError('invalid GitHub collection')
-            rows = data if key is None else data.get(key)
+    def pages(self, path):
+        for page in range(1, PAGE_LIMIT + 1):
+            separator = '&' if '?' in path else '?'
+            rows = self.request(f'{path}{separator}per_page={PAGE_SIZE}&page={page}')
             if not isinstance(rows, list):
                 raise GitHubObservationError('invalid GitHub collection')
             yield from rows
-            if len(rows)<100: return
+            if len(rows) < PAGE_SIZE:
+                return
         raise GitHubObservationError('pagination limit reached; refusing incomplete evidence')
+
+
+def _counted_page(data, key):
+    if not isinstance(data, dict) or not isinstance(data.get(key), list):
+        raise GitHubObservationError('invalid GitHub collection')
+    count = data.get('total_count')
+    if type(count) is not int or count < 0:
+        raise GitHubObservationError('invalid GitHub collection count')
+    return count, data[key]
+
+
+def check_runs(client, repo, head):
+    """Collect distinct check runs for a validated repository and commit SHA."""
+    route = f'/repos/{repo}/commits/{head}'
+    # The ref-level runs endpoint can silently omit older suites at its cap.
+    suite_count, suites = _counted_page(
+        client.request(route + '/check-suites?per_page=1&page=1'), 'check_suites')
+    if len(suites) != min(1, suite_count) or any(
+            not isinstance(row, dict) or not positive_id(row.get('id')) for row in suites):
+        raise GitHubObservationError('invalid check suite observation')
+    if suite_count >= CHECK_SUITE_LIMIT:
+        raise GitHubObservationError('unsupported GitHub check suite count')
+
+    expected = None
+    runs = {}
+    for page in range(1, PAGE_LIMIT + 1):
+        path = f'{route}/check-runs?filter=all&per_page={PAGE_SIZE}&page={page}'
+        count, rows = _counted_page(client.request(path), 'check_runs')
+        if expected is None:
+            expected = count
+            if expected > PAGE_SIZE * PAGE_LIMIT:
+                raise GitHubObservationError('unsupported GitHub check run count')
+        elif count != expected:
+            raise GitHubObservationError('GitHub check run count changed; retry')
+        if len(rows) != min(PAGE_SIZE, expected - len(runs)):
+            raise GitHubObservationError('incomplete or excess GitHub check runs; retry')
+        for row in rows:
+            check_id = check_observation(row, allow_null_app=True)
+            if check_id in runs:
+                raise GitHubObservationError('duplicate GitHub check run identity; retry')
+            runs[check_id] = row
+        if len(runs) == expected:
+            return list(runs.values())
+    raise GitHubObservationError('pagination limit reached; refusing incomplete evidence')
 
 
 def policy_from(path):
@@ -204,16 +255,9 @@ def changed_paths(files, count):
 
 
 def latest_prerequisite(checks, rule, head):
-    matching = []
-    for row in checks:
-        if not isinstance(row, dict) or not isinstance(row.get('name'), str) or not row['name']:
-            raise GitHubObservationError('invalid check collection')
-        if row['name'] == rule['name']:
-            check_observation(row)
-            if row['app']['id'] == rule['app_id'] and row['head_sha'] == head:
-                matching.append(row)
-    if len({row['id'] for row in matching}) != len(matching):
-        raise GitHubObservationError('ambiguous prerequisite checks')
+    matching = (row for row in checks
+                if row['name'] == rule['name'] and row['app'] is not None
+                and row['app']['id'] == rule['app_id'] and row['head_sha'] == head)
     return max(matching, key=lambda row: row['id'], default={})
 
 
@@ -254,7 +298,7 @@ def preflight(client, repo, number, policy, *, publish=False):
     paths = changed_paths(list(client.pages(route+'/files')), count)
     reviews=list(client.pages(route+'/reviews'))
     validate_reviews(reviews)
-    checks=list(client.pages(prefix+f'/commits/{head}/check-runs?filter=all','check_runs'))
+    checks = check_runs(client, repo, head)
     reasons=[]; gates=[]
     def gate(name, passed):
         gates.append({'name':name,'passed':bool(passed)})
@@ -263,10 +307,7 @@ def preflight(client, repo, number, policy, *, publish=False):
     for path in paths:
         gate('scope:'+path,matches(path,policy['allowed_paths']) and not matches(path,policy['protected_paths']))
     for rule in policy['required_checks']:
-        try:
-            latest = latest_prerequisite(checks, rule, head)
-        except GitHubObservationError:
-            latest = {}
+        latest = latest_prerequisite(checks, rule, head)
         gate('check:'+rule['name'],latest.get('status')=='completed' and latest.get('conclusion')=='success')
     latest_reviews={}
     for r in sorted(reviews,key=lambda x:x['id']):

@@ -48,7 +48,7 @@ class FixtureRemote:
         self.reviews = [{'id': i, 'user': {'id': uid, 'type': 'User'}, 'state': 'APPROVED', 'commit_id': head}
                         for i, uid in [(1, 10001), (2, 10002)]]
         self.checks = [{'id': 3, 'name': 'trusted-ci', 'app': {'id': 12345}, 'head_sha': head,
-                        'status': 'completed', 'conclusion': 'success'}]
+                        'status': 'completed', 'conclusion': 'success', 'external_id': None}]
         self.posts = 0
         self.lose_response = False
 
@@ -66,12 +66,15 @@ class FixtureRemote:
             row = next(c for c in self.checks if str(c['id']) == path.rsplit('/', 1)[-1])
             if method == 'PATCH': row.update(payload)
             return copy.deepcopy(row)
+        if '/check-suites?' in path:
+            return {'total_count': 1, 'check_suites': [{'id': 1}]}
+        if '/check-runs?' in path:
+            return {'total_count': len(self.checks), 'check_runs': copy.deepcopy(self.checks)}
         raise ValueError('unexpected fixture API route')
 
     def pages(self, path, key=None):
         if path.endswith('/files'): return iter([{'filename':'app/payments.py','status':'modified'}])
         if path.endswith('/reviews'): return iter(copy.deepcopy(self.reviews))
-        if '/check-runs?' in path: return iter(copy.deepcopy(self.checks))
         raise ValueError('unexpected fixture collection')
 
 

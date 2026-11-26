@@ -13,15 +13,20 @@ class Fixture:
     installation_repository = 'OWNER/REPO'
     def __init__(self):
         self.posts=[];self.lose=False;self.pr={'head':{'sha':HEAD,'repo':{'full_name':'OWNER/REPO'}},'base':{'sha':BASE,'ref':'main','repo':{'full_name':'OWNER/REPO'}},'state':'open','draft':False,'changed_files':1,'user':{'id':99}}
-        self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success'}]
+        self.checks=[{'id':3,'name':'trusted-ci','app':{'id':12345},'head_sha':HEAD,'status':'completed','conclusion':'success','external_id':None}]
         self.reviews=[{'id':i,'user':{'id':u,'type':'User'},'state':'APPROVED','commit_id':HEAD} for i,u in [(1,10001),(2,10002)]]
     def request(self,path,payload=None):
-        if payload is None:return self.pr
+        if payload is None:
+            if '/check-suites?' in path:
+                return {'total_count': 1, 'check_suites': [{'id': 1}]}
+            if '/check-runs?' in path:
+                return {'total_count': len(self.checks), 'check_runs': self.checks}
+            return self.pr
         r={**payload,'id':len(self.posts)+44,'app':{'id':APP}};self.posts.append(r);self.checks.append(r)
         if self.lose:raise ValueError('fixture: response lost after remote write')
         return r
     def pages(self,path,key=None):
-        return iter([{'filename':'app/payments.py','status':'modified'}] if path.endswith('/files') else self.reviews if path.endswith('/reviews') else self.checks)
+        return iter([{'filename':'app/payments.py','status':'modified'}] if path.endswith('/files') else self.reviews)
 
 def study(out):
     out.mkdir(parents=True,exist_ok=False);policy=policy_from(Path('examples/github-policy.toml'));rows=[]

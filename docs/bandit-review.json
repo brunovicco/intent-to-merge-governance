@@ -130,29 +130,29 @@
       "rule": "B404",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "d2a4286e0af916122a69a7d5815a490e490d42e98b1320d037fc88e93eea0131",
+      "source_sha256": "2075c4cfd441352391b5da2c2de674b3b160368e301a95d97457bceb1a8fe574",
       "line_sha256": "a55d45571939a47a8021bc55d088c114bc35cdb06169841669214bb13775d187",
       "disposition": "reviewed_import",
       "rationale": "Import only; assess the individual process call sites separately."
     },
     {
       "file": "scripts/rc1_validate.py",
-      "line": 158,
+      "line": 161,
       "rule": "B607",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "d2a4286e0af916122a69a7d5815a490e490d42e98b1320d037fc88e93eea0131",
+      "source_sha256": "2075c4cfd441352391b5da2c2de674b3b160368e301a95d97457bceb1a8fe574",
       "line_sha256": "5d33c43d2e5cd4ec43204d157c603311e3dd9ecfb597b1fbdc8357d4be29fd7f",
       "disposition": "accepted_lab_residual",
       "rationale": "Executable is selected through PATH. Requires trusted OS account, PATH, installed tools and repository configuration; not suitable for privileged execution of untrusted repositories."
     },
     {
       "file": "scripts/rc1_validate.py",
-      "line": 158,
+      "line": 161,
       "rule": "B603",
       "severity": "LOW",
       "confidence": "HIGH",
-      "source_sha256": "d2a4286e0af916122a69a7d5815a490e490d42e98b1320d037fc88e93eea0131",
+      "source_sha256": "2075c4cfd441352391b5da2c2de674b3b160368e301a95d97457bceb1a8fe574",
       "line_sha256": "5d33c43d2e5cd4ec43204d157c603311e3dd9ecfb597b1fbdc8357d4be29fd7f",
       "disposition": "accepted_lab_residual",
       "rationale": "Git argv with repo path and fixed or caller-selected Git subcommand/refs; requires trusted fixture/workspace and validated caller inputs. No general protection against Git option/config attacks."
@@ -423,11 +423,11 @@
     },
     {
       "file": "src/intent_merge/operational.py",
-      "line": 133,
+      "line": 132,
       "rule": "B608",
       "severity": "MEDIUM",
       "confidence": "MEDIUM",
-      "source_sha256": "09d6237536cf96bce4e919090fd9c52355f137210019236cb245dd9bdfd76dff",
+      "source_sha256": "a109ccbe93549e2b995aac61d0ed517160390a2c51ef793efc4c6761d191cb26",
       "line_sha256": "6a6638caf818f61068fcde6a6c9225963db01d7fc4b323f05f3cbc1588fdd662",
       "disposition": "reviewed_fixed_sql",
       "rationale": "transition checks field names against report/external_id/check_id; values, ID and state are bound parameters."

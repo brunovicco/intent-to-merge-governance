@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 
 from intent_merge import cli, operational
 from intent_merge.cli_errors import failure
-from intent_merge.github import GitHub, CheckPublicationUnconfirmed, preflight, policy_from
+from intent_merge.github import GitHub, GitHubObservationError, CheckPublicationUnconfirmed, preflight, policy_from
 from test_integration_v05 import FixtureAPI, ROOT
 
 
@@ -133,8 +133,8 @@ class PublicationContractTests(unittest.TestCase):
                     self.assertIsNone(body, 'invalid observations must stop before POST')
                     if path.split('?')[0].endswith(route):
                         return payload
-                    if '/check-runs?' in path:
-                        return {'check_runs': self.api.checks}
+                    if '/check-suites?' in path or '/check-runs?' in path:
+                        return self.api.request(path)
                     if '/files?' in path:
                         return self.api.files
                     if '/reviews?' in path:
@@ -184,10 +184,9 @@ class PublicationContractTests(unittest.TestCase):
     def test_malformed_prerequisite_record_cannot_leave_a_passing_gate(self):
         for payload in (None, {}, {'name': []}, {'name': 'trusted-ci', 'app': None}):
             with self.subTest(payload=payload):
-                with patch.object(self.api, 'checks', [*self.api.checks, payload]):
-                    report = preflight(self.api, 'OWNER/REPO', 1, self.policy)
-                self.assertEqual(report['decision'], 'BLOCK')
-                self.assertIn('check:trusted-ci', report['reasons'])
+                with patch.object(self.api, 'checks', [*self.api.checks, payload]), \
+                        self.assertRaises(GitHubObservationError):
+                    preflight(self.api, 'OWNER/REPO', 1, self.policy)
         self.assertEqual(preflight(self.api, 'OWNER/REPO', 1, self.policy)['decision'], 'PASS')
 
     def test_malformed_wire_json_has_a_redacted_domain_error(self):

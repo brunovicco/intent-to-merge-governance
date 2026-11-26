@@ -1,7 +1,6 @@
 """Durable single-worker GitHub App gate. No remote merge authority."""
 from __future__ import annotations
 import base64, hashlib, hmac, json, os, re, sqlite3, time, fcntl
-from collections import Counter
 from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from urllib.request import Request, build_opener
@@ -13,7 +12,7 @@ from .core import canonical, digest, unique_json_members
 from .policy_schema import InvalidConfiguration
 from .github import (
     CheckPublicationUnconfirmed, GitHub, NoRedirect, REPO, preflight, valid_token,
-    SHA, positive_id, validate_check_response,
+    SHA, GitHubObservationError, check_runs, positive_id, validate_check_response,
 )
 
 NAME='ITM / evidence gate'
@@ -247,30 +246,21 @@ def checked_publication(job, client, app_id, installation_id):
 
 
 def correlated_check(client, intent):
-    route = ('/repos/' + intent['repository'] + '/commits/' + intent['head_sha']
-             + '/check-runs?filter=all')
     matches = []
-    check_ids = Counter()
     ambiguous = False
-    for row in client.pages(route, 'check_runs'):
-        if not isinstance(row, dict):
-            ambiguous = True
-            continue
-        if positive_id(row.get('id')):
-            check_ids[row['id']] += 1
+    for row in check_runs(client, intent['repository'], intent['head_sha']):
         external = row.get('external_id')
         if external == intent['external_id']:
             matches.append(row)
-        elif ((not isinstance(external, str) or not external)
-              and (not isinstance(row.get('name'), str) or not row['name'] or row['name'] == NAME)):
+        elif not external and row['name'] == intent['name']:
             ambiguous = True
     if len(matches) == 1 and not ambiguous:
         try:
             check_id = validate_check_response(matches[0], intent, intent['app_id'])
-        except ValueError:
+        except GitHubObservationError:
             pass
         else:
-            if check_ids[check_id] == 1 and check_id <= 2**63 - 1:
+            if check_id <= 2**63 - 1:
                 return check_id, 1
     return None, len(matches)
 
@@ -361,7 +351,7 @@ def reconcile(journal, client, id, app_id, *, installation_id=None):
             return reconciliation_required(job, 'publication_identity_unavailable_or_mismatched')
         try:
             check_id, matches = correlated_check(client, intent)
-        except Exception:
+        except (GitHubObservationError, OSError):
             return reconciliation_required(job, 'remote_observation_unavailable')
         if check_id is None:
             return reconciliation_required(job, 'no_unique_matching_check', matches=matches)

@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
 
 from intent_merge import ops_cli
 from intent_merge.core import canonical
-from intent_merge.github import CheckPublicationUnconfirmed, preflight
+from intent_merge.github import CheckPublicationUnconfirmed, GitHubObservationError, preflight
 from intent_merge.hardening import strict_gate, sweep
 from intent_merge.operational import Journal, delivery, reconcile, work_once
 import test_hardening
@@ -53,6 +53,8 @@ class PublicationLifecycleTests(unittest.TestCase):
     def request(self, path, payload=None, *, method=None):
         if path.endswith('/pulls/1'):
             return copy.deepcopy(self.api.pr)
+        if '/check-suites?' in path or '/check-runs?' in path:
+            return test_hardening.API.request(self.api, path)
         if path.endswith('/check-runs'):
             self.posts.append(copy.deepcopy(payload))
             self.remote = {**payload, 'id': 40 + len(self.posts), 'app': {'id': 77}}
@@ -190,6 +192,63 @@ class PublicationLifecycleTests(unittest.TestCase):
         self.assertEqual(len(self.posts), 1)
         self.assertFalse(self.patches)
 
+    def test_strict_worker_refuses_contradictory_refresh(self):
+        reads = 0
+
+        def observe(path, payload=None, *, method=None):
+            nonlocal reads
+            response = self.request(path, payload, method=method)
+            if '/check-runs?' in path:
+                reads += 1
+                if reads == 2:
+                    response['check_runs'].append({**response['check_runs'][0], 'app': {'id': 17}})
+                    response['total_count'] += 1
+            return response
+
+        with patch.object(self.api, 'request', side_effect=observe), self.assertRaises(GitHubObservationError):
+            self.publish()
+        self.assertEqual(reads, 2)
+        self.assertEqual(self.journal.get(self.job['id'])['state'], 'QUEUED')
+        self.assertFalse(self.posts)
+
+    def test_reconciliation_does_not_swallow_unexpected_errors(self):
+        original = self.lost_post()
+        with patch.object(self.api, 'request', side_effect=TypeError('unexpected fixture failure')):
+            with self.assertRaises(TypeError):
+                self.reconcile()
+        self.assertEqual(self.journal.get(self.job['id']), original)
+        self.assertEqual(len(self.posts), 1)
+
+    def test_reconciliation_requires_complete_all_filter_before_unique_match(self):
+        original = self.lost_post()
+        remote = self.remote
+        query = '/check-runs?filter=all&per_page=100&page='
+        older_match = {**remote, 'id': 40}
+        unrelated = {**remote, 'id': 40, 'name': 'unrelated', 'app': None,
+                     'external_id': None}
+        first = [remote] + [{**self.api.checks[0], 'id': i} for i in range(100, 199)]
+
+        def observe(path, payload=None, *, method=None):
+            if '/check-runs?' not in path:
+                return self.request(path, payload, method=method)
+            self.assertIn(query, path)
+            page = int(path.rsplit('=', 1)[1])
+            return {'total_count': 101, 'check_runs': first if page == 1 else tail}
+
+        with patch.object(self.api, 'request', side_effect=observe):
+            for tail, reason in (([], 'remote_observation_unavailable'),
+                                 ([{**remote, 'external_id': 'different'}], 'remote_observation_unavailable'),
+                                 ([older_match], 'no_unique_matching_check')):
+                with self.subTest(reason=reason):
+                    result = self.reconcile()
+                    self.assertEqual(result['state'], 'UNCERTAIN')
+                    self.assertEqual(result['reason'], reason)
+                    self.assertEqual(self.journal.get(self.job['id']), original)
+            tail = [unrelated]
+            self.assertEqual(self.reconcile(), {'state': 'DONE', 'check_id': remote['id']})
+        self.assertEqual(len(self.posts), 1)
+        self.assertFalse(self.patches)
+
     def test_confirmed_malformed_get_does_not_patch(self):
         self.publish()
         for conclusion in ({}, False, None, 'unknown'):
@@ -219,8 +278,8 @@ class PublicationLifecycleTests(unittest.TestCase):
                            ('app', {'id': float(original['app']['id'])})):
             with self.subTest(field=field, bad=bad):
                 self.api.checks[0] = {**original, field: bad}
-                report = preflight(self.api, self.job['repo'], self.job['pr'], self.policy)
-                self.assertEqual(report['decision'], 'BLOCK')
+                with self.assertRaises(GitHubObservationError):
+                    preflight(self.api, self.job['repo'], self.job['pr'], self.policy)
         self.assertFalse(self.posts)
 
     def test_webhook_installation_id_is_exact(self):
@@ -271,25 +330,27 @@ class PublicationLifecycleTests(unittest.TestCase):
 
     def test_sweep_expires_during_uncertain_reconciliation(self):
         self.lost_post()
-        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_pages(NOW+60)):
+        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_check_runs(NOW+60)):
             self.assertEqual(self.sweep(now=None)['status'], 'REVOKED')
         self.assertEqual((len(self.posts), len(self.patches)), (1, 1))
 
-    def advancing_clock_after_pages(self, final):
+    def advancing_clock_after_check_runs(self, final):
         clock = [NOW]
-        pages = self.api.pages
+        request = self.api.request
 
-        def advance(*args, **kwargs):
-            yield from pages(*args, **kwargs)
-            clock[0] = final
+        def advance(path, *args, **kwargs):
+            response = request(path, *args, **kwargs)
+            if '/check-runs?' in path:
+                clock[0] = final
+            return response
 
-        self.addCleanup(setattr, self.api, 'pages', pages)
-        self.api.pages = advance
+        self.addCleanup(setattr, self.api, 'request', request)
+        self.api.request = advance
         return lambda: clock[0]
 
     def test_sweep_rejects_clock_regression_during_reconciliation(self):
         self.lost_post()
-        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_pages(NOW-1)):
+        with patch('intent_merge.hardening.time.time', self.advancing_clock_after_check_runs(NOW-1)):
             self.assertEqual(self.sweep(apply=False, now=None)['status'], 'WOULD_REVOKE')
         self.assertEqual(self.journal.get(self.job['id'])['state'], 'UNCERTAIN')
         self.assertEqual((len(self.posts), len(self.patches)), (1, 0))
@@ -391,7 +452,7 @@ class PublicationLifecycleTests(unittest.TestCase):
         self.assertEqual(self.journal.get(self.job['id'])['state'], 'UNCERTAIN')
         self.assertEqual((len(self.posts), len(self.patches)), (1, 0))
 
-    def exercise_batch(self, expiries, malformed, *, wrong_id=None, lost_id=None, apply=True, cli=False):
+    def exercise_batch(self, expiries, malformed, *, incomplete=None, wrong_id=None, lost_id=None, apply=True, cli=False):
         """Supply observations keyed by the exact check GET that starts each row."""
         f = self.fixture
         for i, expiry in enumerate(expiries):
@@ -426,7 +487,10 @@ class PublicationLifecycleTests(unittest.TestCase):
                 if check_id == wrong_id:
                     response['external_id'] = 'unrelated'
                 return response
-            return self.request(path, payload, method=method)
+            response = self.request(path, payload, method=method)
+            if incomplete is not None and active == incomplete and '/check-runs?' in path:
+                response['total_count'] += 1
+            return response
 
         def observe_pages(path, key=None):
             if active in malformed and path.endswith('/reviews'):
@@ -463,6 +527,14 @@ class PublicationLifecycleTests(unittest.TestCase):
             ops_cli.main()
         self.assertEqual(caught.exception.code, 2)
         return json.loads(out.getvalue())
+
+    def test_incomplete_refresh_revokes_and_preserves_later_unresolved_expiry(self):
+        results, patched = self.exercise_batch([45, 20], set(), incomplete=41, lost_id=42, cli=True)
+        self.assertEqual([r['status'] for r in results], ['REVOKED', 'REVOCATION_UNCERTAIN'])
+        self.assertEqual(results[0]['reason'], 'preflight_observation_unavailable')
+        self.assertEqual(results[1]['external_id'], self.journal.get('row-2')['external_id'])
+        self.assertEqual(patched, [41, 42])
+        self.assertEqual(self.api.checks[-2]['conclusion'], 'failure')
 
     def test_null_review_does_not_prevent_later_expired_revocation(self):
         results, patched = self.exercise_batch([45, 20], {41})

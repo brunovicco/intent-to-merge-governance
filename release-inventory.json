@@ -88,7 +88,7 @@
     },
     "docs/bandit-review.json": {
       "bytes": 35017,
-      "sha256": "b3a41f31091c53c95163a483213531b6fba69e0a9bbe4e712828c5ebaf99cb94"
+      "sha256": "6bc0e9a6c047adf5d9c3bfec6a2ae7d9b876e7afd8d8abe19b68862fb4dec973"
     },
     "docs/benchmark-methodology.md": {
       "bytes": 1590,
@@ -131,8 +131,8 @@
       "sha256": "67dba421b8aa8af69a15be4fb82838847d0e6abfa827472fb4e1e04cda12c659"
     },
     "docs/operational-integration.md": {
-      "bytes": 9134,
-      "sha256": "56686048d814bfc26508177516a3d01758894c024e18270161fa320cec894014"
+      "bytes": 10445,
+      "sha256": "1699e7db6f9df8a5daad74e55c683f2f8a635b67001bfb2135c3de9a9a9d5c36"
     },
     "docs/policy-hardening-draft.md": {
       "bytes": 3859,
@@ -2559,8 +2559,8 @@
       "sha256": "bbad1f2ed3f3e8d709e20394869882c5dccef529c63d2ac6bb253187a727ec01"
     },
     "scripts/operational_demo.py": {
-      "bytes": 5202,
-      "sha256": "a7447412cfcefba63795314345a8dbf39145df7f4ff56f5c3d9693613de1228a"
+      "bytes": 5423,
+      "sha256": "5ddbb0c9076c98cdb00214e00abc91602d735fd532217e3453c292db3c7e43ef"
     },
     "scripts/public_security.sh": {
       "bytes": 2283,
@@ -2571,8 +2571,8 @@
       "sha256": "b8677ef126143a4b2d0cf425bc525a399ccef982c874d7b51f37202610e83c4f"
     },
     "scripts/rc1_validate.py": {
-      "bytes": 14627,
-      "sha256": "d2a4286e0af916122a69a7d5815a490e490d42e98b1320d037fc88e93eea0131"
+      "bytes": 14807,
+      "sha256": "2075c4cfd441352391b5da2c2de674b3b160368e301a95d97457bceb1a8fe574"
     },
     "scripts/release_inventory.py": {
       "bytes": 3882,
@@ -2691,8 +2691,8 @@
       "sha256": "6494499658185c5e9a6e74d0f5a93efb8035bbcf7302848393feebdcc568cae0"
     },
     "src/intent_merge/github.py": {
-      "bytes": 16911,
-      "sha256": "dc6912e982141bdb4174769e63428e777577e3a41b3bae54e2e1c31c05e38b7f"
+      "bytes": 18812,
+      "sha256": "946eeb6376a90bcf5b79e1ef788952c71973f0376233965b346931133fab64e9"
     },
     "src/intent_merge/hardening.py": {
       "bytes": 24332,
@@ -2715,8 +2715,8 @@
       "sha256": "49d713eedd52fc82d9d65adb49a909599f7d9889d6f0e468f58d874d88e11050"
     },
     "src/intent_merge/operational.py": {
-      "bytes": 22560,
-      "sha256": "09d6237536cf96bce4e919090fd9c52355f137210019236cb245dd9bdfd76dff"
+      "bytes": 22183,
+      "sha256": "a109ccbe93549e2b995aac61d0ed517160390a2c51ef793efc4c6761d191cb26"
     },
     "src/intent_merge/operations_demo.py": {
       "bytes": 8492,
@@ -2790,6 +2790,10 @@
       "bytes": 9195,
       "sha256": "255b1985eea3f72a639daeb2ef052675ce326e79d6402b946bcc822e9dcebf8c"
     },
+    "tests/test_check_collection.py": {
+      "bytes": 8567,
+      "sha256": "e41b78c34db2fba116392338a9bf6c7709483b4991218e7cbf5b23a9ab345550"
+    },
     "tests/test_cli_failure_contract.py": {
       "bytes": 9830,
       "sha256": "90e78b634b4241eb53e6a2c3dedb52b70c60c6f5507fd7f6f24f3d01fdbb099c"
@@ -2815,16 +2819,16 @@
       "sha256": "3a8fe1c058c645981c6f2ada946ae7e940af14ea0b7e0a32089ecac3d889b4ae"
     },
     "tests/test_integration_v05.py": {
-      "bytes": 5555,
-      "sha256": "a7c818b245044db224e1f97b296ac1d2bcf895adbc14111ab219aca9dade260a"
+      "bytes": 5762,
+      "sha256": "d7d517cf2a6c4b60d03daf729660ae73507f029bd2c26bdd130ba52847ec5a8f"
     },
     "tests/test_intent.py": {
       "bytes": 3913,
       "sha256": "d5e309e2cd1d7779d9afc43bc48685a1d58952b33915bf0836f306d85e15ba44"
     },
     "tests/test_operational.py": {
-      "bytes": 15796,
-      "sha256": "134637398b1dc8e1e09ab211bebcf416d43004b840c4ab5f4b5c1480329dbc87"
+      "bytes": 16553,
+      "sha256": "a629c1958be56120b533f6858d12c325cf3e2c7e30f9272dfe1385bbd12ae3cc"
     },
     "tests/test_policy_hardening.py": {
       "bytes": 7315,
@@ -2835,12 +2839,12 @@
       "sha256": "61579b4b20ccbd6da414c308b6a795052a9facba3378eac2775fe8d2433d465c"
     },
     "tests/test_publication_contract.py": {
-      "bytes": 11153,
-      "sha256": "84e23b3af201667681ff357330d98e0b52b5b98bfbc01fc5ca4e45de4ff90b7f"
+      "bytes": 11125,
+      "sha256": "66e29102e40cc9697a45b86bd38c8112b6a6625cea3d72e2168bc0d54251cfd9"
     },
     "tests/test_publication_lifecycle.py": {
-      "bytes": 24741,
-      "sha256": "0505451d5bf2e536cc4ab06541586e55b09dad659de62719fa00055442ab14f9"
+      "bytes": 28596,
+      "sha256": "a03a0695ff94f47960293837b06bbed3a782f8126e940184dd8b91c76b0a702a"
     },
     "tests/test_qualification_metadata.py": {
       "bytes": 1036,

@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives.asymmetric import ed25519,rsa,padding
 from cryptography.hazmat.primitives import hashes
 from intent_merge.operational import (app_jwt,delivery,Journal,verify_assertion,gate,work_once,reconcile,DOMAIN,CONTROLS,NAME)
 from intent_merge.core import canonical,digest
-from intent_merge.github import policy_from
+from intent_merge.github import GitHubObservationError, policy_from
 from intent_merge.capture import hook,run_agent
 from test_integration_v05 import FixtureAPI,HEAD,BASE,ROOT
 NOW=1900000000; APP=789; SECRET=b'x'*32
@@ -141,13 +141,34 @@ class OpsTests(unittest.TestCase):
                      [good, {**good, 'head_sha': 'f'*40}], [good, good],
                      [good, None], [good, {}], [good, {**good, 'external_id': 'other'}],
                      [good, {**good, 'app': {'id': 789.0}}]):
-            with self.subTest(rows=len(rows)), patch.object(self.api, 'pages', return_value=rows):
+            with self.subTest(rows=len(rows)), patch.object(self.api, 'checks', rows):
                 result = reconcile(self.j, self.api, 'd1', APP)
                 self.assertEqual(result['state'], 'UNCERTAIN')
                 self.assertEqual(self.j.get('d1')['external_id'], good['external_id'])
-        with patch.object(self.api, 'pages', return_value=[{**good, 'id': 99, 'external_id': 'other'}, good]):
+        with patch.object(self.api, 'checks', [{**good, 'id': 99, 'external_id': 'other'}, good]):
             self.assertEqual(reconcile(self.j, self.api, 'd1', APP)['state'], 'DONE')
         self.assertEqual(len(self.api.posts), 1)
+
+    def test_default_worker_refuses_incomplete_refresh(self):
+        from unittest.mock import patch
+        self.assertion()
+        request = self.api.request
+        reads = 0
+
+        def observe(path, payload=None):
+            nonlocal reads
+            response = request(path, payload)
+            if '/check-runs?' in path:
+                reads += 1
+                if reads == 2:
+                    response['total_count'] += 1
+            return response
+
+        with patch.object(self.api, 'request', side_effect=observe), self.assertRaises(GitHubObservationError):
+            self.work(publish=True)
+        self.assertEqual(reads, 2)
+        self.assertEqual(self.j.get('d1')['state'], 'QUEUED')
+        self.assertFalse(self.api.posts)
 
     def test_default_gate_expiry_after_publishing_commit(self):
         from unittest.mock import patch
