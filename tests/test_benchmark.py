@@ -1,5 +1,6 @@
 import json, shutil, tempfile, unittest
 from pathlib import Path
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge.benchmark import CATALOG, STRATEGIES, classify, summarize, evaluate_corpus, generate, write_reports
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -8,7 +9,7 @@ CORPUS=ROOT/'examples/amgb-v1'
 class BenchmarkTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.report=evaluate_corpus(CORPUS/'bundles',CORPUS/'signer.pub')
+        cls.report=evaluate_corpus(CORPUS/'bundles',CORPUS/'signer.pub', profile=HISTORICAL_V1)
     def test_catalog(self):
         self.assertEqual(len(CATALOG),19)
         self.assertEqual(sum(v[0] for v in CATALOG.values()),4)
@@ -34,12 +35,12 @@ class BenchmarkTests(unittest.TestCase):
                 self.assertEqual(r['observed']['executed_candidate_cases'],0)
     def test_missing_corpus(self):
         with tempfile.TemporaryDirectory() as d:
-            with self.assertRaisesRegex(ValueError,'catalog exactly'): evaluate_corpus(d,CORPUS/'signer.pub')
+            with self.assertRaisesRegex(ValueError,'catalog exactly'): evaluate_corpus(d,CORPUS/'signer.pub', profile=HISTORICAL_V1)
     def test_tamper(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/'bundles'; shutil.copytree(CORPUS/'bundles',p)
             f=p/'happy/evidence/report.json'; f.write_text(f.read_text()+' ')
-            with self.assertRaisesRegex(ValueError,'inventory mismatch'): evaluate_corpus(p,CORPUS/'signer.pub')
+            with self.assertRaisesRegex(ValueError,'inventory mismatch'): evaluate_corpus(p,CORPUS/'signer.pub', profile=HISTORICAL_V1)
     def test_wrong_policy_rejected_before_execution(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaisesRegex(ValueError,'catalog-bound'):

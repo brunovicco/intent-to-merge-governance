@@ -1,10 +1,12 @@
 from __future__ import annotations
 import hashlib, hmac, json, tomllib
+from datetime import date, time
+from math import isfinite
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Protocol
 from .path_policy import matches, SEGMENT_V2, LEGACY_V1
-from .policy_schema import invalid_configuration
+from .policy_schema import InvalidConfiguration, invalid_configuration
 from .approvals import valid_context, valid_binding, verified_approval_actors
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
@@ -19,8 +21,45 @@ def digest(x):
 def file_hash(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
+def unique_json_members(pairs):
+    result = {}
+    for name, value in pairs:
+        if name in result:
+            raise ValueError('duplicate JSON member')
+        result[name] = value
+    return result
+
+
 def load_config(path):
     with open(path, 'rb') as f: return tomllib.load(f)
+
+
+def load_user_config(path):
+    """Parse user TOML. Filesystem errors remain operational failures."""
+    try:
+        config = load_config(path)
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError, RecursionError):
+        raise InvalidConfiguration('invalid_toml') from None
+    pending = [config]
+    while pending:
+        value = pending.pop()
+        if isinstance(value, dict):
+            pending.extend(value.values())
+        elif isinstance(value, list):
+            pending.extend(value)
+        elif isinstance(value, (date, time)) or (type(value) is float and not isfinite(value)):
+            raise InvalidConfiguration('unsupported_configuration_scalar')
+    return config
+
+
+def load_user_json_config(path, validate):
+    """Parse and validate configuration while leaving file errors operational."""
+    try:
+        config = json.loads(Path(path).read_text(), object_pairs_hook=unique_json_members)
+        validate(config)
+    except (ValueError, TypeError, KeyError, RecursionError):
+        raise InvalidConfiguration('invalid_json_configuration') from None
+    return config
 
 
 @dataclass(frozen=True)

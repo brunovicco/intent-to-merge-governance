@@ -4,17 +4,28 @@ External receipts are authenticated claims, not proof of semantic correctness.
 The local coordinator only operates on explicitly configured bare fixture repos.
 """
 from __future__ import annotations
-import base64, json, time, sqlite3, re
+import base64, json, time, sqlite3, re, math
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from .core import canonical, digest
-from .operational import CONTROLS, NAME, require, gate
-from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign
+from .github import GitHubObservationError, positive_id, validate_check_response
+from .policy_schema import InvalidConfiguration
+from .operational import (
+    CONTROLS, require, gate, checked_publication, correlated_check, reconciliation_required,
+    validate_gate_policy, publication_block,
+)
+from .changeset import verify_plan, repos_checked, plan, ref, git, verify_sig, sign, OBSERVATION_ERRORS
 
 RECEIPT_DOMAIN = b'ITM-control-receipt-v1\0'
 BINDINGS = ('repository','pr','head','base','policy_digest')
+
+
+def validate_control_trust(trust):
+    require(isinstance(trust, dict) and set(trust) == CONTROLS
+            and all(isinstance(k, str) and re.fullmatch(r'[0-9a-f]{64}', k) for k in trust.values())
+            and len(set(trust.values())) == len(CONTROLS), 'independent control keys required')
 
 
 def verify_control_receipts(receipts, trust, report, now):
@@ -23,7 +34,7 @@ def verify_control_receipts(receipts, trust, report, now):
     Artifact contents are bounded structured observations supplied by trusted control
     services. The caller must pin trust outside agent-controlled storage.
     """
-    require(set(trust)==CONTROLS and all(isinstance(k,str) and re.fullmatch(r'[0-9a-f]{64}',k) for k in trust.values()) and len(set(trust.values()))==len(CONTROLS), 'independent control keys required')
+    validate_control_trust(trust)
     require(isinstance(receipts,list) and len(receipts)==len(CONTROLS),'complete control inventory required')
     seen=set(); roots={}
     for r in receipts:
@@ -32,7 +43,7 @@ def verify_control_receipts(receipts, trust, report, now):
         require(control in CONTROLS and control not in seen,'unknown or duplicate control')
         require(set(s)==set(BINDINGS)|{'control','profile','issued_at','expires_at','artifact_digest','passed'},'invalid statement fields')
         require(s['profile']=='external-control-v1' and s['passed'] is True,'control failed or synthetic profile')
-        require(all(s[k]==report[k] for k in BINDINGS),'control binding mismatch')
+        require(positive_id(s['pr']) and all(s[k]==report[k] for k in BINDINGS), 'control binding mismatch')
         require(type(s['issued_at']) is int and type(s['expires_at']) is int and s['issued_at']<=now<s['expires_at']<=s['issued_at']+900,'control expired')
         require(isinstance(artifact,dict) and 0<len(canonical(artifact))<=262144,'invalid artifact size')
         require(s['artifact_digest']==digest(artifact),'artifact digest mismatch')
@@ -58,7 +69,7 @@ def strict_gate(client,job,policy,assertion_dir,verifier_key,now=None,*,receipt_
         require(digest(assertion)==report['assertion_digest'],'assertion changed')
         require(assertion['statement']['evidence_digest']==result['evidence_digest'],'aggregate evidence binding mismatch')
         report['control_receipts']=result
-        report['expires_at']=min(result['expires_at'],assertion['statement']['expires_at'])
+        report['expires_at']=min(result['expires_at'],report['expires_at'])
     except (ValueError,KeyError,TypeError,OSError,AttributeError):
         report['reasons'].append('independent_control_evidence_missing_or_invalid')
     report['decision']='PASS' if not report['reasons'] else 'BLOCK'
@@ -66,39 +77,167 @@ def strict_gate(client,job,policy,assertion_dir,verifier_key,now=None,*,receipt_
     return report
 
 
-def sweep(journal,client,policy,assertion_dir,verifier_key,receipt_dir,control_trust,app_id,*,now=None,apply=False):
-    """Revoke stale successful checks known to the journal. PATCH is idempotent.
+BLOCKED_CONCLUSIONS = {'failure', 'action_required', 'cancelled', 'timed_out', 'stale', 'startup_failure'}
 
-    A check may be shared across PRs with the same head: never create a success here.
-    Missing or ambiguous API observations are errors, not evidence of revocation.
-    """
-    now=int(time.time() if now is None else now); results=[]
-    with journal.worker_lock():
-        for row in journal.list():
-            if row['state']!='DONE' or not row['check_id'] or not row['report']: continue
-            old=json.loads(row['report'])
-            if old.get('decision')!='PASS' or row['repo'].lower()!=policy['repository'].lower(): continue
-            path=f"/repos/{row['repo']}/check-runs/{row['check_id']}"
-            try:
-                remote=client.request(path)
-                require(remote['id']==row['check_id'] and remote['head_sha']==old['head'] and remote['external_id']==row['external_id'] and remote['name']==NAME and remote['app']['id']==app_id,'check identity mismatch')
-                if remote['status']=='completed' and remote['conclusion'] in ('failure','action_required','cancelled','timed_out','stale'):
-                    results.append({'id':row['id'],'status':'ALREADY_BLOCKED'}); continue
-            except Exception:
-                results.append({'id':row['id'],'status':'REMOTE_STATE_UNKNOWN'}); continue
-            try:
-                current=strict_gate(client,row,policy,assertion_dir,verifier_key,now,receipt_dir=receipt_dir,control_trust=control_trust)
-                valid=remote['status']=='completed' and remote['conclusion']=='success' and old.get('profile')=='github-strict-snapshot' and now<old.get('expires_at',0) and current['decision']=='PASS' and all(old.get(k)==current.get(k) for k in (*BINDINGS,'assertion_digest','control_receipts','gates'))
-            except Exception: valid=False
-            if valid: status='CURRENT'
-            elif not apply: status='WOULD_REVOKE'
+
+def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, control_trust,
+          app_id, *, installation_id=None, now=None, apply=False):
+    """Reconcile and revoke by exact check ID. A fixed now is for fixture replay."""
+    validate_gate_policy(policy)
+    previous = 0
+    clock_valid = True
+
+    def sample():
+        # Latch regressions across rows, even if the clock later catches up.
+        nonlocal previous, clock_valid
+        try:
+            observed = time.time() if now is None else now
+            if type(observed) not in (int, float) or not math.isfinite(observed) or observed < previous:
+                clock_valid = False
             else:
+                previous = observed
+        except (OSError, ValueError, TypeError, OverflowError):
+            clock_valid = False
+        return int(previous) if clock_valid else None
+
+    sample()
+    results = []
+    with journal.worker_lock():
+        journal.recover()
+        sample()
+        for row in journal.list():
+            state = row['state']
+            if (state not in ('DONE', 'UNCERTAIN', 'REVOCATION_UNCERTAIN')
+                    or row['repo'].lower() != policy['repository'].lower()):
+                continue
+            sample()
+            job_id = row['id']
+            try:
+                intent, old = checked_publication(row, client, app_id, installation_id)
+            except (ValueError, KeyError, TypeError):
+                results.append({'id': job_id, **reconciliation_required(
+                    row, 'publication_identity_unavailable_or_mismatched')})
+                continue
+
+            expiry = old.get('expires_at')
+
+            def timing():
+                checked_at = sample()
+                if checked_at is None or type(expiry) is not int:
+                    return {}
+                return {'expired': checked_at >= expiry, 'expires_at': expiry}
+
+            check_id = row['check_id']
+            if state == 'UNCERTAIN':
                 try:
-                    response=client.request(path,{'status':'completed','conclusion':'failure','output':{'title':'ITM evidence revoked','summary':'Evidence no longer current; fresh evaluation required.'}},method='PATCH')
-                    require(response['id']==row['check_id'] and response['head_sha']==old['head'] and response['app']['id']==app_id and response['name']==NAME and response['external_id']==row['external_id'] and response['conclusion']=='failure','revocation not confirmed')
-                    status='REVOKED'
-                except Exception: status='REVOCATION_UNCERTAIN'
-            results.append({'id':row['id'],'status':status})
+                    check_id, matches = correlated_check(client, intent)
+                except (GitHubObservationError, OSError):
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'remote_observation_unavailable', **timing())})
+                    continue
+                try:
+                    checked_publication(row, client, app_id, installation_id)
+                except (ValueError, KeyError, TypeError):
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'publication_identity_unavailable_or_mismatched', **timing())})
+                    continue
+                sample()
+                if check_id is None:
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'no_unique_matching_check', matches=matches, **timing())})
+                    continue
+            if intent['conclusion'] == 'failure':
+                if state == 'UNCERTAIN':
+                    if apply:
+                        journal.transition(job_id, state, 'DONE', check_id=check_id)
+                    results.append({'id': job_id, 'status': 'RECONCILED' if apply else 'WOULD_RECONCILE'})
+                continue
+
+            path = f"/repos/{intent['repository']}/check-runs/{check_id}"
+            try:
+                if not positive_id(check_id):
+                    raise GitHubObservationError('invalid stored check ID')
+                remote = client.request(path)
+                validate_check_response(remote, intent, intent['app_id'], check_id=check_id,
+                                        conclusions=BLOCKED_CONCLUSIONS | {'success'})
+            except (GitHubObservationError, OSError):
+                results.append({'id': job_id, 'status': 'REMOTE_STATE_UNKNOWN',
+                                'external_id': intent['external_id'], **timing(),
+                                'action': 'Inspect the correlated check before revocation.'})
+                continue
+
+            try:
+                checked_publication(row, client, app_id, installation_id)
+            except (ValueError, KeyError, TypeError):
+                results.append({'id': job_id, **reconciliation_required(
+                    row, 'publication_identity_unavailable_or_mismatched', **timing())})
+                continue
+            checked_at = sample()
+            if state == 'UNCERTAIN' and apply:
+                journal.transition(job_id, state, 'DONE', check_id=check_id)
+                checked_at = sample()
+            if remote['conclusion'] in BLOCKED_CONCLUSIONS:
+                if state == 'REVOCATION_UNCERTAIN' and apply:
+                    journal.transition(job_id, state, 'DONE')
+                results.append({'id': job_id, 'status': 'ALREADY_BLOCKED'})
+                continue
+
+            preflight_failure = {}
+            if (state != 'REVOCATION_UNCERTAIN' and old.get('profile') == 'github-strict-snapshot'
+                    and checked_at is not None and type(expiry) is int and checked_at < expiry):
+                try:
+                    current = strict_gate(client, row, policy, assertion_dir, verifier_key, checked_at,
+                                          receipt_dir=receipt_dir, control_trust=control_trust)
+                except (GitHubObservationError, OSError):
+                    sample()
+                    preflight_failure = {'reason': 'preflight_observation_unavailable'}
+                else:
+                    try:
+                        checked_publication(row, client, app_id, installation_id)
+                    except (ValueError, KeyError, TypeError):
+                        results.append({'id': job_id, **reconciliation_required(
+                            journal.get(job_id), 'publication_identity_unavailable_or_mismatched', **timing())})
+                        continue
+                    same_evidence = current['decision'] == 'PASS' and all(
+                        old.get(k) == current.get(k) for k in
+                        (*BINDINGS, 'assertion_digest', 'control_receipts', 'gates', 'expires_at')
+                    )
+                    final_at = sample()
+                    if same_evidence and publication_block(old, current, final_at) is None:
+                        status = 'WOULD_RECONCILE' if state == 'UNCERTAIN' and not apply else 'CURRENT'
+                        results.append({'id': job_id, 'status': status})
+                        continue
+
+            if not apply:
+                status = 'WOULD_REVOKE'
+            else:
+                prior = 'REVOCATION_UNCERTAIN' if state == 'REVOCATION_UNCERTAIN' else 'DONE'
+                try:
+                    checked_publication(row, client, app_id, installation_id)
+                except (ValueError, KeyError, TypeError):
+                    results.append({'id': job_id, **reconciliation_required(
+                        journal.get(job_id), 'publication_identity_unavailable_or_mismatched', **timing())})
+                    continue
+                journal.transition(job_id, prior, 'REVOKING')
+                try:
+                    response = client.request(path, {
+                        'status': 'completed', 'conclusion': 'failure',
+                        'output': {'title': 'ITM evidence revoked',
+                                   'summary': 'Evidence no longer current; fresh evaluation required.'},
+                    }, method='PATCH')
+                    validate_check_response(response, {**intent, 'conclusion': 'failure'},
+                                            intent['app_id'], check_id=check_id)
+                except (GitHubObservationError, OSError):
+                    journal.transition(job_id, 'REVOKING', 'REVOCATION_UNCERTAIN')
+                    results.append({'id': job_id, 'status': 'REVOCATION_UNCERTAIN',
+                                    'external_id': intent['external_id'], **timing(), **preflight_failure,
+                                    'action': 'Observe the same check before confirming revocation.'})
+                    continue
+                journal.transition(job_id, 'REVOKING', 'DONE')
+                status = 'REVOKED'
+            if preflight_failure:
+                preflight_failure['action'] = 'Refresh GitHub preflight before evaluating again.'
+            results.append({'id': job_id, 'status': status, **preflight_failure})
     return results
 
 
@@ -143,10 +282,16 @@ class DurableChangeSet:
             def expected():return {n:heads[n] if n in s['completed'] else bases[n] for n in bases}
             def stop(reason):
                 s['status']='MANUAL_INTERVENTION';s['events'].append({'event':'manual','reason':reason});persist();return s
+            def observe():
+                try:
+                    return snapshot()
+                except OBSERVATION_ERRORS:
+                    return None
             # If the process died between CAS and its acknowledgement, check the
             # complete ref vector against the before and after states.
             if s['pending']:
-                pending=s['pending'];n=pending['component'];before=expected();after={**before,n:pending['new']};actual=snapshot()
+                pending=s['pending'];n=pending['component'];before=expected();after={**before,n:pending['new']};actual=observe()
+                if actual is None:return stop('refs unknown during recovery')
                 if actual==after:
                     if pending['direction']=='forward':s['completed'].append(n)
                     else:s['completed'].remove(n)
@@ -154,21 +299,89 @@ class DurableChangeSet:
                 elif actual==before:s['events'].append({'event':'reconciled_not_applied','component':n})
                 else:return stop('unexpected refs during recovery')
                 s['pending']=None;persist()
-            if snapshot()!=expected():return stop('unexpected refs before execution')
+            actual=observe()
+            if actual is None:return stop('refs unknown before execution')
+            if actual!=expected():return stop('unexpected refs before execution')
             if compensate:s['mode']='compensate';persist()
             for n in (list(reversed(s['completed'])) if s['mode']=='compensate' else [n for n in p['order'] if n not in s['completed']]):
-                if snapshot()!=expected():return stop('unexpected refs before CAS')
-                if s['mode']=='forward' and ref(repos[n],'refs/heads/candidate')!=heads[n]:return stop('candidate drift')
+                actual=observe()
+                if actual is None:return stop('refs unknown before CAS')
+                if actual!=expected():return stop('unexpected refs before CAS')
+                if s['mode']=='forward':
+                    try:
+                        candidate=ref(repos[n],'refs/heads/candidate')
+                    except OBSERVATION_ERRORS:
+                        return stop('candidate ref unknown')
+                    if candidate!=heads[n]:return stop('candidate drift')
                 old=expected()[n];new=bases[n] if s['mode']=='compensate' else heads[n]
                 s['pending']={'component':n,'old':old,'new':new,'direction':s['mode']};persist()
                 if fault:fault('before_cas',n,repos)
-                if git(repos[n],'update-ref','refs/heads/main',new,old,check=False).returncode:return stop('CAS failed')
+                try:
+                    result=git(repos[n],'update-ref','refs/heads/main',new,old,check=False)
+                except OBSERVATION_ERRORS:
+                    return stop('CAS outcome unknown')
+                if result.returncode:return stop('CAS failed')
                 if fault:fault('after_cas',n,repos)
+                actual=observe()
+                if actual is None:return stop('refs unknown after CAS')
+                if actual!={**expected(),n:new}:return stop('unexpected refs after CAS')
                 if s['mode']=='forward':s['completed'].append(n)
                 else:s['completed'].remove(n)
                 s['pending']=None;s['events'].append({'event':'cas_applied','component':n,'direction':s['mode']});persist()
-                if snapshot()!=expected():return stop('unexpected refs after CAS')
             s['status']='COMPENSATED' if s['mode']=='compensate' else 'COMPLETED';persist();return s
+
+
+def _payment_candidate_sources(repo, base, head, target):
+    from .integrated import git as isolated_git
+
+    def observe(*args):
+        return isolated_git(repo, *args, bare=True)
+
+    # Trusted, self-contained repository. Keep Git from consulting shared object
+    # stores or completing a partial clone from a configured remote.
+    for entry in ('commondir', 'objects/info/alternates', 'objects/info/http-alternates'):
+        path = repo / entry
+        require(not path.exists() and not path.is_symlink(), 'shared Git object store unsupported')
+    require(observe('rev-parse', '--is-bare-repository').strip() == b'true',
+            'trusted bare Git clone required')
+    require(observe('rev-parse', '--show-object-format').strip() == b'sha1'
+            and observe('rev-parse', '--is-shallow-repository').strip() == b'false',
+            'complete SHA-1 Git repository required')
+    config = observe('config', '--includes', '--null', '--name-only', '--list').split(b'\0')
+    require(b'extensions.partialclone' not in config and not any(
+        key.startswith(b'remote.') and key.endswith(b'.promisor') for key in config
+    ), 'partial Git clone unsupported')
+
+    def commit_tree(oid):
+        resolved = observe('rev-parse', '--verify', '--end-of-options', oid + '^{commit}').strip()
+        require(resolved == oid.encode(), 'exact commit object required')
+        tree = observe('rev-parse', '--verify', '--end-of-options', oid + '^{tree}').strip()
+        header = observe('cat-file', 'commit', oid).partition(b'\n')[0]
+        require(re.fullmatch(rb'[0-9a-f]{40}', tree) and header == b'tree ' + tree
+                and observe('cat-file', '-t', tree.decode()).strip() == b'tree',
+                'commit tree identity mismatch')
+        return tree.decode()
+
+    base_tree, head_tree = commit_tree(base), commit_tree(head)
+    require(observe('merge-base', base, head).strip() == base.encode(),
+            'candidate not descended from base')
+    changed = observe('diff-tree', '-r', '--no-commit-id', '--no-renames', '--no-ext-diff',
+                      '--no-textconv', '--ignore-submodules=none', '--no-relative',
+                      '--name-only', '-z', base_tree, head_tree, '--')
+    require(changed == target.encode() + b'\0', 'candidate outside demo scope')
+
+    def source(tree):
+        entry = observe('ls-tree', '--full-tree', '-z', tree, '--', target)
+        metadata, _, name = entry.partition(b'\t')
+        match = re.fullmatch(rb'100(?:644|755) blob ([0-9a-f]{40})', metadata)
+        require(match is not None and name == target.encode() + b'\0',
+                'candidate path must be a regular-file blob')
+        oid = match[1].decode()
+        require(observe('cat-file', '-t', oid).strip() == b'blob', 'candidate blob type mismatch')
+        require(int(observe('cat-file', '-s', oid)) <= 131072, 'candidate source too large')
+        return observe('cat-file', 'blob', oid).decode()
+
+    return source(base_tree), source(head_tree)
 
 
 def verify_payment_candidate(repo,base,head,spec,*,backend='docker',trusted_fixture=False,image='python:3.11-slim'):
@@ -184,16 +397,15 @@ def verify_payment_candidate(repo,base,head,spec,*,backend='docker',trusted_fixt
     from .intent import validate_spec, drift, requirement_coverage
     require(hexstr(base,40) and hexstr(head,40) and base!=head,'invalid commit binding')
     require(backend=='docker' or (backend=='local' and trusted_fixture),'local execution restricted to trusted fixtures')
-    validate_spec(spec);require(spec['id']=='PAY-104' and spec['allowed_paths']==['app/payments.py'],'unsupported demo spec')
-    repo=Path(repo).resolve(strict=True)
-    require(git(repo,'rev-parse','--is-bare-repository').stdout.strip()==b'true','trusted bare Git clone required')
-    require(git(repo,'merge-base','--is-ancestor',base,head,check=False).returncode==0,'candidate not descended from base')
-    paths=sorted(x.decode() for x in git(repo,'diff','--no-renames','--name-only','-z',base,head,'--').stdout.split(b'\0') if x)
-    require(paths==['app/payments.py'],'candidate outside demo scope')
-    def source(sha):
-        raw=git(repo,'show',sha+':app/payments.py').stdout
-        require(len(raw)<=131072,'candidate source too large');return raw.decode()
-    b,h=source(base),source(head)
+    try:
+        validate_spec(spec)
+    except ValueError:
+        raise InvalidConfiguration('invalid_spec') from None
+    if spec['id'] != 'PAY-104' or spec['allowed_paths'] != ['app/payments.py']:
+        raise InvalidConfiguration('unsupported_demo_spec')
+    target = spec['allowed_paths'][0]
+    b, h = _payment_candidate_sources(Path(repo).resolve(strict=True), base, head, target)
+    paths = [target]
     d=drift(spec,{'app/payments.py':b},{'app/payments.py':h},paths)
     ex=Executor(backend,image);vp=verification_plan(); baseline=ex.execute(b,WORKER,vp); candidate=ex.execute(h,WORKER,vp)
     result=evaluate(vp,candidate,baseline); mutations=mutation_report(vp,ex,WORKER,FIXED,baseline)

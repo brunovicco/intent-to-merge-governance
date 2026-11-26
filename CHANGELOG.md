@@ -7,7 +7,9 @@
 - Explicit historical versus externally pinned historical trust profiles; no current organizational authorization.
 - Redacted CLI execution errors, explicit GitHub App credentials for CLI check publication, minimal and telemetry-enabled test jobs.
 - Preserve signed v1 artifacts and historical replay; new decisions require the new contracts. See [migration](docs/migration-v2.md).
-- Pre-version-change qualification is recorded separately; exact RC scans, test runs, Docker and publication approval remain required.
+- Harden final publication freshness, immutable check correlation, remote acknowledgement validation and recovery of uncertain publication and revocation. Isolate recoverable sweep failures per publication.
+- Require complete counted check-run collections with collection-wide identity validation, exact Git object resolution in trusted bare repositories, and consistency between candidate patches and signed evidence. Preserve recovery evidence when changeset state cannot be confirmed.
+- Complete independent AI-assisted review and local operational qualification of the signed implementation, including both locked regression suites, Docker and Compose fixture runs, and deterministic historical replay. Publication remains on hold. See the [qualification record](docs/qualification-v2-rc1.md).
 
 ## 1.0.0 — security remediation candidate (unpublished)
 

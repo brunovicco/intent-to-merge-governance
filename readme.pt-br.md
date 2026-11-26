@@ -18,7 +18,7 @@ O ITM é uma **implementação de pesquisa e referência**, independente de forn
 
 > Agentes geram código. Evidências sustentam a confiança. Políticas concedem autoridade. A autonomia precisa ser revogável.
 
-**Status:** candidato v2.0.0-rc.1, ainda não publicado. A [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) continua sendo a release pública de referência. `production_ready: false`; `merge_authority: false`.
+**Status** — A implementação assinada da v2.0.0-rc.1 passou por revisão independente assistida por IA e concluiu a qualificação operacional local. A publicação continua pendente. A [v1.0.0](https://github.com/brunovicco/intent-to-merge-governance/releases/tag/v1.0.0) continua sendo a versão pública estável. `publication_ready: false`, `production_ready: false`, `merge_authority: false`.
 
 [Guia de migração](docs/migration-v2.md) · [Qualificação da RC](docs/qualification-v2-rc1.md) · [Changelog](CHANGELOG.md).
 
@@ -174,7 +174,7 @@ Execute em um checkout com dependências travadas após a configuração do iní
 
 | Estudo | Comando | Escopo |
 | --- | --- | --- |
-| AMGB histórico | `uv run --locked intent-merge benchmark-replay --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 traces selecionados e assinados |
+| AMGB histórico | `uv run --locked intent-merge benchmark-replay --profile historical-v1 --bundles examples/amgb-v1/bundles --public-key examples/amgb-v1/signer.pub --output results/amgb-replay` | 19 traces selecionados e assinados |
 | Ablação adversarial | `uv run --locked python scripts/adversarial_benchmark.py --out results/adversarial` | 25 candidatos selecionados |
 | Plano de controle distribuído | `uv run --locked python scripts/control_plane.py demo --out results/control-plane` | Seis controles sintéticos; 15 casos |
 | Runtime integrado | `uv run --locked python scripts/integrated_runtime.py run --fixture repair --out results/runtime` | Reparo com fixture AUTH-201 |

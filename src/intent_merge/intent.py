@@ -5,31 +5,59 @@ AST checks are narrow structural invariants, not proof of semantic equivalence.
 from __future__ import annotations
 import ast
 from .core import digest, matches
-from .path_policy import SEGMENT_V2
+from .path_policy import SEGMENT_V2, validate_patterns
+from .policy_schema import names, require
+from .checkpoints import ID
 
 
 def validate_spec(spec, *, semantics=SEGMENT_V2):
-    criteria = spec['criteria']
-    if not criteria or len(criteria) != len(set(criteria)):
-        raise ValueError('criteria must be nonempty and unique')
-    requirements = spec.get('requirements', [])
-    ids = [r['id'] for r in requirements]
-    mapped = [c for r in requirements for c in r['criteria']]
-    if not ids or len(ids) != len(set(ids)) or set(mapped) != set(criteria):
-        raise ValueError('requirements must uniquely identify and cover all acceptance criteria')
-    for r in requirements:
-        if not r['criteria'] or not r['paths'] or any(not matches(p, spec['allowed_paths'], semantics=semantics) for p in r['paths']):
-            raise ValueError('requirement needs criteria and authorized paths')
-    rules = spec.get('non_goals', [])
-    if not rules or len({r['id'] for r in rules}) != len(rules):
-        raise ValueError('non-goals must be nonempty and uniquely identified')
-    for r in rules:
-        if r['kind'] not in {'preserve_symbol', 'preserve_signature', 'no_new_imports'}:
-            raise ValueError('unsupported non-goal: '+r['kind'])
-        if not matches(r['path'], spec['allowed_paths'], semantics=semantics):
-            raise ValueError('non-goal must target authorized path')
-        if r['kind'] != 'no_new_imports' and not r.get('symbol'):
-            raise ValueError('non-goal requires symbol')
+    fields = {'id', 'intent', 'criteria', 'allowed_paths', 'requirements', 'non_goals'}
+    require(isinstance(spec, dict) and set(spec) == fields, 'spec_fields')
+    require(isinstance(spec['id'], str) and ID.fullmatch(spec['id']), 'spec_id')
+    require(isinstance(spec['intent'], str) and spec['intent'].strip(), 'spec_intent')
+    criteria, allowed = spec['criteria'], spec['allowed_paths']
+    names(criteria, 'criteria', nonempty=True)
+    if semantics == SEGMENT_V2:
+        validate_patterns(allowed, nonempty=True)
+    else:
+        names(allowed, 'allowed_paths', nonempty=True)
+
+    requirements, rules = spec['requirements'], spec['non_goals']
+    require(isinstance(requirements, list) and requirements, 'requirements')
+    require(isinstance(rules, list) and rules, 'non_goals')
+    for requirement in requirements:
+        require(isinstance(requirement, dict)
+                and set(requirement) == {'id', 'description', 'criteria', 'paths'},
+                'requirement_fields')
+        require(isinstance(requirement['description'], str) and requirement['description'].strip(),
+                'requirement_description')
+        names(requirement['criteria'], 'requirement_criteria', nonempty=True)
+        paths = requirement['paths']
+        if semantics == SEGMENT_V2:
+            validate_patterns(paths, nonempty=True)
+        else:
+            names(paths, 'requirement_paths', nonempty=True)
+        require(all(matches(path, allowed, semantics=semantics) for path in paths),
+                'requirement_path_outside_spec_scope')
+    fields = {'id', 'description', 'kind', 'path'}
+    for rule in rules:
+        require(isinstance(rule, dict) and fields <= set(rule) <= fields | {'symbol'},
+                'non_goal_fields')
+        require(isinstance(rule['description'], str) and rule['description'].strip(),
+                'non_goal_description')
+        kind = rule['kind']
+        require(kind in ('preserve_symbol', 'preserve_signature', 'no_new_imports'),
+                'non_goal_kind')
+        require(isinstance(rule['path'], str) and matches(rule['path'], allowed, semantics=semantics),
+                'non_goal_path_outside_spec_scope')
+        if kind != 'no_new_imports' or 'symbol' in rule:
+            require(isinstance(rule.get('symbol'), str) and rule['symbol'].isidentifier(),
+                    'non_goal_symbol')
+    ids = [r['id'] for r in (*requirements, *rules)]
+    require(all(isinstance(i, str) and ID.fullmatch(i) for i in ids)
+            and len(ids) == len(set(ids)), 'duplicate_or_invalid_contract_ids')
+    require({c for r in requirements for c in r['criteria']} == set(criteria),
+            'requirement_criteria_coverage')
 
 
 def _symbol(tree, name):

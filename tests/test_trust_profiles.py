@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge.runner import run
 from intent_merge.trust import ANCHORED, SYNTHETIC, audit_anchored, audit_synthetic
 
@@ -121,7 +122,7 @@ class TrustProfilesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'current lab profiles'):
             audit_anchored(legacy, anchor, trust, expected_anchor_sha256=sha(anchor),
                            expected_trust_sha256=sha(trust))
-        self.assertTrue(audit_synthetic(legacy, anchor, trust)['merged'])
+        self.assertTrue(audit_synthetic(legacy, anchor, trust, profile=HISTORICAL_V1)['merged'])
 
     def test_snapshot_not_original_passed_to_audit(self):
         from intent_merge.runner import audit
@@ -156,3 +157,35 @@ class TrustProfilesTests(unittest.TestCase):
         self.repin_manifest(manifest)
         with self.assertRaisesRegex(ValueError, 'empty ledger'):
             self.anchored()
+
+    def test_synthetic_rejects_nested_symlink_and_nonregular_artifacts(self):
+        import os
+
+        evidence = self.out/'evidence'
+        for kind in ('directory', 'symlink', 'fifo', 'file'):
+            with self.subTest(kind=kind):
+                extra = evidence/'unexpected'
+                if kind == 'directory':
+                    extra.mkdir()
+                    (extra/'nested').write_text('outside the manifest')
+                elif kind == 'symlink':
+                    extra.symlink_to(self.original/'evidence/report.json')
+                elif kind == 'fifo':
+                    os.mkfifo(extra)
+                else:
+                    extra.write_text('outside the manifest')
+                try:
+                    for audit in (lambda: audit_synthetic(self.out, self.anchor, self.trust), self.anchored):
+                        with self.assertRaises(ValueError):
+                            audit()
+                finally:
+                    if kind == 'directory':
+                        shutil.rmtree(extra)
+                    else:
+                        extra.unlink()
+
+    def test_synthetic_does_not_follow_evidence_root_symlink(self):
+        shutil.rmtree(self.out/'evidence')
+        (self.out/'evidence').symlink_to(self.original/'evidence', target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'invalid audit directory'):
+            audit_synthetic(self.out, self.anchor, self.trust)

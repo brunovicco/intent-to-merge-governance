@@ -9,6 +9,7 @@ from pathlib import Path
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from .core import canonical, digest
+from .evidence_profile import CURRENT
 from .bundle import verify
 from .verification import expected
 
@@ -23,13 +24,14 @@ def hexstr(value,n=64):
     return isinstance(value,str) and re.fullmatch('[0-9a-f]{'+str(n)+'}',value) is not None
 
 def validate_config(c):
-    require(set(c)=={'version','scope','keys','initial_level','clean_required','window','adverse_limit','max_level','risk_ceiling'},'invalid config fields')
-    require(c['version']==1 and c['initial_level'] in (0,1,2) and c['max_level'] in (1,2) and c['initial_level']<=c['max_level'],'invalid levels')
+    require(isinstance(c, dict) and set(c)=={'version','scope','keys','initial_level','clean_required','window','adverse_limit','max_level','risk_ceiling'},'invalid config fields')
+    require(all(type(c[k]) is int for k in ('version', 'initial_level', 'max_level'))
+            and c['version']==1 and c['initial_level'] in (0,1,2) and c['max_level'] in (1,2) and c['initial_level']<=c['max_level'],'invalid levels')
     require(all(type(c[k]) is int and 1<=c[k]<=1000 for k in ('clean_required','window','adverse_limit')) and c['adverse_limit']<=c['window'],'invalid thresholds')
     require(c['risk_ceiling'] in ('low','medium','high'),'invalid risk ceiling')
-    scope=c['scope']; require(set(scope)=={'repository','agent','model','harness','policy','spec','bundle_signer','profile'},'invalid scope')
+    scope=c['scope']; require(isinstance(scope, dict) and set(scope)=={'repository','agent','model','harness','policy','spec','bundle_signer','profile'},'invalid scope')
     require(all(isinstance(v,str) and v for v in scope.values()) and all(hexstr(scope[k]) for k in ('harness','policy','spec','bundle_signer')) and scope['profile']=='synthetic-demo','invalid scope values')
-    require(set(c['keys'])==set(ROLES.values()) and all(hexstr(v) for v in c['keys'].values()) and len(set(c['keys'].values()))==len(c['keys']),'distinct role keys required')
+    require(isinstance(c['keys'], dict) and set(c['keys'])==set(ROLES.values()) and all(hexstr(v) for v in c['keys'].values()) and len(set(c['keys'].values()))==len(c['keys']),'distinct role keys required')
     return c
 
 def sign_event(config, events, kind, payload, private_key):
@@ -116,11 +118,11 @@ def replay(config, events, expected_root):
     require(previous==expected_root,'external root mismatch (stale, truncated or altered stream)')
     return s
 
-def gate(config, events, expected_root, bundle, public_key):
+def gate(config, events, expected_root, bundle, public_key, *, profile=CURRENT):
     """Evaluate extra gate against a verified *historical synthetic* change.
     Never grants authority, relaxes a base approval, or writes a GitHub check.
     """
-    s=replay(config,events,expected_root); b=Path(bundle); v=verify(b,public_key)
+    s=replay(config,events,expected_root); b=Path(bundle); v=verify(b,public_key,profile=profile)
     ev=b/'evidence'; report=json.loads((ev/'report.json').read_text()); first=json.loads((ev/'ledger.jsonl').read_text().splitlines()[0])['payload']; scope=config['scope']
     require(v['key_id']==scope['bundle_signer'] and v['profile']==scope['profile'] and all(first[k]==scope[k] for k in ('harness','policy','spec')),'bundle does not match scope pins')
     r=(v['ledger_root'],v['candidate']); reasons=[]

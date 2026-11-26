@@ -2,6 +2,16 @@
 from .path_policy import validate_patterns, validate_pattern
 
 
+class InvalidConfiguration(ValueError):
+    """A user-supplied configuration failed parsing or explicit validation."""
+
+
+def configuration_decision(reason):
+    return {'authorized': False, 'risk': 'unknown', 'required_roles': [],
+            'verified_roles': [], 'reasons': ['invalid_configuration:' + reason],
+            'status': 'INVALID_CONFIGURATION'}
+
+
 def require(condition, message):
     if not condition:
         raise ValueError(message)
@@ -51,8 +61,6 @@ def invalid_configuration(spec, policy):
     try:
         validate_local_policy(policy)
         validate_scope_spec(spec)
-    except (ValueError, TypeError) as exc:
-        return {'authorized': False, 'risk': 'unknown', 'required_roles': [],
-                'verified_roles': [], 'reasons': ['invalid_configuration:' + str(exc)],
-                'status': 'INVALID_CONFIGURATION'}
+    except ValueError:
+        return configuration_decision('invalid_scope_or_policy')
     return None

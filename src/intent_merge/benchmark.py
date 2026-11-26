@@ -3,9 +3,11 @@ from __future__ import annotations
 import html, json, tempfile, csv
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from .evidence_profile import CURRENT
+from .policy_schema import InvalidConfiguration
 from .bundle import keygen, pack, verify
-from .core import load_config, digest
-from .runner import run, write_json
+from .core import load_config, load_user_config, digest
+from .runner import run, write_json, validate_runner_configuration
 
 # Predeclared labels, independent of the recorded decision.
 CATALOG = {
@@ -61,12 +63,12 @@ def summarize(rows):
         result.append({'id':sid,'label':label,'true_allow':tp,'true_block':tn,'unsafe_allow':fp,'false_block':fn,'unsafe_allow_rate':ratio(fp,fp+tn),'false_block_rate':ratio(fn,fn+tp),'unsafe_share_of_allows':ratio(fp,tp+fp),'accuracy':ratio(tp+tn,len(rows)),'missing_evidence_scenarios':missing})
     return result
 
-def evaluate_corpus(bundles_dir, public_key):
+def evaluate_corpus(bundles_dir, public_key, *, profile=CURRENT):
     bundles_dir=Path(bundles_dir)
     if {p.name for p in bundles_dir.iterdir()}!=set(CATALOG): raise ValueError('benchmark corpus must match v1 catalog exactly')
     rows=[]; roots=set(); configs=set()
     for scenario,(expected,category) in CATALOG.items():
-        bundle=bundles_dir/scenario; verified=verify(bundle,public_key); ev=bundle/'evidence'
+        bundle=bundles_dir/scenario; verified=verify(bundle,public_key,profile=profile); ev=bundle/'evidence'
         if verified['profile']!='synthetic-demo' or verified['ledger_root'] in roots: raise ValueError('invalid or duplicate trace')
         roots.add(verified['ledger_root'])
         report=json.loads((ev/'report.json').read_text()); events=[json.loads(line) for line in (ev/'ledger.jsonl').read_text().splitlines()]
@@ -117,7 +119,10 @@ def write_reports(report, out):
 
 def generate(out, spec, policy, workers=4):
     if not 1<=workers<=8: raise ValueError('workers must be between 1 and 8')
-    if (digest(load_config(spec)),digest(load_config(policy)))!=(V1_SPEC,V1_POLICY): raise ValueError('AMGB v1 requires the catalog-bound spec and policy')
+    spec_config, policy_config = load_user_config(spec), load_user_config(policy)
+    validate_runner_configuration(spec_config, policy_config)
+    if (digest(spec_config), digest(policy_config)) != (V1_SPEC, V1_POLICY):
+        raise InvalidConfiguration('AMGB v1 requires the catalog-bound spec and policy')
     out=Path(out).resolve(); out.mkdir(parents=True,exist_ok=False); public=out/'signer.pub'
     with tempfile.TemporaryDirectory(prefix='amgb-') as tmp:
         private=Path(tmp)/'signer.pem'; keygen(private,public)

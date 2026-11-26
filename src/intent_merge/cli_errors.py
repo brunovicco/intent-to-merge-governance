@@ -4,6 +4,9 @@ import sqlite3
 import subprocess
 import sys
 
+from .github import CheckPublicationUnconfirmed
+from .policy_schema import InvalidConfiguration
+
 
 class TelemetryUnavailable(ValueError):
     """The requested optional telemetry runtime is not installed."""
@@ -27,7 +30,9 @@ def telemetry_provider(stream):
 
 
 def failure(command, exc, *, remote_write_possible=False):
-    if isinstance(exc, TelemetryUnavailable):
+    if isinstance(exc, InvalidConfiguration):
+        code = 'INVALID_CONFIGURATION'
+    elif isinstance(exc, TelemetryUnavailable):
         code = 'OPTIONAL_TELEMETRY_UNAVAILABLE'
     elif isinstance(exc, (sqlite3.Error, OSError, subprocess.SubprocessError)):
         code = 'OPERATIONAL_ERROR'
@@ -36,16 +41,21 @@ def failure(command, exc, *, remote_write_possible=False):
     else:
         code = 'UNEXPECTED_ERROR'
     # Raw exception messages may contain paths, tokens or inputs.
-    return {
+    result = {
         'command': command,
-        'status': 'ERROR',
+        'status': 'INVALID_CONFIGURATION' if code == 'INVALID_CONFIGURATION' else 'ERROR',
         'decision': 'BLOCK',
         'authorized': False,
+        'merged': False,
         'merge_authority': False,
         'production_ready': False,
         'reason': code,
         'remote_state': 'NOT_CONFIRMED' if remote_write_possible else 'NOT_ASSESSED',
     }
+    if isinstance(exc, CheckPublicationUnconfirmed):
+        result['remote_state'] = 'NOT_CONFIRMED'
+        result['publication'] = exc.correlation
+    return result
 
 
 def emit_failure(command, exc, *, remote_write_possible=False):

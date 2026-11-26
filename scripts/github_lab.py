@@ -6,7 +6,7 @@ from functools import partial
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 from intent_merge.core import digest
-from intent_merge.github import policy_from,preflight
+from intent_merge.github import policy_from,preflight,validate_check_response,positive_id
 from intent_merge.operational import CONTROLS,NAME,Journal,installation_client,work_once
 from intent_merge.hardening import strict_gate
 
@@ -17,7 +17,9 @@ def save(path,data):
     with path.open('x') as f:json.dump(data,f,indent=2);f.flush();os.fsync(f.fileno())
 
 def verify_remote(c,app_id,head,name,external,conclusion,id=None):
-    if not (type(c.get('id')) is int and (id is None or c['id']==id) and c.get('app',{}).get('id')==app_id and c.get('head_sha')==head and c.get('name')==name and c.get('external_id')==external and c.get('status')=='completed' and c.get('conclusion')==conclusion):raise ValueError('remote check identity or conclusion mismatch')
+    expected = {'head_sha': head, 'name': name, 'external_id': external,
+                'status': 'completed', 'conclusion': conclusion}
+    validate_check_response(c, expected, app_id, check_id=id)
     return {k:c.get(k) for k in ('id','name','head_sha','external_id','status','conclusion','html_url')}|{'app_id':app_id}
 
 def lab_negative(client,policy,pr,app_id,out,publish):
@@ -44,6 +46,8 @@ def transport(client,policy,pr,app_id,out):
     # Guard against accidentally making this check required in an active ruleset.
     # Public repository ruleset reads require no administration write permission.
     for item in client.pages(prefix+'/rulesets'):
+        if not isinstance(item, dict) or not positive_id(item.get('id')):
+            raise ValueError('invalid ruleset identity')
         rule=client.request(prefix+'/rulesets/'+str(item['id']))
         for entry in rule.get('rules',[]):
             if entry.get('type')=='required_status_checks' and any(c.get('context')==TRANSPORT for c in entry['parameters']['required_status_checks']):raise ValueError('transport check must never be required')

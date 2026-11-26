@@ -11,9 +11,9 @@ import re
 import tempfile
 from pathlib import Path
 
-from .approval_registry import PROFILE as REGISTRY_PROFILE
-from .approvals import PROFILE as APPROVAL_PROFILE
-from .path_policy import SEGMENT_V2
+from .core import unique_json_members
+from .evidence_inventory import evidence_files, regular_file
+from .evidence_profile import CURRENT
 from .runner import audit
 
 SYNTHETIC = "synthetic-historical-v1"
@@ -38,24 +38,15 @@ def _require(condition, message):
 
 
 def _read(path, limit):
-    path = Path(path)
-    _require(not path.is_symlink() and path.is_file(), "expected regular file")
+    path = regular_file(path)
     with path.open("rb") as file:
         data = file.read(limit + 1)
     _require(len(data) <= limit, "audit artifact too large")
     return data
 
 
-def _unique_pairs(pairs):
-    result = {}
-    for key, value in pairs:
-        _require(key not in result, "duplicate JSON member")
-        result[key] = value
-    return result
-
-
 def _decode(data):
-    return json.loads(data.decode("utf-8"), object_pairs_hook=_unique_pairs)
+    return json.loads(data.decode("utf-8"), object_pairs_hook=unique_json_members)
 
 
 def _pinned(path, expected):
@@ -83,9 +74,9 @@ def _historical_result(result, profile):
             "production_ready": False}
 
 
-def audit_synthetic(out, anchor_path, trust_path):
+def audit_synthetic(out, anchor_path, trust_path, *, profile=CURRENT):
     """Compatibility mode; trust is not independently established."""
-    return _historical_result(audit(out, anchor_path, trust_path), SYNTHETIC)
+    return _historical_result(audit(out, anchor_path, trust_path, profile=profile), SYNTHETIC)
 
 
 def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
@@ -103,9 +94,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
     _public_trust(_decode(trust_bytes))
 
     source = Path(out)
-    ev = source / "evidence"
-    _require(not source.is_symlink() and source.is_dir() and not ev.is_symlink()
-             and ev.is_dir(), "invalid audit directory")
+    files = evidence_files(source)
     manifest_bytes = _read(source / "manifest.json", MAX_METADATA)
     _require(_sha(manifest_bytes) == anchor["manifest"], "manifest anchor mismatch")
     manifest = _decode(manifest_bytes)
@@ -114,7 +103,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
     for name, digest in manifest.items():
         _require(isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,128}", name)
                  and name not in {".", ".."} and _hex(digest), "invalid manifest entry")
-    _require({p.name for p in ev.iterdir()} == set(manifest), "artifact inventory mismatch")
+    _require(files.keys() == manifest.keys(), "artifact inventory mismatch")
 
     # The exact checked bytes, not the caller's mutable files, reach the auditor.
     # This is a private temporary copy, not a hostile same-user security boundary.
@@ -124,7 +113,7 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
         staged_ev.mkdir()
         total = 0
         for name, digest in manifest.items():
-            data = _read(ev / name, MAX_ARTIFACT)
+            data = _read(files[name], MAX_ARTIFACT)
             total += len(data)
             _require(total <= MAX_TOTAL, "audit snapshot too large")
             _require(_sha(data) == digest, "artifact integrity mismatch")
@@ -137,11 +126,6 @@ def audit_anchored(out, anchor_path, trust_path, *, expected_anchor_sha256,
         first = _decode(ledger[0])
         _require(isinstance(first, dict) and first.get("kind") == "intent_registered"
                  and isinstance(first.get("payload"), dict), "invalid initial ledger event")
-        init = first["payload"]
-        _require(init.get("path_semantics") == SEGMENT_V2
-                 and init.get("approval_profile") == APPROVAL_PROFILE
-                 and init.get("challenge_profile") == REGISTRY_PROFILE,
-                 "anchored audit requires current lab profiles")
         result = audit(stage, stage / "anchor.json", stage / "approval-trust.json")
     return {**_historical_result(result, ANCHORED), "pins_verified": True,
             "anchor_sha256": expected_anchor_sha256,

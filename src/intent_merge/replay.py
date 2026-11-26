@@ -4,10 +4,12 @@ No approvals are re-signed, no merges are executed, no future outcome is predict
 from __future__ import annotations
 import json
 from pathlib import Path
+from .evidence_profile import CURRENT
 from .bundle import verify
-from .core import digest, load_config, verified_actors, evaluate_decision
-from .path_policy import LEGACY_V1
-from .approval_registry import PROFILE as REGISTRY_PROFILE, gate_decision, verify_recorded_claim
+from .core import digest, load_config, load_user_config, verified_actors, evaluate_decision
+from .policy_schema import InvalidConfiguration, validate_local_policy
+from .path_policy import LEGACY_V1, SEGMENT_V2
+from .approval_registry import gate_decision, verify_recorded_claim
 
 DECISION_FIELDS={'required_checks','protected_paths','risk_rules'}
 
@@ -25,16 +27,25 @@ def validate_proposal(old, new):
     return sorted(changed)
 
 
-def replay(bundles, public_key, proposed_policy):
-    proposed=load_config(proposed_policy); rows=[]; seen=set()
+def replay(bundles, public_key, proposed_policy, *, profile=CURRENT):
+    proposed=load_user_config(proposed_policy); rows=[]; seen=set()
+    try:
+        validate_local_policy(proposed)
+    except ValueError:
+        raise InvalidConfiguration('invalid_proposed_policy') from None
+    semantics = SEGMENT_V2 if profile == CURRENT else LEGACY_V1
     for bundle in bundles:
-        bundle=Path(bundle); verified=verify(bundle,public_key); ev=bundle/'evidence'
+        bundle=Path(bundle); verified=verify(bundle,public_key,profile=profile); ev=bundle/'evidence'
         if verified['ledger_root'] in seen: raise ValueError('duplicate historical evidence')
         seen.add(verified['ledger_root'])
-        spec=load_config(ev/'spec.toml'); old=load_config(ev/'policy.toml'); changed=validate_proposal(old,proposed)
+        spec=load_config(ev/'spec.toml'); old=load_config(ev/'policy.toml')
+        try:
+            changed=validate_proposal(old,proposed)
+        except ValueError as exc:
+            raise InvalidConfiguration(str(exc)) from None
         events=[json.loads(line) for line in (ev/'ledger.jsonl').read_text().splitlines()]
         decision=next(e['payload'] for e in events if e['kind']=='policy_decision'); i=decision['inputs']; actual=decision['decision']
-        actors=verified_actors(old,i['binding'],i['approvals'],json.loads((bundle/'approval-trust.json').read_text()),i['author'],approval_context=i.get('approval_context'),_historical_semantics=events[0]['payload'].get('path_semantics',LEGACY_V1))
+        actors=verified_actors(old,i['binding'],i['approvals'],json.loads((bundle/'approval-trust.json').read_text()),i['author'],approval_context=i.get('approval_context'),_historical_semantics=semantics)
         # Rebind only the policy digest in the *hypothetical* input. Preserve every
         # historical mismatch and never treat original signatures as new approvals.
         binding={**i['binding']}
@@ -43,8 +54,8 @@ def replay(bundles, public_key, proposed_policy):
         eval_binding=i['eval_binding']
         if eval_binding is not None and i['binding'].get('policy')==digest(old) and eval_binding.get('policy')==digest(old):
             eval_binding={**eval_binding,'policy':digest(proposed)}
-        candidate=evaluate_decision(spec,proposed,i['paths'],i['checks'],binding,actors,termination=i['termination'],current_head=i['current_head'],current_base=i['current_base'],eval_binding=eval_binding,_historical_semantics=events[0]['payload'].get('path_semantics', LEGACY_V1))
-        if events[0]["payload"].get("challenge_profile") == REGISTRY_PROFILE:
+        candidate=evaluate_decision(spec,proposed,i['paths'],i['checks'],binding,actors,termination=i['termination'],current_head=i['current_head'],current_base=i['current_base'],eval_binding=eval_binding,_historical_semantics=semantics)
+        if profile == CURRENT:
             candidate = gate_decision(candidate, verify_recorded_claim(events, i, json.loads((bundle/"approval-trust.json").read_text())))
         state=('unchanged_allow' if actual['authorized'] else 'unchanged_deny') if actual['authorized']==candidate['authorized'] else ('would_allow' if candidate['authorized'] else 'would_deny')
         if not changed and actual!=candidate: raise ValueError('identity replay mismatch')

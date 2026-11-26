@@ -1,20 +1,24 @@
 import argparse, json
 from pathlib import Path
+from functools import partial
+from .core import load_user_json_config
+from .evidence_profile import CURRENT, PROFILES
 from .runner import run, SCENARIOS
 from .trust import audit_synthetic, audit_anchored
 from .checkpoints import normalize_session
 from .bundle import keygen, pack, verify
 from .replay import replay
-from .github import GitHub, policy_from, preflight
+from .github import GitHub, policy_from, preflight, positive_id
 from .operational import installation_client
+from .policy_schema import InvalidConfiguration
 from .cli_errors import emit_failure
 from .agent_import import import_agent
 from .explorer import render
 from .benchmark import generate, evaluate_corpus, write_reports
-from .autonomy import replay as replay_operations, gate as autonomy_gate
+from .autonomy import replay as replay_operations, gate as autonomy_gate, validate_config as validate_autonomy_config
 from .operations_demo import study
 from .changeset_demo import study as changeset_study
-from .changeset import verify_receipt
+from .changeset import verify_receipt, order
 
 def main():
     p = argparse.ArgumentParser(description='Intent-to-Merge Governance reference harness')
@@ -46,10 +50,14 @@ def main():
     og=sub.add_parser('autonomy-gate',help='Evaluate extra eligibility gate on a signed synthetic bundle'); og.add_argument('--config',type=Path,required=True); og.add_argument('--events',type=Path,required=True); og.add_argument('--expected-root',required=True); og.add_argument('--bundle',type=Path,required=True); og.add_argument('--public-key',type=Path,required=True)
     cs=sub.add_parser('changeset-demo',help='Run local multi-repository contract and compensation study'); cs.add_argument('--out',type=Path,required=True)
     cv=sub.add_parser('changeset-verify',help='Verify signed local change-set receipt offline'); cv.add_argument('--config',type=Path,required=True); cv.add_argument('--receipt',type=Path,required=True); cv.add_argument('--expected-config-digest',required=True)
+    for name in ('audit', 'verify-bundle', 'policy-replay', 'explorer', 'autonomy-gate', 'benchmark-replay'):
+        sub.choices[name].add_argument('--profile', choices=PROFILES,
+            default=CURRENT,
+            help='Select verification semantics from trusted caller context')
     args = p.parse_args()
     try:
         if args.cmd=='demo': result = run(args.scenario,args.out,args.spec,args.policy,args.executor,args.image)
-        elif args.cmd=='audit': result = audit_synthetic(args.out,args.anchor,args.trust)
+        elif args.cmd=='audit': result = audit_synthetic(args.out,args.anchor,args.trust,profile=args.profile)
         elif args.cmd=='audit-anchored':
             result = audit_anchored(args.out, args.anchor, args.trust,
                 expected_anchor_sha256=args.expected_anchor_sha256,
@@ -57,14 +65,14 @@ def main():
         elif args.cmd=='normalize-session': result = normalize_session(json.loads(args.input.read_text()))
         elif args.cmd=='keygen': result=keygen(args.private_key,args.public_key)
         elif args.cmd=='bundle': result=pack(args.out,args.bundle,args.private_key)
-        elif args.cmd=='verify-bundle': result=verify(args.bundle,args.public_key)
-        elif args.cmd=='policy-replay': result=replay(args.bundle,args.public_key,args.policy)
+        elif args.cmd=='verify-bundle': result=verify(args.bundle,args.public_key,profile=args.profile)
+        elif args.cmd=='policy-replay': result=replay(args.bundle,args.public_key,args.policy,profile=args.profile)
         elif args.cmd=='github-preflight':
             policy = policy_from(args.policy)
-            if args.repo.lower() != policy['repository'].lower() or args.pr <= 0:
+            if args.repo.lower() != policy['repository'].lower() or not positive_id(args.pr):
                 raise ValueError('repository/PR does not match policy')
             if args.publish:
-                if not args.app_id or args.app_id <= 0 or not args.installation or args.installation <= 0 or args.app_key is None:
+                if not positive_id(args.app_id) or not positive_id(args.installation) or args.app_key is None:
                     raise ValueError('publication requires GitHub App installation credentials')
                 client = installation_client(args.app_id, args.installation, args.app_key, policy['repository'])
             else:
@@ -73,15 +81,15 @@ def main():
                 client = GitHub()
             result = preflight(client, args.repo, args.pr, policy, publish=args.publish)
         elif args.cmd=='import-agent': result=import_agent(args.provider,args.input,args.agent_id,args.head)
-        elif args.cmd=='explorer': result=render(args.bundle,args.public_key,args.output,pr_reports=args.pr_report,sessions=args.session)
+        elif args.cmd=='explorer': result=render(args.bundle,args.public_key,args.output,pr_reports=args.pr_report,sessions=args.session,profile=args.profile)
         elif args.cmd=='changeset-demo': result=changeset_study(args.out)
-        elif args.cmd=='changeset-verify': result=verify_receipt(json.loads(args.config.read_text()),json.loads(args.receipt.read_text()),args.expected_config_digest)
+        elif args.cmd=='changeset-verify': result=verify_receipt(load_user_json_config(args.config, partial(order, historical=True)),json.loads(args.receipt.read_text()),args.expected_config_digest)
         elif args.cmd=='autonomy-demo': result=study(args.bundles,args.public_key,args.out)
-        elif args.cmd=='autonomy-replay': result=replay_operations(json.loads(args.config.read_text()),json.loads(args.events.read_text()),args.expected_root).summary()
-        elif args.cmd=='autonomy-gate': result=autonomy_gate(json.loads(args.config.read_text()),json.loads(args.events.read_text()),args.expected_root,args.bundle,args.public_key)
+        elif args.cmd=='autonomy-replay': result=replay_operations(load_user_json_config(args.config, validate_autonomy_config),json.loads(args.events.read_text()),args.expected_root).summary()
+        elif args.cmd=='autonomy-gate': result=autonomy_gate(load_user_json_config(args.config, validate_autonomy_config),json.loads(args.events.read_text()),args.expected_root,args.bundle,args.public_key,profile=args.profile)
         elif args.cmd=='benchmark': result=generate(args.out,args.spec,args.policy,args.workers)
         elif args.cmd=='benchmark-replay':
-            result=evaluate_corpus(args.bundles,args.public_key); args.output.mkdir(parents=True,exist_ok=False); write_reports(result,args.output)
+            result=evaluate_corpus(args.bundles,args.public_key,profile=args.profile); args.output.mkdir(parents=True,exist_ok=False); write_reports(result,args.output)
         else:
             ev=args.out/'evidence'; report=json.loads((ev/'report.json').read_text()); coverage=report['requirement_coverage']
             if args.requirement:
@@ -89,7 +97,9 @@ def main():
                 if not coverage: raise ValueError('unknown requirement')
             result={'verified_requirements':coverage,'drift':json.loads((ev/'intent-drift.json').read_text()),'decision':report['decision'],'note':'Recorded evidence; run audit for integrity verification.'}
         print(json.dumps(result,indent=2))
+        if args.cmd == 'demo' and result.get('decision', {}).get('status') == 'INVALID_CONFIGURATION':
+            p.exit(2)
     except Exception as exc:
         emit_failure(args.cmd, exc, remote_write_possible=getattr(args, 'publish', False))
-        p.exit(1)
+        p.exit(2 if isinstance(exc, InvalidConfiguration) else 1)
 if __name__ == '__main__': main()

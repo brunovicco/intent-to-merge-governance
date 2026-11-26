@@ -2,6 +2,7 @@ import copy, json, tempfile, unittest
 from pathlib import Path
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
+from intent_merge.evidence_profile import HISTORICAL_V1
 from intent_merge.autonomy import ROLES, ZERO, replay, sign_event, gate, validate_case
 from intent_merge.core import digest
 from intent_merge.verification import expected
@@ -70,7 +71,7 @@ class AutonomyTests(unittest.TestCase):
     def test_no_arbitrary_executable_eval(self):
         with self.assertRaises(ValueError): validate_case([['exec','arbitrary']])
     def test_gate_never_bypasses_base(self):
-        r=gate(self.cfg,[],ZERO,CORPUS/'bundles/missing-approval',CORPUS/'signer.pub'); self.assertIn('base_policy_denied',r['reasons']); self.assertFalse(r['merge_authority'])
+        r=gate(self.cfg,[],ZERO,CORPUS/'bundles/missing-approval',CORPUS/'signer.pub', profile=HISTORICAL_V1); self.assertIn('base_policy_denied',r['reasons']); self.assertFalse(r['merge_authority'])
     def test_bundle_scope_pin(self):
         self.cfg['scope']['harness']='0'*64
-        with self.assertRaisesRegex(ValueError,'scope pins'): gate(self.cfg,[],ZERO,CORPUS/'bundles/happy',CORPUS/'signer.pub')
+        with self.assertRaisesRegex(ValueError,'scope pins'): gate(self.cfg,[],ZERO,CORPUS/'bundles/happy',CORPUS/'signer.pub', profile=HISTORICAL_V1)

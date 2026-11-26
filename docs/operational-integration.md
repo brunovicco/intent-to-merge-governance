@@ -89,3 +89,11 @@ Install the `telemetry` extra. `--trace-console` exports OpenTelemetry spans to 
 - GitHub App installation tokens: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-an-installation-access-token-for-a-github-app
 - GitHub webhook validation: https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries
 - Codex noninteractive execution: https://developers.openai.com/cookbook/examples/codex/build_iterative_repair_loops_with_codex
+
+### GitHub check collection limits
+
+Preflight and publication reconciliation request `filter=all` for the exact commit SHA. Preflight selects the highest check-run ID for the required name, App and head. Reconciliation checks for multiple records carrying the publication's external ID, including older runs. Both require consistent counts and distinct, structurally valid identities across up to 30 pages of 100 runs. A nullable App cannot qualify as a trusted producer.
+
+Before listing runs, ITM probes the unfiltered check-suite count and rejects refs that advertise 1,000 or more suites. GitHub limits the ref-level run endpoint to the most recent 1,000 suites and may delete older same-name runs within a suite. This procedure validates the collection GitHub exposes to the configured credentials under those limits. Stable counts and distinct IDs do not establish an atomic snapshot, and concurrent changes that preserve counts may go undetected. Count changes and invalid responses stop evaluation with a recoverable observation error. Reconciliation retains the original publication identity so operators can retry observation without repeating the creation POST.
+
+[GitHub check runs](https://docs.github.com/en/rest/checks/runs) · [GitHub check suites](https://docs.github.com/en/rest/checks/suites)
