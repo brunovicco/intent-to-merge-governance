@@ -10,7 +10,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from .core import canonical, digest
-from .github import positive_id, validate_check_response
+from .github import GitHubObservationError, positive_id, validate_check_response
 from .policy_schema import InvalidConfiguration
 from .operational import (
     CONTROLS, require, gate, checked_publication, correlated_check, reconciliation_required,
@@ -131,10 +131,15 @@ def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, con
             if state == 'UNCERTAIN':
                 try:
                     check_id, matches = correlated_check(client, intent)
-                    checked_publication(row, client, app_id, installation_id)
-                except Exception:
+                except (GitHubObservationError, OSError):
                     results.append({'id': job_id, **reconciliation_required(
                         row, 'remote_observation_unavailable', **timing())})
+                    continue
+                try:
+                    checked_publication(row, client, app_id, installation_id)
+                except (ValueError, KeyError, TypeError):
+                    results.append({'id': job_id, **reconciliation_required(
+                        row, 'publication_identity_unavailable_or_mismatched', **timing())})
                     continue
                 sample()
                 if check_id is None:
@@ -150,11 +155,12 @@ def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, con
 
             path = f"/repos/{intent['repository']}/check-runs/{check_id}"
             try:
-                require(positive_id(check_id), 'invalid stored check ID')
+                if not positive_id(check_id):
+                    raise GitHubObservationError('invalid stored check ID')
                 remote = client.request(path)
                 validate_check_response(remote, intent, intent['app_id'], check_id=check_id,
                                         conclusions=BLOCKED_CONCLUSIONS | {'success'})
-            except Exception:
+            except (GitHubObservationError, OSError):
                 results.append({'id': job_id, 'status': 'REMOTE_STATE_UNKNOWN',
                                 'external_id': intent['external_id'], **timing(),
                                 'action': 'Inspect the correlated check before revocation.'})
@@ -176,23 +182,31 @@ def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, con
                 results.append({'id': job_id, 'status': 'ALREADY_BLOCKED'})
                 continue
 
+            preflight_failure = {}
             if (state != 'REVOCATION_UNCERTAIN' and old.get('profile') == 'github-strict-snapshot'
                     and checked_at is not None and type(expiry) is int and checked_at < expiry):
                 try:
                     current = strict_gate(client, row, policy, assertion_dir, verifier_key, checked_at,
                                           receipt_dir=receipt_dir, control_trust=control_trust)
-                    checked_publication(row, client, app_id, installation_id)
+                except (GitHubObservationError, OSError):
+                    sample()
+                    preflight_failure = {'reason': 'preflight_observation_unavailable'}
+                else:
+                    try:
+                        checked_publication(row, client, app_id, installation_id)
+                    except (ValueError, KeyError, TypeError):
+                        results.append({'id': job_id, **reconciliation_required(
+                            journal.get(job_id), 'publication_identity_unavailable_or_mismatched', **timing())})
+                        continue
                     same_evidence = current['decision'] == 'PASS' and all(
                         old.get(k) == current.get(k) for k in
                         (*BINDINGS, 'assertion_digest', 'control_receipts', 'gates', 'expires_at')
                     )
-                except (ValueError, KeyError, TypeError, OSError):
-                    same_evidence = False
-                final_at = sample()
-                if same_evidence and publication_block(old, current, final_at) is None:
-                    status = 'WOULD_RECONCILE' if state == 'UNCERTAIN' and not apply else 'CURRENT'
-                    results.append({'id': job_id, 'status': status})
-                    continue
+                    final_at = sample()
+                    if same_evidence and publication_block(old, current, final_at) is None:
+                        status = 'WOULD_RECONCILE' if state == 'UNCERTAIN' and not apply else 'CURRENT'
+                        results.append({'id': job_id, 'status': status})
+                        continue
 
             if not apply:
                 status = 'WOULD_REVOKE'
@@ -213,15 +227,17 @@ def sweep(journal, client, policy, assertion_dir, verifier_key, receipt_dir, con
                     }, method='PATCH')
                     validate_check_response(response, {**intent, 'conclusion': 'failure'},
                                             intent['app_id'], check_id=check_id)
-                except Exception:
+                except (GitHubObservationError, OSError):
                     journal.transition(job_id, 'REVOKING', 'REVOCATION_UNCERTAIN')
                     results.append({'id': job_id, 'status': 'REVOCATION_UNCERTAIN',
-                                    'external_id': intent['external_id'], **timing(),
+                                    'external_id': intent['external_id'], **timing(), **preflight_failure,
                                     'action': 'Observe the same check before confirming revocation.'})
                     continue
                 journal.transition(job_id, 'REVOKING', 'DONE')
                 status = 'REVOKED'
-            results.append({'id': job_id, 'status': status})
+            if preflight_failure:
+                preflight_failure['action'] = 'Refresh GitHub preflight before evaluating again.'
+            results.append({'id': job_id, 'status': status, **preflight_failure})
     return results
 
 

@@ -123,3 +123,79 @@ class PublicationContractTests(unittest.TestCase):
             self.assertFalse(result['decision']['authorized'])
             self.assertEqual(json.loads((out/'configuration-rejection.jsonl').read_text())['kind'], 'configuration_rejected')
             self.assertFalse((out/'repo').exists())
+
+    def assert_bad_observations(self, messages):
+        for route, payload, message in messages:
+            with self.subTest(route=route, payload_type=type(payload)):
+                client = GitHub('fixture-token', installation_app_id=789)
+
+                def request(path, body=None):
+                    self.assertIsNone(body, 'invalid observations must stop before POST')
+                    if path.split('?')[0].endswith(route):
+                        return payload
+                    if '/check-runs?' in path:
+                        return {'check_runs': self.api.checks}
+                    if '/files?' in path:
+                        return self.api.files
+                    if '/reviews?' in path:
+                        return self.api.reviews
+                    return self.api.pr
+
+                with patch.object(client, 'request', side_effect=request):
+                    with self.assertRaisesRegex(ValueError, '^' + message + '$') as caught:
+                        preflight(client, 'OWNER/REPO', 1, self.policy, publish=True)
+                self.assertEqual(type(caught.exception).__name__, 'GitHubObservationError')
+
+    def test_review_containers_and_nested_fields_are_validated(self):
+        review = self.api.reviews[0]
+        self.assert_bad_observations([
+            ('/reviews', payload, 'invalid GitHub collection') for payload in ({}, None, 'private fixture')
+        ] + [
+            ('/reviews', [payload, *self.api.reviews], 'invalid review observation')
+            for payload in (None, 'private fixture', 7, {'id': 10}, {**review, 'id': 10, 'user': None},
+                            {**review, 'id': 10, 'user': 'private fixture'},
+                            {**review, 'id': 10, 'user': {'id': True, 'type': 'User'}},
+                            {**review, 'id': 10, 'user': {'id': 1}},
+                            {**review, 'id': 10, 'user': {'id': 1, 'type': 1}},
+                            {**review, 'id': 10, 'state': []},
+                            {'id': 10, 'user': review['user'], 'state': 'APPROVED'},
+                            {**review, 'id': 10, 'commit_id': {'unexpected': 1}})
+        ])
+
+    def test_pr_file_and_prerequisite_containers_are_validated(self):
+        pr = self.api.pr
+        self.assert_bad_observations([
+            ('/pulls/1', payload, 'invalid PR observation')
+            for payload in (None, [], {**pr, 'user': None}, {**pr, 'head': []},
+                            {**pr, 'head': {**pr['head'], 'repo': None}},
+                            {**pr, 'base': {**pr['base'], 'sha': 1}},
+                            {**pr, 'base': {**pr['base'], 'ref': 1}},
+                            {**pr, 'base': {**pr['base'], 'repo': {'full_name': []}}})
+        ] + [
+            ('/files', [payload], 'invalid PR file observation')
+            for payload in (None, {}, {'filename': 'app/payments.py', 'status': {}},
+                            {'filename': 'app/payments.py', 'status': 'unknown'},
+                            {'filename': 'app/payments.py', 'status': 'renamed', 'previous_filename': []})
+        ] + [
+            ('/check-runs', payload, 'invalid GitHub collection')
+            for payload in ([], None, {}, {'check_runs': {}})
+        ])
+
+    def test_malformed_prerequisite_record_cannot_leave_a_passing_gate(self):
+        for payload in (None, {}, {'name': []}, {'name': 'trusted-ci', 'app': None}):
+            with self.subTest(payload=payload):
+                with patch.object(self.api, 'checks', [*self.api.checks, payload]):
+                    report = preflight(self.api, 'OWNER/REPO', 1, self.policy)
+                self.assertEqual(report['decision'], 'BLOCK')
+                self.assertIn('check:trusted-ci', report['reasons'])
+        self.assertEqual(preflight(self.api, 'OWNER/REPO', 1, self.policy)['decision'], 'PASS')
+
+    def test_malformed_wire_json_has_a_redacted_domain_error(self):
+        client = GitHub('fixture-token')
+        for raw in (b'{"private fixture":}', b'{"private fixture":0,"private fixture":1}', b'\xff'):
+            with self.subTest(raw=raw):
+                with patch.object(client.opener, 'open') as opener:
+                    opener.return_value.__enter__.return_value.read.return_value = raw
+                    with self.assertRaisesRegex(ValueError, '^invalid GitHub response JSON$') as caught:
+                        client.request('/repos/OWNER/REPO/pulls/1')
+                self.assertEqual(type(caught.exception).__name__, 'GitHubObservationError')

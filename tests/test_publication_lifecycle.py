@@ -1,16 +1,21 @@
 """Adversarial transport observations and SQLite recovery boundaries."""
 import base64
 import copy
+import io
 import hashlib
 import hmac
 import json
 import sqlite3
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from functools import partial
 from pathlib import Path
 from unittest.mock import patch
 
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+from intent_merge import ops_cli
 from intent_merge.core import canonical
 from intent_merge.github import CheckPublicationUnconfirmed, preflight
 from intent_merge.hardening import strict_gate, sweep
@@ -385,3 +390,116 @@ class PublicationLifecycleTests(unittest.TestCase):
             self.assertEqual(self.sweep()['status'], 'REMOTE_STATE_UNKNOWN')
         self.assertEqual(self.journal.get(self.job['id'])['state'], 'UNCERTAIN')
         self.assertEqual((len(self.posts), len(self.patches)), (1, 0))
+
+    def exercise_batch(self, expiries, malformed, *, wrong_id=None, lost_id=None, apply=True, cli=False):
+        """Supply observations keyed by the exact check GET that starts each row."""
+        f = self.fixture
+        for i, expiry in enumerate(expiries):
+            f.setup_evidence(expires_at=NOW+expiry)
+            if i:
+                self.journal.enqueue({**self.job, 'id': f'row-{i + 1}'})
+            self.assertEqual(self.publish()['decision'], 'PASS')
+        original = self.journal.list()
+
+        # Use the last publication's evidence for the well-formed row.
+        active = None
+        clock = NOW
+        pages = self.api.pages
+        patched = []
+
+        def request(path, payload=None, *, method=None):
+            nonlocal active, clock
+            self.assertFalse(path.endswith('/check-runs'), 'sweep must never create a check')
+            if '/check-runs/' in path:
+                check_id = int(path.rsplit('/', 1)[1])
+                if method == 'PATCH':
+                    patched.append(check_id)
+                    if check_id == lost_id:
+                        self.revocation_fault = 'lost'
+                    try:
+                        return self.request(path, payload, method=method)
+                    finally:
+                        self.revocation_fault = None
+                active = check_id
+                clock = NOW+20 if check_id > 41 else NOW+5
+                response = self.request(path)
+                if check_id == wrong_id:
+                    response['external_id'] = 'unrelated'
+                return response
+            return self.request(path, payload, method=method)
+
+        def observe_pages(path, key=None):
+            if active in malformed and path.endswith('/reviews'):
+                return iter([{'id': 11, 'user': None, 'state': 'APPROVED'}])
+            return pages(path, key)
+
+        with patch.object(self.api, 'request', side_effect=request), \
+                patch.object(self.api, 'pages', side_effect=observe_pages), \
+                patch('intent_merge.hardening.time.time', side_effect=lambda: clock):
+            if cli:
+                results = self.cli_sweep()
+            else:
+                results = sweep(self.journal, self.api, self.policy, f.a, f.key.public_key(),
+                                f.r, f.trust, 77, installation_id=42, apply=apply)
+        fields = ('report', 'publication_intent', 'external_id', 'check_id')
+        self.assertEqual([{k: row[k] for k in fields} for row in original],
+                         [{k: row[k] for k in fields} for row in self.journal.list()])
+        self.assertEqual(len(self.posts), len(expiries))
+        return results, patched
+
+    def cli_sweep(self):
+        f = self.fixture
+        trust, key = f.root / 'trust.json', f.root / 'verifier.pub'
+        trust.write_text(json.dumps(f.trust))
+        key.write_bytes(f.key.public_key().public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo))
+        args = ['itm-ops', 'sweep', '--db', str(self.db), '--policy',
+                str(test_hardening.ROOT / 'examples/github-policy.toml'),
+                '--app-id', '77', '--installation', '42', '--app-key', str(key),
+                '--control-trust', str(trust), '--verifier-key', str(key),
+                '--assertions', str(f.a), '--receipts', str(f.r), '--publish']
+        out = io.StringIO()
+        with patch('sys.argv', args), patch.object(ops_cli, 'installation_client', return_value=self.api), \
+                redirect_stdout(out), self.assertRaises(SystemExit) as caught:
+            ops_cli.main()
+        self.assertEqual(caught.exception.code, 2)
+        return json.loads(out.getvalue())
+
+    def test_null_review_does_not_prevent_later_expired_revocation(self):
+        results, patched = self.exercise_batch([45, 20], {41})
+        self.assertEqual([r['status'] for r in results], ['REVOKED', 'REVOKED'])
+        self.assertEqual(results[0]['reason'], 'preflight_observation_unavailable')
+        self.assertEqual(patched, [41, 42])
+        self.assertEqual(self.remote['conclusion'], 'failure')
+
+    def test_mixed_batch_preserves_unresolved_outcomes_and_later_current(self):
+        results, patched = self.exercise_batch([45, 20, 50], {41}, lost_id=42, cli=True)
+        self.assertEqual([r['status'] for r in results], ['REVOKED', 'REVOCATION_UNCERTAIN', 'CURRENT'])
+        self.assertEqual(results[1]['external_id'], self.journal.get('row-2')['external_id'])
+        self.assertEqual(self.journal.get('row-2')['state'], 'REVOCATION_UNCERTAIN')
+        self.assertEqual(patched, [41, 42])
+
+    def test_malformed_final_row_preserves_prior_result(self):
+        results, patched = self.exercise_batch([50, 50], {42}, apply=False)
+        self.assertEqual([r['status'] for r in results], ['CURRENT', 'WOULD_REVOKE'])
+        self.assertEqual(results[1]['reason'], 'preflight_observation_unavailable')
+        self.assertTrue(results[1]['action'])
+        self.assertFalse(patched)
+
+    def test_unconfirmed_first_identity_preserves_correlation_and_continues(self):
+        results, patched = self.exercise_batch([45, 20], {41}, wrong_id=41)
+        self.assertEqual([r['status'] for r in results], ['REMOTE_STATE_UNKNOWN', 'REVOKED'])
+        self.assertEqual(results[0]['external_id'], self.journal.get(self.job['id'])['external_id'])
+        self.assertTrue(results[0]['action'])
+        self.assertEqual(patched, [42])
+        self.assertEqual(self.api.checks[-2]['conclusion'], 'success')
+
+    def test_systemic_journal_and_unexpected_evaluation_failures_propagate(self):
+        self.publish()
+        with patch.object(self.journal, 'transition', side_effect=sqlite3.OperationalError('fixture failure')):
+            with self.assertRaises(sqlite3.OperationalError):
+                self.sweep()
+        with patch('intent_merge.hardening.strict_gate', side_effect=TypeError('unexpected implementation fault')):
+            with self.assertRaises(TypeError):
+                self.sweep(now=NOW)
+        self.assertEqual(len(self.posts), 1)
+        self.assertFalse(self.patches)

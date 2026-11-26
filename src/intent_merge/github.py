@@ -4,6 +4,7 @@ import json, os, re
 from .path_policy import matches, validate_patterns, SEGMENT_V2
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
+from http.client import HTTPException
 from urllib.parse import quote
 from .core import digest, load_user_config, unique_json_members
 from .policy_schema import InvalidConfiguration
@@ -11,6 +12,7 @@ from .policy_schema import InvalidConfiguration
 SHA = re.compile(r'[0-9a-f]{40}')
 REPO = re.compile(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+')
 CHECK_NAME = 'ITM / PR preflight'
+FILE_STATUSES = ('added', 'removed', 'modified', 'renamed', 'copied', 'changed', 'unchanged')
 CHECK_STATUSES = {'queued', 'in_progress', 'completed', 'requested', 'waiting', 'pending'}
 CHECK_CONCLUSIONS = {'action_required', 'cancelled', 'failure', 'neutral', 'skipped',
                      'stale', 'startup_failure', 'success', 'timed_out'}
@@ -30,10 +32,14 @@ def positive_id(value):
     return type(value) is int and value > 0
 
 
+class GitHubObservationError(ValueError):
+    """An unavailable or invalid GitHub observation with a redacted message."""
+
+
 def check_observation(row):
     """Validate the identity and lifecycle fields returned by GitHub."""
     if not isinstance(row, dict):
-        raise ValueError('invalid check observation')
+        raise GitHubObservationError('invalid check observation')
     app, status, conclusion = row.get('app'), row.get('status'), row.get('conclusion')
     if (not positive_id(row.get('id')) or not isinstance(app, dict) or not positive_id(app.get('id'))
             or not isinstance(row.get('name'), str) or not row['name']
@@ -43,7 +49,7 @@ def check_observation(row):
             or (status == 'completed' and
                 (not isinstance(conclusion, str) or conclusion not in CHECK_CONCLUSIONS))
             or (status != 'completed' and conclusion is not None)):
-        raise ValueError('invalid check observation')
+        raise GitHubObservationError('invalid check observation')
     return row['id']
 
 
@@ -57,7 +63,7 @@ def validate_check_response(response, expected, app_id, *, check_id=None, conclu
             or any(field not in response or response[field] != expected[field] for field in fields)
             or response['conclusion'] not in conclusions
             or (check_id is not None and (not positive_id(check_id) or observed_id != check_id))):
-        raise ValueError('unexpected check response')
+        raise GitHubObservationError('unexpected check response')
     return observed_id
 
 
@@ -92,18 +98,29 @@ class GitHub:
         try:
             with self.opener.open(req, timeout=30) as response:
                 raw=response.read(16*1024*1024+1)
-                if len(raw)>16*1024*1024: raise ValueError('API response too large')
-                return json.loads(raw, object_pairs_hook=unique_json_members)
-        except HTTPError as e: raise ValueError(f'GitHub HTTP {e.code}') from None
-        except URLError: raise ValueError('GitHub transport failure') from None
+        except HTTPError as e:
+            raise GitHubObservationError(f'GitHub HTTP {e.code}') from None
+        except (URLError, OSError, HTTPException):
+            raise GitHubObservationError('GitHub transport failure') from None
+        if len(raw) > 16*1024*1024:
+            raise GitHubObservationError('GitHub response too large')
+        try:
+            return json.loads(raw, object_pairs_hook=unique_json_members)
+        except (ValueError, RecursionError):
+            raise GitHubObservationError('invalid GitHub response JSON') from None
+
     def pages(self,path,key=None):
         for page in range(1,31):
             data=self.request(path+('&' if '?' in path else '?')+f'per_page=100&page={page}')
-            rows=data[key] if key else data
-            if not isinstance(rows,list): raise ValueError('invalid GitHub collection')
+            if key is not None and not isinstance(data, dict):
+                raise GitHubObservationError('invalid GitHub collection')
+            rows = data if key is None else data.get(key)
+            if not isinstance(rows, list):
+                raise GitHubObservationError('invalid GitHub collection')
             yield from rows
             if len(rows)<100: return
-        raise ValueError('pagination limit reached; refusing incomplete evidence')
+        raise GitHubObservationError('pagination limit reached; refusing incomplete evidence')
+
 
 def policy_from(path):
     p = load_user_config(path)
@@ -139,32 +156,82 @@ def validate_policy(p):
         ids.update(members)
     return p
 
+def pr_side(side):
+    if isinstance(side, dict) and isinstance(side.get('repo'), dict):
+        sha = side.get('sha')
+        name = side['repo'].get('full_name')
+        if isinstance(sha, str) and SHA.fullmatch(sha) and isinstance(name, str) and REPO.fullmatch(name):
+            return sha, name
+    raise GitHubObservationError('invalid PR observation')
+
+
 def identity(pr, number):
-    head, base = pr['head'], pr['base']
-    author, count, draft = pr['user']['id'], pr['changed_files'], pr['draft']
+    if not isinstance(pr, dict) or not isinstance(pr.get('user'), dict):
+        raise GitHubObservationError('invalid PR observation')
+    author, count, draft = pr['user'].get('id'), pr.get('changed_files'), pr.get('draft')
+    state = pr.get('state')
     if (not positive_id(author) or type(count) is not int or type(draft) is not bool
             or ('number' in pr and (not positive_id(pr['number']) or pr['number'] != number))
-            or pr['state'] not in ('open', 'closed')):
-        raise ValueError('invalid PR observation')
-    return (head['sha'], base['sha'], base['ref'], pr['state'], draft,
-            head['repo']['full_name'], base['repo']['full_name'], count, author)
+            or state not in ('open', 'closed')):
+        raise GitHubObservationError('invalid PR observation')
+    head, head_repo = pr_side(pr.get('head'))
+    base, base_repo = pr_side(pr.get('base'))
+    ref = pr['base'].get('ref')
+    if not isinstance(ref, str) or not ref:
+        raise GitHubObservationError('invalid PR observation')
+    return head, base, ref, state, draft, head_repo, base_repo, count, author
+
+
+def changed_paths(files, count):
+    names = set()
+    paths = set()
+    for item in files:
+        if not isinstance(item, dict):
+            raise GitHubObservationError('invalid PR file observation')
+        name, status, previous = item.get('filename'), item.get('status'), item.get('previous_filename')
+        if (not isinstance(name, str) or not name or status not in FILE_STATUSES
+                or (previous is not None and (not isinstance(previous, str) or not previous))):
+            raise GitHubObservationError('invalid PR file observation')
+        if status == 'renamed' and previous is None:
+            raise GitHubObservationError('rename missing source path')
+        names.add(name)
+        paths.add(name)
+        if previous is not None:
+            paths.add(previous)
+    if len(files) != count or len(names) != count:
+        raise GitHubObservationError('incomplete file inventory')
+    return sorted(paths)
 
 
 def latest_prerequisite(checks, rule, head):
     matching = []
-    try:
-        for row in checks:
-            if not isinstance(row, dict):
-                raise ValueError('invalid check collection')
-            if row.get('name') == rule['name']:
-                check_observation(row)
-                if row['app']['id'] == rule['app_id'] and row['head_sha'] == head:
-                    matching.append(row)
-        if len({row['id'] for row in matching}) != len(matching):
-            raise ValueError('ambiguous prerequisite checks')
-    except ValueError:
-        return {}
+    for row in checks:
+        if not isinstance(row, dict) or not isinstance(row.get('name'), str) or not row['name']:
+            raise GitHubObservationError('invalid check collection')
+        if row['name'] == rule['name']:
+            check_observation(row)
+            if row['app']['id'] == rule['app_id'] and row['head_sha'] == head:
+                matching.append(row)
+    if len({row['id'] for row in matching}) != len(matching):
+        raise GitHubObservationError('ambiguous prerequisite checks')
     return max(matching, key=lambda row: row['id'], default={})
+
+
+def validate_reviews(reviews):
+    review_ids = set()
+    for review in reviews:
+        if not isinstance(review, dict) or not isinstance(review.get('user'), dict):
+            raise GitHubObservationError('invalid review observation')
+        user, review_id = review['user'], review.get('id')
+        state, user_type, commit = review.get('state'), user.get('type'), review.get('commit_id')
+        if (not positive_id(review_id) or review_id in review_ids or not positive_id(user.get('id'))
+                or not isinstance(user_type, str) or not user_type
+                or state not in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED', 'COMMENTED', 'PENDING')
+                or (state != 'PENDING' and 'commit_id' not in review)
+                or (commit is not None and (not isinstance(commit, str) or not SHA.fullmatch(commit)))):
+            raise GitHubObservationError('invalid review observation')
+        review_ids.add(review_id)
+
 
 def preflight(client, repo, number, policy, *, publish=False):
     validate_policy(policy)
@@ -181,15 +248,12 @@ def preflight(client, repo, number, policy, *, publish=False):
         raise ValueError('installation repository mismatch')
     prefix='/repos/'+repo; route=prefix+f'/pulls/{number}'
     pr=client.request(route); before=identity(pr, number); head,base,ref,state,draft,head_repo,base_repo,count,author=before
-    if not SHA.fullmatch(head) or not SHA.fullmatch(base): raise ValueError('invalid Git SHA')
-    if base_repo.lower()!=repo.lower(): raise ValueError('base repository mismatch')
-    if head_repo.lower()!=repo.lower(): raise ValueError('fork PRs unsupported in v0.5')
-    if count<=0 or count>=3000: raise ValueError('unsupported file count')
-    files=list(client.pages(route+'/files'))
-    if len(files)!=count or any(not isinstance(f.get('filename'),str) or not f['filename'] for f in files) or len({f['filename'] for f in files})!=count: raise ValueError('incomplete file inventory')
-    paths=sorted({p for f in files for p in [f['filename'],f.get('previous_filename')] if p})
-    if any(f['status']=='renamed' and not f.get('previous_filename') for f in files): raise ValueError('rename missing source path')
+    if base_repo.lower()!=repo.lower(): raise GitHubObservationError('base repository mismatch')
+    if head_repo.lower()!=repo.lower(): raise GitHubObservationError('fork PRs unsupported in v0.5')
+    if count<=0 or count>=3000: raise GitHubObservationError('unsupported file count')
+    paths = changed_paths(list(client.pages(route+'/files')), count)
     reviews=list(client.pages(route+'/reviews'))
+    validate_reviews(reviews)
     checks=list(client.pages(prefix+f'/commits/{head}/check-runs?filter=all','check_runs'))
     reasons=[]; gates=[]
     def gate(name, passed):
@@ -199,26 +263,21 @@ def preflight(client, repo, number, policy, *, publish=False):
     for path in paths:
         gate('scope:'+path,matches(path,policy['allowed_paths']) and not matches(path,policy['protected_paths']))
     for rule in policy['required_checks']:
-        latest = latest_prerequisite(checks, rule, head)
+        try:
+            latest = latest_prerequisite(checks, rule, head)
+        except GitHubObservationError:
+            latest = {}
         gate('check:'+rule['name'],latest.get('status')=='completed' and latest.get('conclusion')=='success')
-    review_ids = set()
-    for review in reviews:
-        if (not positive_id(review.get('id')) or review['id'] in review_ids
-                or not positive_id(review['user'].get('id'))
-                or review.get('state') not in ('APPROVED', 'CHANGES_REQUESTED', 'DISMISSED',
-                                                'COMMENTED', 'PENDING')):
-            raise ValueError('invalid review observation')
-        review_ids.add(review['id'])
     latest_reviews={}
     for r in sorted(reviews,key=lambda x:x['id']):
         uid=r['user']['id']; status=r['state']
         if status in ('APPROVED','CHANGES_REQUESTED','DISMISSED'): latest_reviews[uid]=r
     approved={uid for uid,r in latest_reviews.items() if uid!=author and r['state']=='APPROVED' and r.get('commit_id')==head and r['user'].get('type')=='User'}
     for role, members in policy['required_roles'].items(): gate('approval:'+role,bool(approved.intersection(members)))
-    if identity(client.request(route), number)!=before: raise ValueError('PR changed during collection; retry')
+    if identity(client.request(route), number)!=before: raise GitHubObservationError('PR changed during collection; retry')
     report={'schema_version':'1.0','profile':'github-live-preflight','repository':repo,'pr':number,'head':head,'base':base,'base_ref':ref,'policy_digest':digest(policy),'paths':paths,'gates':gates,'reasons':reasons,'decision':'PASS' if not reasons else 'BLOCK','full_itm_authorization':False,'note':'PR preflight only; no verification of agent observations or full evidence bundle. GitHub enforces merge rules.'}
     if publish:
-        if identity(client.request(route), number)!=before: raise ValueError('PR changed before publication')
+        if identity(client.request(route), number)!=before: raise GitHubObservationError('PR changed before publication')
         payload={'name':CHECK_NAME,'head_sha':head,'status':'completed','conclusion':'failure' if reasons else 'success','external_id':digest(report),'output':{'title':'ITM preflight '+report['decision'],'summary':f'{sum(g["passed"] for g in gates)}/{len(gates)} gates passed. Base {base}. This is not full ITM merge authorization.'}}
         try:
             result = client.request(prefix+'/check-runs', payload)
